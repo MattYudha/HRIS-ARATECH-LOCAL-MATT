@@ -76,7 +76,7 @@
                         class="forgot-link"
                         style="font-size:14px; text-decoration:none;"
                     >
-                        {{ __('Forgot password?') }}
+                        {{ __('Forgot ya?') }}
                     </a>
                 @endif
             </div>
