@@ -1,0 +1,834 @@
+-- Generated MySQL schema from combined_hris_prod.sql (DBML-like)
+-- Target database: hrappsprod
+-- Import example: mysql -u <user> -p hrappsprod < hrapps_prod-fix.sql
+
+-- Select target database (prevents #1046 "No database selected" when importing)
+USE `hrappsprod`;
+
+CREATE TABLE IF NOT EXISTS `foundations` (
+  `foundation_id` varchar(8) not null,
+  `foundation_name` varchar(64) not null,
+  `email` varchar(64) not null,
+  `phone` int not null,
+  `address` text not null,
+  `status` int not null,
+  PRIMARY KEY (`foundation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `job_positions` (
+  `position_id` varchar(10) not null,
+  `level` varchar(20) null,
+  `salary_grade` decimal(10,2) null,
+  `title` varchar(50) null,
+  `description` text null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`position_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_types` (
+  `user_type_id` varchar(8) not null,
+  `user_type_name` varchar(32) not null,
+  `description` text not null,
+  PRIMARY KEY (`user_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `roles` (
+  `role_id` int not null,
+  `role_name` varchar(32) not null,
+  `description` text not null,
+  PRIMARY KEY (`role_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `list_menu_features` (
+  `menu_id` int not null,
+  `parent_id` int not null,
+  `caption_eng` varchar(64) not null,
+  `caption_indo` varchar(64) not null,
+  `seq_level` int not null,
+  `seq_order` int not null,
+  `icon` varchar(32) not null,
+  `url` varchar(128) not null,
+  `description` text not null,
+  PRIMARY KEY (`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `education_levels` (
+  `education_level_id` int not null,
+  `level` int not null,
+  `create_at` datetime not null,
+  `create_by` varchar(32) not null,
+  `update_at` datetime not null,
+  `update_by` int not null,
+  PRIMARY KEY (`education_level_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `pay_grade` (
+  `pay_grade_id` int not null,
+  `name` varchar(255) null,
+  `currency` varchar(255) null,
+  `pay_schedule` varchar(255) null,
+  PRIMARY KEY (`pay_grade_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `identity_types` (
+  `identity_types_id` int not null,
+  `identity_type_name` varchar(64) not null,
+  PRIMARY KEY (`identity_types_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `approval_types` (
+  `approval_type_id` varchar(255) not null,
+  `approval_type` varchar(255) not null,
+  `created_at` datetime not null,
+  `created_by` varchar(32) not null,
+  `updated_at` datetime not null,
+  `updated_by` varchar(255) not null,
+  PRIMARY KEY (`approval_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payroll_period` (
+  `period_id` int not null,
+  `period_code` varchar(255) not null,
+  `date_start` date not null,
+  `date_end` date not null,
+  `pay_date` date not null,
+  `status` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`period_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `pay_component` (
+  `component_id` int not null,
+  `code` varchar(255) not null,
+  `name` varchar(255) not null,
+  `type` varchar(255) not null,
+  `calc_basis` int not null,
+  `taxable` tinyint(1) not null,
+  `statutory` tinyint(1) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_period` (
+  `period_id` int not null,
+  `code` varchar(255) not null,
+  `name` varchar(255) not null,
+  `date_start` date not null,
+  `date_end` date not null,
+  `frequency` varchar(255) not null,
+  `status` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`period_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_scale` (
+  `scale_id` int not null,
+  `name` varchar(255) not null,
+  `min_value` decimal(15,2) not null,
+  `max_value` decimal(15,2) not null,
+  `step` decimal(15,2) not null,
+  `description` varchar(255) not null,
+  PRIMARY KEY (`scale_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_category` (
+  `category_id` int not null,
+  `code` varchar(255) not null,
+  `name` varchar(255) not null,
+  `description` varchar(255) not null,
+  PRIMARY KEY (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `inventory_categories` (
+  `id` int not null,
+  `name` varchar(255) not null,
+  `description` text not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `letter_templates` (
+  `id` int not null,
+  `name` varchar(255) not null,
+  `description` varchar(255) not null,
+  `content` longtext not null,
+  `type` varchar(255) not null,
+  `is_active` tinyint not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `letter_configurations` (
+  `id` int not null,
+  `company_name` varchar(255) not null,
+  `company_address` varchar(255) not null,
+  `company_phone` varchar(255) not null,
+  `company_email` varchar(255) not null,
+  `company_website` varchar(255) not null,
+  `letterhead_footer` text not null,
+  `letter_number_format` varchar(255) not null,
+  `current_number` int not null,
+  `is_active` tinyint not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `letter_archives` (
+  `id` int not null,
+  `month` int not null,
+  `year` int not null,
+  `total_letters` int not null,
+  `approved_letters` int not null,
+  `printed_letters` int not null,
+  `summary` longtext not null,
+  `generated_at` datetime not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cache` (
+  `key` varchar(255) not null,
+  `value` mediumtext not null,
+  `expiration` int not null,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `cache_locks` (
+  `key` varchar(255) not null,
+  `owner` varchar(255) not null,
+  `expiration` int not null,
+  PRIMARY KEY (`key`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `failed_jobs` (
+  `id` int not null,
+  `uuid` varchar(255) not null,
+  `connection` text not null,
+  `queue` text not null,
+  `payload` longtext not null,
+  `exception` longtext not null,
+  `failed_at` datetime not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `jobs` (
+  `id` int not null,
+  `queue` varchar(255) not null,
+  `payload` longtext not null,
+  `attempts` tinyint not null,
+  `reserved_at` int not null,
+  `available_at` int not null,
+  `created_at` int not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `job_batches` (
+  `id` varchar(255) not null,
+  `name` varchar(255) not null,
+  `total_jobs` int not null,
+  `pending_jobs` int not null,
+  `failed_jobs` int not null,
+  `failed_job_ids` longtext not null,
+  `options` mediumtext not null,
+  `cancelled_at` int not null,
+  `created_at` int not null,
+  `finished_at` int not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `migrations` (
+  `id` int not null,
+  `migration` varchar(255) not null,
+  `batch` int not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `password_reset_tokens` (
+  `email` varchar(255) not null,
+  `token` varchar(255) not null,
+  `created_at` datetime null,
+  PRIMARY KEY (`email`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `sessions` (
+  `id` varchar(255) not null,
+  `user_id` varchar(16) not null,
+  `ip_address` varchar(45) not null,
+  `user_agent` text not null,
+  `payload` longtext not null,
+  `last_activity` int not null,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `departments` (
+  `department_id` int not null,
+  `foundation_id` varchar(8) not null,
+  `department_name` varchar(32) not null,
+  `description` varchar(128) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `code` varchar(8) not null,
+  `parent_id` int not null,
+  `check_in` time not null,
+  `check_out` time not null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`department_id`),
+  CONSTRAINT `fk_departments_foundation_id` FOREIGN KEY (`foundation_id`) REFERENCES `foundations` (`foundation_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `users` (
+  `user_id` varchar(16) not null,
+  `foundation_id` varchar(8) not null,
+  `name` varchar(255) null,
+  `user_type_id` varchar(8) null,
+  `phone` varchar(255) null,
+  `password` varchar(255) null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `last_login` datetime null,
+  `profile_picture` varchar(255) null,
+  `email` varchar(255) null,
+  `email_verified_at` datetime null,
+  `active` tinyint(1) null,
+  `remember_token` varchar(100) not null,
+  PRIMARY KEY (`user_id`),
+  UNIQUE KEY `uniq_users_email` (`email`),
+  CONSTRAINT `fk_users_foundation_id` FOREIGN KEY (`foundation_id`) REFERENCES `foundations` (`foundation_id`),
+  CONSTRAINT `fk_users_user_type_id` FOREIGN KEY (`user_type_id`) REFERENCES `user_types` (`user_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `user_type_roles` (
+  `user_type_id` varchar(8) not null,
+  `role_id` int not null,
+  `menu` int not null,
+  `menu_id` int not null,
+  `role_status` tinyint(1) not null,
+  PRIMARY KEY (`user_type_id`, `role_id`, `menu_id`),
+  CONSTRAINT `fk_user_type_roles_user_type_id` FOREIGN KEY (`user_type_id`) REFERENCES `user_types` (`user_type_id`),
+  CONSTRAINT `fk_user_type_roles_role_id` FOREIGN KEY (`role_id`) REFERENCES `roles` (`role_id`),
+  CONSTRAINT `fk_user_type_roles_menu_id` FOREIGN KEY (`menu_id`) REFERENCES `list_menu_features` (`menu_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `category_approvals` (
+  `category_id` int not null,
+  `approval_type_id` varchar(255) not null,
+  `category` varchar(255) not null,
+  PRIMARY KEY (`category_id`),
+  CONSTRAINT `fk_category_approvals_approval_type_id` FOREIGN KEY (`approval_type_id`) REFERENCES `approval_types` (`approval_type_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `pay_grade_component` (
+  `pgc_id` int not null,
+  `pay_grade_id` int not null,
+  `component_id` int not null,
+  `default_amount` decimal(15,2) not null,
+  `default_rate` decimal(15,2) not null,
+  `is_active` tinyint(1) not null,
+  PRIMARY KEY (`pgc_id`),
+  CONSTRAINT `fk_pay_grade_component_pay_grade_id` FOREIGN KEY (`pay_grade_id`) REFERENCES `pay_grade` (`pay_grade_id`),
+  CONSTRAINT `fk_pay_grade_component_component_id` FOREIGN KEY (`component_id`) REFERENCES `pay_component` (`component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_scale_level` (
+  `level_id` int not null,
+  `scale_id` int not null,
+  `value` decimal(15,2) not null,
+  `label` varchar(255) not null,
+  `description` varchar(255) not null,
+  PRIMARY KEY (`level_id`),
+  CONSTRAINT `fk_kpi_scale_level_scale_id` FOREIGN KEY (`scale_id`) REFERENCES `kpi_scale` (`scale_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_template` (
+  `template_id` int not null,
+  `name` varchar(255) not null,
+  `description` varchar(255) not null,
+  `department_id` int not null,
+  `position_id` varchar(10) not null,
+  `pay_grade_id` int not null,
+  `scale_id` int not null,
+  `is_active` tinyint(1) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`template_id`),
+  CONSTRAINT `fk_kpi_template_scale_id` FOREIGN KEY (`scale_id`) REFERENCES `kpi_scale` (`scale_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_indicator` (
+  `indicator_id` int not null,
+  `category_id` int not null,
+  `code` varchar(255) not null,
+  `name` varchar(255) not null,
+  `description` varchar(255) not null,
+  `unit` varchar(255) not null,
+  `calc_method` varchar(255) not null,
+  `formula` varchar(255) not null,
+  `direction` varchar(255) not null,
+  `default_weight` decimal(15,2) not null,
+  `is_active` tinyint(1) not null,
+  PRIMARY KEY (`indicator_id`),
+  UNIQUE KEY `uniq_kpi_indicator_code` (`code`),
+  CONSTRAINT `fk_kpi_indicator_category_id` FOREIGN KEY (`category_id`) REFERENCES `kpi_category` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `inventories` (
+  `id` int not null,
+  `inventory_category_id` int not null,
+  `name` varchar(255) not null,
+  `description` text not null,
+  `quantity` int not null,
+  `location` varchar(255) not null,
+  `purchase_date` date not null,
+  `status` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_inventories_inventory_category_id` FOREIGN KEY (`inventory_category_id`) REFERENCES `inventory_categories` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employees` (
+  `employee_id` int not null,
+  `hire_date` date null,
+  `user_id` varchar(16) not null,
+  `fullname` varchar(100) not null,
+  `join_date` date not null,
+  `resign_date` date not null,
+  `emp_code` varchar(20) not null,
+  `gender` varchar(1) not null,
+  `npwp` varchar(20) not null,
+  `place_of_birth` varchar(32) not null,
+  `date_of_birth` date not null,
+  `marital_status` varchar(5) not null,
+  `religion_id` int not null,
+  `education_level_id` int not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `address` text null,
+  `phone_number` varchar(255) not null,
+  `email` varchar(255) not null,
+  `status` varchar(255) not null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`employee_id`),
+  CONSTRAINT `fk_employees_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_employees_education_level_id` FOREIGN KEY (`education_level_id`) REFERENCES `education_levels` (`education_level_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `document_identity` (
+  `id` int not null auto_increment,
+  `identity_type_id` int not null,
+  `user_id` varchar(16) not null,
+  `identity_number` varchar(20) not null,
+  `file_name` text not null,
+  `description` text not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_document_identity_identity_type_id` FOREIGN KEY (`identity_type_id`) REFERENCES `identity_types` (`identity_types_id`),
+  CONSTRAINT `fk_document_identity_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `bank_account` (
+  `bank_account_id` int not null,
+  `user_id` varchar(16) not null,
+  `bank_name` varchar(255) not null,
+  `account_no` varchar(255) not null,
+  `account_holder` varchar(255) not null,
+  `status` int not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`bank_account_id`),
+  CONSTRAINT `fk_bank_account_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `letters` (
+  `id` int not null,
+  `user_id` varchar(16) not null,
+  `approver_id` varchar(16) not null,
+  `letter_template_id` int not null,
+  `letter_number` varchar(255) not null,
+  `subject` varchar(255) not null,
+  `content` longtext not null,
+  `letter_type` varchar(255) not null,
+  `status` varchar(255) not null,
+  `created_date` date not null,
+  `approved_date` datetime not null,
+  `printed_date` datetime not null,
+  `notes` text not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_letters_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_letters_approver_id` FOREIGN KEY (`approver_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_letters_letter_template_id` FOREIGN KEY (`letter_template_id`) REFERENCES `letter_templates` (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `signatures` (
+  `id` int not null,
+  `user_id` varchar(16) not null,
+  `signable_type` varchar(255) not null,
+  `signable_id` int not null,
+  `signature_image` longtext not null,
+  `signature_hash` varchar(255) not null,
+  `signed_date` datetime not null,
+  `ip_address` varchar(255) not null,
+  `user_agent` varchar(255) not null,
+  `is_verified` tinyint not null,
+  `verification_token` varchar(255) not null,
+  `verified_at` datetime not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_signatures_user_id` FOREIGN KEY (`user_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_template_item` (
+  `template_item_id` int not null,
+  `template_id` int not null,
+  `indicator_id` int not null,
+  `weight` decimal(15,2) not null,
+  `target_value` decimal(15,2) not null,
+  `target_text` varchar(255) not null,
+  `baseline_value` decimal(15,2) not null,
+  PRIMARY KEY (`template_item_id`),
+  CONSTRAINT `fk_kpi_template_item_template_id` FOREIGN KEY (`template_id`) REFERENCES `kpi_template` (`template_id`),
+  CONSTRAINT `fk_kpi_template_item_indicator_id` FOREIGN KEY (`indicator_id`) REFERENCES `kpi_indicator` (`indicator_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employee_positions` (
+  `employee_position_id` int not null,
+  `employee_id` int not null,
+  `position_id` varchar(10) not null,
+  `department_id` int not null,
+  `start_date` date not null,
+  `end_date` date not null,
+  `sk_file_name` text not null,
+  `sk_number` varchar(32) not null,
+  `base_on_salary` int not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `pay_grade_id` int not null,
+  `is_supervisor` tinyint(1) not null,
+  PRIMARY KEY (`employee_position_id`),
+  CONSTRAINT `fk_employee_positions_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_employee_positions_position_id` FOREIGN KEY (`position_id`) REFERENCES `job_positions` (`position_id`),
+  CONSTRAINT `fk_employee_positions_department_id` FOREIGN KEY (`department_id`) REFERENCES `departments` (`department_id`),
+  CONSTRAINT `fk_employee_positions_pay_grade_id` FOREIGN KEY (`pay_grade_id`) REFERENCES `pay_grade` (`pay_grade_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employee_families` (
+  `nik` varchar(16) not null,
+  `no_kk` varchar(16) not null,
+  `fullname` varchar(64) not null,
+  `place_of_birth` varchar(32) not null,
+  `date_of_birth` date not null,
+  `employee_id` int not null,
+  `gender` varchar(1) not null,
+  `status_active` int not null,
+  `relationship` varchar(32) not null,
+  PRIMARY KEY (`nik`),
+  CONSTRAINT `fk_employee_families_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `attendance` (
+  `attendance_id` int not null,
+  `employee_id` int not null,
+  `status` varchar(255) not null,
+  `work_date` date not null,
+  `check_in` datetime not null,
+  `check_out` datetime not null,
+  `work_location` varchar(255) not null,
+  `notes` varchar(255) not null,
+  `lat` double not null,
+  `long` double not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`attendance_id`),
+  CONSTRAINT `fk_attendance_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `approval_requests` (
+  `approval_id` int not null,
+  `employee_id` int not null,
+  `approval_type_id` varchar(255) not null,
+  `approval_status` varchar(255) not null,
+  `approval_date` date not null,
+  `amount` int not null,
+  `attachment_url` varchar(255) not null,
+  `created_at` datetime not null,
+  `created_by` varchar(32) not null,
+  `updated_at` datetime not null,
+  `updated_by` varchar(255) not null,
+  `category_id` int not null,
+  `start_date` datetime not null,
+  `end_date` datetime not null,
+  `reason` text not null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`approval_id`),
+  CONSTRAINT `fk_approval_requests_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_approval_requests_approval_type_id` FOREIGN KEY (`approval_type_id`) REFERENCES `approval_types` (`approval_type_id`),
+  CONSTRAINT `fk_approval_requests_category_id` FOREIGN KEY (`category_id`) REFERENCES `category_approvals` (`category_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employee_pay_component` (
+  `epc_id` int not null,
+  `employee_id` int not null,
+  `component_id` int not null,
+  `amount_override` decimal(15,2) not null,
+  `rate_override` decimal(15,2) not null,
+  `effective_from` date not null,
+  `effective_to` date not null,
+  PRIMARY KEY (`epc_id`),
+  CONSTRAINT `fk_employee_pay_component_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_employee_pay_component_component_id` FOREIGN KEY (`component_id`) REFERENCES `pay_component` (`component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payslip` (
+  `payslip_id` int not null,
+  `employee_id` int not null,
+  `period_id` int not null,
+  `gross_amount` decimal(15,2) not null,
+  `total_deduction` decimal(15,2) not null,
+  `net_amount` decimal(15,2) not null,
+  `generated_at` datetime not null,
+  `status` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`payslip_id`),
+  CONSTRAINT `fk_payslip_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_payslip_period_id` FOREIGN KEY (`period_id`) REFERENCES `payroll_period` (`period_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employee_kpi` (
+  `emp_kpi_id` int not null,
+  `employee_id` int not null,
+  `period_id` int not null,
+  `template_id` int null,
+  `scale_id` int not null,
+  `reviewer_id` int not null,
+  `secondary_reviewer_id` int not null,
+  `status` varchar(255) not null,
+  `submitted_at` datetime not null,
+  `approved_at` datetime not null,
+  `locked_at` datetime not null,
+  `notes` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`emp_kpi_id`),
+  CONSTRAINT `fk_employee_kpi_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_employee_kpi_period_id` FOREIGN KEY (`period_id`) REFERENCES `kpi_period` (`period_id`),
+  CONSTRAINT `fk_employee_kpi_template_id` FOREIGN KEY (`template_id`) REFERENCES `kpi_template` (`template_id`),
+  CONSTRAINT `fk_employee_kpi_scale_id` FOREIGN KEY (`scale_id`) REFERENCES `kpi_scale` (`scale_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_evaluations` (
+  `evaluation_id` int not null,
+  `employee_id` int not null,
+  `evaluation_period` varchar(20) null,
+  `score` decimal(5,2) null,
+  `comments` text null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`evaluation_id`),
+  CONSTRAINT `fk_kpi_evaluations_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `performance_reviews` (
+  `review_id` int not null,
+  `employee_id` int not null,
+  `reviewer_id` varchar(16) not null,
+  `period` varchar(255) not null,
+  `overall_score` decimal(5,2) not null,
+  `achievements` text not null,
+  `areas_improvement` text not null,
+  `goals_next_period` text not null,
+  `comments` text not null,
+  `status` varchar(255) not null,
+  `reviewed_at` datetime not null,
+  `approved_at` datetime not null,
+  `approved_by` varchar(16) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`review_id`),
+  CONSTRAINT `fk_performance_reviews_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_performance_reviews_reviewer_id` FOREIGN KEY (`reviewer_id`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_performance_reviews_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `inventory_usage_logs` (
+  `id` int not null,
+  `inventory_id` int not null,
+  `employee_id` int not null,
+  `borrowed_date` datetime not null,
+  `returned_date` datetime not null,
+  `notes` text not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_inventory_usage_logs_inventory_id` FOREIGN KEY (`inventory_id`) REFERENCES `inventories` (`id`),
+  CONSTRAINT `fk_inventory_usage_logs_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `incidents` (
+  `id` int not null,
+  `employee_id` int not null,
+  `type` varchar(255) not null,
+  `incident_date` date not null,
+  `description` text not null,
+  `severity` varchar(255) not null,
+  `status` varchar(255) not null,
+  `action_taken` text not null,
+  `reported_by` varchar(16) not null,
+  `resolved_by` varchar(16) not null,
+  `resolved_at` datetime not null,
+  `notes` text not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_incidents_employee_id` FOREIGN KEY (`employee_id`) REFERENCES `employees` (`employee_id`),
+  CONSTRAINT `fk_incidents_reported_by` FOREIGN KEY (`reported_by`) REFERENCES `users` (`user_id`),
+  CONSTRAINT `fk_incidents_resolved_by` FOREIGN KEY (`resolved_by`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `tasks` (
+  `id` int not null,
+  `title` varchar(255) not null,
+  `description` text not null,
+  `assigned_to` int not null,
+  `due_date` datetime not null,
+  `status` varchar(255) not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  `deleted_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_tasks_assigned_to` FOREIGN KEY (`assigned_to`) REFERENCES `employees` (`employee_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `signature_verifications` (
+  `id` int not null,
+  `signature_id` int not null,
+  `verified_by_id` varchar(16) not null,
+  `status` varchar(255) not null,
+  `remarks` text not null,
+  `verification_date` datetime not null,
+  `created_at` datetime null,
+  `updated_at` datetime null,
+  PRIMARY KEY (`id`),
+  CONSTRAINT `fk_signature_verifications_signature_id` FOREIGN KEY (`signature_id`) REFERENCES `signatures` (`id`),
+  CONSTRAINT `fk_signature_verifications_verified_by_id` FOREIGN KEY (`verified_by_id`) REFERENCES `users` (`user_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `approved` (
+  `approved_id` int not null,
+  `approval_id` int not null,
+  `approval_date` date null,
+  `approval_status` varchar(20) null,
+  `approved_by` int not null,
+  PRIMARY KEY (`approved_id`),
+  CONSTRAINT `fk_approved_approval_id` FOREIGN KEY (`approval_id`) REFERENCES `approval_requests` (`approval_id`),
+  CONSTRAINT `fk_approved_approved_by` FOREIGN KEY (`approved_by`) REFERENCES `employee_positions` (`employee_position_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `payslip_line` (
+  `line_id` int not null,
+  `payslip_id` int not null,
+  `component_id` int not null,
+  `quantity` decimal(15,2) not null,
+  `rate` decimal(15,2) not null,
+  `amount` decimal(15,2) not null,
+  `source_type` varchar(255) not null,
+  `source_id` int not null,
+  PRIMARY KEY (`line_id`),
+  CONSTRAINT `fk_payslip_line_payslip_id` FOREIGN KEY (`payslip_id`) REFERENCES `payslip` (`payslip_id`),
+  CONSTRAINT `fk_payslip_line_component_id` FOREIGN KEY (`component_id`) REFERENCES `pay_component` (`component_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `employee_kpi_item` (
+  `emp_kpi_item_id` int not null,
+  `emp_kpi_id` int not null,
+  `indicator_id` int not null,
+  `weight` decimal(15,2) not null,
+  `target_value` decimal(15,2) not null,
+  `target_text` varchar(255) not null,
+  `baseline_value` decimal(15,2) not null,
+  `calc_method` varchar(255) not null,
+  `unit` varchar(255) not null,
+  `direction` varchar(255) not null,
+  `sort_order` int not null,
+  PRIMARY KEY (`emp_kpi_item_id`),
+  CONSTRAINT `fk_employee_kpi_item_emp_kpi_id` FOREIGN KEY (`emp_kpi_id`) REFERENCES `employee_kpi` (`emp_kpi_id`),
+  CONSTRAINT `fk_employee_kpi_item_indicator_id` FOREIGN KEY (`indicator_id`) REFERENCES `kpi_indicator` (`indicator_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_review` (
+  `review_id` int not null,
+  `emp_kpi_id` int not null,
+  `reviewer_id` int not null,
+  `review_stage` varchar(255) not null,
+  `review_date` date not null,
+  `comment` text not null,
+  `overall_rating` decimal(15,2) not null,
+  PRIMARY KEY (`review_id`),
+  CONSTRAINT `fk_kpi_review_emp_kpi_id` FOREIGN KEY (`emp_kpi_id`) REFERENCES `employee_kpi` (`emp_kpi_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_score` (
+  `score_id` int not null,
+  `emp_kpi_id` int not null,
+  `calc_date` datetime not null,
+  `method` varchar(255) not null,
+  `weighted_score` decimal(15,2) not null,
+  `rating_value` decimal(15,2) not null,
+  `rating_label` varchar(255) not null,
+  `normalized_score` decimal(15,2) not null,
+  `details_json` varchar(255) not null,
+  `locked` tinyint(1) not null,
+  PRIMARY KEY (`score_id`),
+  CONSTRAINT `fk_kpi_score_emp_kpi_id` FOREIGN KEY (`emp_kpi_id`) REFERENCES `employee_kpi` (`emp_kpi_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_approval` (
+  `approval_id` int not null,
+  `emp_kpi_id` int not null,
+  `step` int not null,
+  `approver_id` int not null,
+  `action` varchar(255) not null,
+  `comment` varchar(255) not null,
+  `action_at` datetime not null,
+  PRIMARY KEY (`approval_id`),
+  CONSTRAINT `fk_kpi_approval_emp_kpi_id` FOREIGN KEY (`emp_kpi_id`) REFERENCES `employee_kpi` (`emp_kpi_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_checkin` (
+  `checkin_id` int not null,
+  `emp_kpi_item_id` int not null,
+  `checkin_date` date not null,
+  `actual_value` decimal(15,2) not null,
+  `comment` varchar(255) not null,
+  `created_by` int not null,
+  `created_at` datetime not null,
+  PRIMARY KEY (`checkin_id`),
+  CONSTRAINT `fk_kpi_checkin_emp_kpi_item_id` FOREIGN KEY (`emp_kpi_item_id`) REFERENCES `employee_kpi_item` (`emp_kpi_item_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;
+
+CREATE TABLE IF NOT EXISTS `kpi_evidence` (
+  `evidence_id` int not null,
+  `emp_kpi_item_id` int not null,
+  `checkin_id` int not null,
+  `title` varchar(255) not null,
+  `url` varchar(255) not null,
+  `uploaded_by` int not null,
+  `uploaded_at` datetime not null,
+  PRIMARY KEY (`evidence_id`),
+  CONSTRAINT `fk_kpi_evidence_emp_kpi_item_id` FOREIGN KEY (`emp_kpi_item_id`) REFERENCES `employee_kpi_item` (`emp_kpi_item_id`),
+  CONSTRAINT `fk_kpi_evidence_checkin_id` FOREIGN KEY (`checkin_id`) REFERENCES `kpi_checkin` (`checkin_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci;

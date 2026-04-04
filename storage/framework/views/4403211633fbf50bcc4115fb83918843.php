@@ -1,0 +1,835 @@
+<?php $__env->startSection('content'); ?>
+
+
+
+<div class="page-heading">
+    <div class="page-title">
+        <div class="row">
+            <div class="col-12 col-md-6 order-md-1 order-last">
+                <h3>New Presence</h3>
+                <p class="text-subtitle text-muted">Monitor presences data.</p>
+            </div>
+            <div class="col-12 col-md-6 order-md-2 order-first">
+                <nav aria-label="breadcrumb" class="breadcrumb-header float-start float-lg-end">
+                    <ol class="breadcrumb">
+                        <li class="breadcrumb-item"><a href="index.html">Dashboard</a></li>
+                        <li class="breadcrumb-item">Presences</li>
+                        <li class="breadcrumb-item active" aria-current="page">Index</li>
+                    </ol>
+                </nav>
+            </div>
+        </div>
+    </div>
+    
+    <section class="section">
+        <div class="card">
+            
+            <?php if(session('success')): ?>
+                <div class="alert alert-success"><?php echo e(session('success')); ?></div>
+            <?php endif; ?>
+
+            <?php if(session('warning')): ?>
+                <div class="alert alert-warning"><?php echo e(session('warning')); ?></div>
+            <?php endif; ?>
+
+            <?php if(session('error')): ?>
+                <div class="alert alert-danger"><?php echo e(session('error')); ?></div>
+            <?php endif; ?>
+
+            <?php if($errors->any()): ?>
+                <div class="alert alert-danger">
+                    <ul>
+                        <?php $__currentLoopData = $errors->all(); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $error): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                            <li><?php echo e($error); ?></li>
+                        <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                    </ul>
+                </div>
+            <?php endif; ?>
+
+            <div class="card-body">
+
+                <?php if(session('role') == 'HR Administrator'): ?> 
+                    <!-- HR Administrator FORM (unchanged) -->
+                    <form action="<?php echo e(route('presences.store')); ?>" method="POST">
+                        <?php echo csrf_field(); ?>
+            
+                        <div class="mb-3">
+                            <label for="employee_id" class="form-label">Employee</label>
+                            <select name="employee_id" class="form-control" id="employee_id" required>
+                                <?php $__currentLoopData = $employees; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $employee): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                    <option value="<?php echo e($employee->id); ?>"><?php echo e($employee->fullname); ?></option>
+                                <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                            </select>
+                        </div>
+            
+                        <div class="mb-3">
+                            <label for="check_in" class="form-label">Check In</label>
+                            <input type="datetime-local" name="check_in" class="form-control datetime" id="check_in" required>
+                        </div>
+            
+                        <div class="mb-3">
+                            <label for="check_out" class="form-label">Check Out</label>
+                            <input type="datetime-local" name="check_out" class="form-control datetime" id="check_out">
+                        </div>
+            
+                        <div class="mb-3">
+                            <label for="status" class="form-label">Status</label>
+                            <select name="status" class="form-control" id="status" required>
+                                <option value="present">Present</option>
+                                <option value="absent">Absent</option>
+                                <option value="leave">Leave</option>
+                            </select>
+                        </div>
+            
+                        <button type="submit" class="btn btn-primary">Save</button>
+                    </form>
+
+                <?php else: ?>
+                    <!-- EMPLOYEE FORM: Step-based approach -->
+                    
+                    <!-- STEP 1: Choose Work Type -->
+                    <div id="step-choose-type">
+                        <h5 class="mb-3">📍 Pilih Tipe Kerja Hari Ini</h5>
+                        <div class="row g-3">
+                            <div class="col-md-4">
+                                <div class="card border-primary h-100" style="cursor: pointer;" onclick="selectWorkType('WFO')">
+                                    <div class="card-body text-center">
+                                        <span class="badge bg-primary mb-2" style="font-size: 1.2rem;">WFO</span>
+                                        <h6>Work From Office</h6>
+                                        <p class="text-muted small">Bekerja dari kantor<br>(Pilih site + GPS + WiFi + Face)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-success h-100" style="cursor: pointer;" onclick="selectWorkType('WFH')">
+                                    <div class="card-body text-center">
+                                        <span class="badge bg-success mb-2" style="font-size: 1.2rem;">WFH</span>
+                                        <h6>Work From Home</h6>
+                                        <p class="text-muted small">Bekerja dari rumah<br>(GPS + WiFi + Face)</p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="card border-info h-100" style="cursor: pointer;" onclick="selectWorkType('WFA')">
+                                    <div class="card-body text-center">
+                                        <span class="badge bg-info mb-2" style="font-size: 1.2rem;">WFA</span>
+                                        <h6>Work From Anywhere</h6>
+                                        <p class="text-muted small">Bekerja dari mana saja<br>(GPS + WiFi + Face)</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- STEP 2: WFO Form -->
+                    <div id="form-wfo" style="display: none;">
+                        <h5 class="mb-3">
+                            <span class="badge bg-primary">WFO</span> Work From Office
+                            <button type="button" class="btn btn-sm btn-outline-secondary float-end" onclick="backToChooseType()">← Ganti Tipe</button>
+                        </h5>
+                        
+                        <form action="<?php echo e(route('presences.store')); ?>" method="POST" id="form-wfo-submit">
+                            <?php echo csrf_field(); ?>
+                            <input type="hidden" name="work_type" value="WFO">
+                            <input type="hidden" name="fingerprint" id="fingerprint-wfo">
+                            <input type="hidden" name="is_mobile" id="is_mobile-wfo">
+                            <input type="hidden" name="latitude" id="latitude-wfo">
+                            <input type="hidden" name="longitude" id="longitude-wfo">
+                            <input type="hidden" name="accuracy" id="accuracy-wfo">
+
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-building"></i> <strong>Site Kantor WFO</strong></label>
+                                <select class="form-select" name="office_location_id" id="office-location-wfo" <?php echo e(!empty($wfoOfficeLocations) ? 'required' : 'disabled'); ?>>
+                                    <?php $__empty_1 = true; $__currentLoopData = $wfoOfficeLocations; $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $officeLocation): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); $__empty_1 = false; ?>
+                                        <option value="<?php echo e($officeLocation['id']); ?>" <?php echo e((string) old('office_location_id', $selectedWfoOfficeLocation['id'] ?? '') === (string) $officeLocation['id'] ? 'selected' : ''); ?>>
+                                            <?php echo e($officeLocation['name']); ?>
+
+                                        </option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); if ($__empty_1): ?>
+                                        <option value="">Belum ada lokasi kantor aktif</option>
+                                    <?php endif; ?>
+                                </select>
+                                <small class="text-muted">Semua karyawan dapat memilih site WFO sesuai lokasi aktual dan SSID kantor yang terhubung.</small>
+                            </div>
+
+                            <div class="alert alert-info">
+                                <strong>📋 Validasi WFO:</strong> Pilih site kantor + GPS + WiFi Kantor + Verifikasi Wajah
+                                <div class="small mt-2">
+                                    Lokasi kerja aktif: <strong id="wfo-office-name"><?php echo e($selectedWfoOfficeLocation['name'] ?? 'Belum ada lokasi kantor aktif'); ?></strong>
+                                    <span id="wfo-office-address-wrapper" <?php if(empty($selectedWfoOfficeLocation['address'])): ?> style="display: none;" <?php endif; ?>>
+                                        <br><span id="wfo-office-address"><?php echo e($selectedWfoOfficeLocation['address'] ?? ''); ?></span>
+                                    </span>
+                                    <br>Radius validasi: <strong><span id="wfo-office-radius"><?php echo e($selectedWfoOfficeLocation['radius'] ?? 0); ?></span> meter</strong>
+                                </div>
+                            </div>
+
+                            <!-- GPS Section -->
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-geo-alt"></i> Lokasi GPS</h6>
+                                    <div id="gps-status-wfo" class="mb-2">
+                                        <span class="badge bg-warning">Memuat GPS...</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Latitude: <span id="lat-display-wfo">-</span></small><br>
+                                        <small class="text-muted">Longitude: <span id="lon-display-wfo">-</span></small><br>
+                                        <small class="text-muted">Jarak: <span id="dist-display-wfo">-</span> meter</small><br>
+                                        <small class="text-muted">Site acuan: <span id="wfo-distance-office-name"><?php echo e($selectedWfoOfficeLocation['name'] ?? '-'); ?></span></small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-primary" onclick="refreshGPS()">
+                                        <i class="bi bi-arrow-clockwise"></i> Refresh GPS
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WiFi SSID -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-wifi"></i> <strong>WiFi SSID Kantor</strong></label>
+                                <select class="form-select" name="ssid" id="ssid-wfo" required <?php echo e(empty($wfoOfficeLocations) ? 'disabled' : ''); ?>>
+                                    <option value="">-- Pilih SSID Terhubung --</option>
+                                    <?php $__currentLoopData = ($selectedWfoOfficeLocation['allowed_ssids'] ?? []); $__env->addLoop($__currentLoopData); foreach($__currentLoopData as $allowedSsid): $__env->incrementLoopIndices(); $loop = $__env->getLastLoop(); ?>
+                                        <option value="<?php echo e($allowedSsid); ?>"><?php echo e($allowedSsid); ?></option>
+                                    <?php endforeach; $__env->popLoop(); $loop = $__env->getLastLoop(); ?>
+                                </select>
+                                <small class="text-muted" id="wfo-ssid-help">Pilih WiFi yang saat ini terhubung untuk lokasi <?php echo e($selectedWfoOfficeLocation['name'] ?? 'kantor terpilih'); ?>.</small>
+                            </div>
+
+                            <!-- Face Detection -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
+                                <div class="position-relative" style="width: 100%; max-width: 400px;">
+                                    <video id="video-wfo" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                </div>
+                                <div id="face-status-wfo" class="mt-2">
+                                    <span class="badge bg-secondary">Menunggu Kamera...</span>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <button type="submit" id="btn-submit-wfo" class="btn btn-primary btn-lg w-100" disabled>
+                                <i class="bi bi-check-circle"></i> Present (WFO)
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- STEP 2: WFH Form -->
+                    <div id="form-wfh" style="display: none;">
+                        <h5 class="mb-3">
+                            <span class="badge bg-success">WFH</span> Work From Home
+                            <button type="button" class="btn btn-sm btn-outline-secondary float-end" onclick="backToChooseType()">← Ganti Tipe</button>
+                        </h5>
+                        
+                        <form action="<?php echo e(route('presences.store')); ?>" method="POST" id="form-wfh-submit">
+                            <?php echo csrf_field(); ?>
+                            <input type="hidden" name="work_type" value="WFH">
+                            <input type="hidden" name="fingerprint" id="fingerprint-wfh">
+                            <input type="hidden" name="is_mobile" id="is_mobile-wfh">
+                            <input type="hidden" name="latitude" id="latitude-wfh">
+                            <input type="hidden" name="longitude" id="longitude-wfh">
+                            <input type="hidden" name="accuracy" id="accuracy-wfh">
+                            <input type="hidden" name="ssid" id="ssid-value-wfh">
+
+                            <div class="alert alert-success">
+                                <strong>📋 Validasi WFH:</strong> GPS + WiFi + Verifikasi Wajah + Fingerprint
+                            </div>
+
+                            <!-- GPS Section (Free Location) -->
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-geo-alt"></i> Lokasi GPS</h6>
+                                    <div id="gps-status-wfh" class="mb-2">
+                                        <span class="badge bg-warning">Memuat GPS...</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Latitude: <span id="lat-display-wfh">-</span></small><br>
+                                        <small class="text-muted">Longitude: <span id="lon-display-wfh">-</span></small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-success" onclick="refreshGPSFree('wfh')">
+                                        <i class="bi bi-arrow-clockwise"></i> Refresh GPS
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WiFi SSID (Free) -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-wifi"></i> <strong>WiFi SSID</strong></label>
+                                <select class="form-select" id="ssid-select-wfh">
+                                    <option value="">-- Pilih SSID --</option>
+                                    <option value="UNPAM VIKTOR">UNPAM VIKTOR</option>
+                                    <option value="Serhan 2">Serhan 2</option>
+                                    <option value="Serhan">Serhan</option>
+                                    <option value="S53s">S53s</option>
+                                    <option value="__other__">Other (Input Manual)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2" id="ssid-other-wfh" placeholder="Masukkan nama WiFi" style="display: none;">
+                                <small class="text-muted">Pilih WiFi yang terhubung atau pilih Other</small>
+                            </div>
+
+                            <!-- Face Detection -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
+                                <div class="position-relative" style="width: 100%; max-width: 400px;">
+                                    <video id="video-wfh" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                </div>
+                                <div id="face-status-wfh" class="mt-2">
+                                    <span class="badge bg-secondary">Menunggu Kamera...</span>
+                                </div>
+                            </div>
+
+                            <!-- Fingerprint Status -->
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body text-center">
+                                    <div id="fingerprint-status-wfh" class="mb-2">
+                                        <span class="badge bg-warning">Memuat Fingerprint...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btn-submit-wfh" class="btn btn-success btn-lg w-100" disabled>
+                                <i class="bi bi-check-circle"></i> Present (WFH)
+                            </button>
+                        </form>
+                    </div>
+
+                    <!-- STEP 2: WFA Form -->
+                    <div id="form-wfa" style="display: none;">
+                        <h5 class="mb-3">
+                            <span class="badge bg-info">WFA</span> Work From Anywhere
+                            <button type="button" class="btn btn-sm btn-outline-secondary float-end" onclick="backToChooseType()">← Ganti Tipe</button>
+                        </h5>
+                        
+                        <form action="<?php echo e(route('presences.store')); ?>" method="POST" id="form-wfa-submit">
+                            <?php echo csrf_field(); ?>
+                            <input type="hidden" name="work_type" value="WFA">
+                            <input type="hidden" name="fingerprint" id="fingerprint-wfa">
+                            <input type="hidden" name="is_mobile" id="is_mobile-wfa">
+                            <input type="hidden" name="latitude" id="latitude-wfa">
+                            <input type="hidden" name="longitude" id="longitude-wfa">
+                            <input type="hidden" name="accuracy" id="accuracy-wfa">
+                            <input type="hidden" name="ssid" id="ssid-value-wfa">
+
+                            <div class="alert alert-info">
+                                <strong>📋 Validasi WFA:</strong> GPS + WiFi + Verifikasi Wajah + Fingerprint
+                            </div>
+
+                            <!-- GPS Section (Free Location) -->
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body">
+                                    <h6><i class="bi bi-geo-alt"></i> Lokasi GPS</h6>
+                                    <div id="gps-status-wfa" class="mb-2">
+                                        <span class="badge bg-warning">Memuat GPS...</span>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted">Latitude: <span id="lat-display-wfa">-</span></small><br>
+                                        <small class="text-muted">Longitude: <span id="lon-display-wfa">-</span></small>
+                                    </div>
+                                    <button type="button" class="btn btn-sm btn-outline-info" onclick="refreshGPSFree('wfa')">
+                                        <i class="bi bi-arrow-clockwise"></i> Refresh GPS
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- WiFi SSID (Free) -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-wifi"></i> <strong>WiFi SSID</strong></label>
+                                <select class="form-select" id="ssid-select-wfa">
+                                    <option value="">-- Pilih SSID --</option>
+                                    <option value="UNPAM VIKTOR">UNPAM VIKTOR</option>
+                                    <option value="Serhan 2">Serhan 2</option>
+                                    <option value="Serhan">Serhan</option>
+                                    <option value="S53s">S53s</option>
+                                    <option value="__other__">Other (Input Manual)</option>
+                                </select>
+                                <input type="text" class="form-control mt-2" id="ssid-other-wfa" placeholder="Masukkan nama WiFi" style="display: none;">
+                                <small class="text-muted">Pilih WiFi yang terhubung atau pilih Other</small>
+                            </div>
+
+                            <!-- Face Detection -->
+                            <div class="mb-3">
+                                <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
+                                <div class="position-relative" style="width: 100%; max-width: 400px;">
+                                    <video id="video-wfa" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                </div>
+                                <div id="face-status-wfa" class="mt-2">
+                                    <span class="badge bg-secondary">Menunggu Kamera...</span>
+                                </div>
+                            </div>
+
+                            <!-- Fingerprint Status -->
+                            <div class="card mb-3 bg-light">
+                                <div class="card-body text-center">
+                                    <div id="fingerprint-status-wfa" class="mb-2">
+                                        <span class="badge bg-warning">Memuat Fingerprint...</span>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <button type="submit" id="btn-submit-wfa" class="btn btn-info btn-lg w-100" disabled>
+                                <i class="bi bi-check-circle"></i> Present (WFA)
+                            </button>
+                        </form>
+                    </div>
+
+                <?php endif; ?>
+
+            </div>
+        </div>
+    </section>
+</div>
+
+<!-- Security Libraries -->
+<script src="<?php echo e(asset('vendor/fingerprintjs/fp.min.js')); ?>"></script>
+<script src="<?php echo e(asset('vendor/face-api/face-api.min.js')); ?>"></script>
+
+<script>
+    const wfoOfficeLocations = <?php echo json_encode($wfoOfficeLocations, 15, 512) ?>;
+
+    // State tracking per mode
+    const modeState = {
+        wfo: { gps: false, fingerprint: false, ssid: false, face: false },
+        wfh: { gps: false, fingerprint: false, ssid: false, face: false },
+        wfa: { gps: false, fingerprint: false, ssid: false, face: false }
+    };
+
+    let currentWorkType = null;
+    let gpsWatchId = null;
+    let gpsWatchIds = { wfh: null, wfa: null };
+    let videoStream = null;
+    let videoStreams = { wfh: null, wfa: null };
+    let faceDetectionInterval = null;
+    let faceDetectionIntervals = { wfh: null, wfa: null };
+
+    function getSelectedWfoOffice() {
+        const select = document.getElementById('office-location-wfo');
+        if (!select) {
+            return null;
+        }
+
+        const selectedId = Number(select.value);
+        return wfoOfficeLocations.find((officeLocation) => Number(officeLocation.id) === selectedId) ?? null;
+    }
+
+    function calculateDistanceMeters(lat, lon, officeLat, officeLon) {
+        const distDegrees = Math.sqrt(Math.pow(lat - officeLat, 2) + Math.pow(lon - officeLon, 2));
+        return Math.round(distDegrees * 111320);
+    }
+
+    function updateWfoDistanceStatus(lat, lon, acc) {
+        const office = getSelectedWfoOffice();
+        if (!office) {
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-danger">❌ Belum ada lokasi kantor aktif</span>';
+            document.getElementById('dist-display-wfo').textContent = '-';
+            modeState.wfo.gps = false;
+            checkReady('wfo');
+            return;
+        }
+
+        document.getElementById('latitude-wfo').value = lat;
+        document.getElementById('longitude-wfo').value = lon;
+        document.getElementById('accuracy-wfo').value = acc;
+
+        document.getElementById('lat-display-wfo').textContent = Number(lat).toFixed(6);
+        document.getElementById('lon-display-wfo').textContent = Number(lon).toFixed(6);
+
+        const distMeters = calculateDistanceMeters(Number(lat), Number(lon), Number(office.latitude), Number(office.longitude));
+        document.getElementById('dist-display-wfo').textContent = distMeters;
+
+        if (distMeters <= Number(office.radius)) {
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-success">✅ GPS OK (' + distMeters + 'm)</span>';
+            modeState.wfo.gps = true;
+        } else {
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-danger">❌ Terlalu jauh (' + distMeters + 'm)</span>';
+            modeState.wfo.gps = false;
+        }
+
+        checkReady('wfo');
+    }
+
+    function renderWfoOfficeDetails() {
+        const office = getSelectedWfoOffice();
+        const officeName = office ? office.name : 'Belum ada lokasi kantor aktif';
+        const officeAddress = office?.address ?? '';
+        const officeRadius = office?.radius ?? 0;
+        const allowedSsids = office?.allowed_ssids ?? [];
+
+        document.getElementById('wfo-office-name').textContent = officeName;
+        document.getElementById('wfo-office-radius').textContent = officeRadius;
+        document.getElementById('wfo-distance-office-name').textContent = office ? office.name : '-';
+
+        const addressWrapper = document.getElementById('wfo-office-address-wrapper');
+        const addressEl = document.getElementById('wfo-office-address');
+        if (officeAddress) {
+            addressEl.textContent = officeAddress;
+            addressWrapper.style.display = 'inline';
+        } else {
+            addressEl.textContent = '';
+            addressWrapper.style.display = 'none';
+        }
+
+        const ssidSelect = document.getElementById('ssid-wfo');
+        const ssidHelp = document.getElementById('wfo-ssid-help');
+        const previousValue = ssidSelect ? ssidSelect.value : '';
+
+        if (ssidSelect) {
+            ssidSelect.innerHTML = '<option value="">-- Pilih SSID Terhubung --</option>';
+            allowedSsids.forEach((ssid) => {
+                const option = document.createElement('option');
+                option.value = ssid;
+                option.textContent = ssid;
+                if (ssid === previousValue) {
+                    option.selected = true;
+                }
+                ssidSelect.appendChild(option);
+            });
+            ssidSelect.disabled = !office || allowedSsids.length === 0;
+            modeState.wfo.ssid = ssidSelect.value !== '';
+        }
+
+        if (ssidHelp) {
+            ssidHelp.textContent = office
+                ? 'Pilih WiFi yang saat ini terhubung untuk lokasi ' + office.name + '.'
+                : 'Belum ada lokasi kantor aktif yang dapat dipilih.';
+        }
+
+        const latitude = document.getElementById('latitude-wfo').value;
+        const longitude = document.getElementById('longitude-wfo').value;
+        const accuracy = document.getElementById('accuracy-wfo').value;
+
+        if (office && latitude && longitude) {
+            updateWfoDistanceStatus(Number(latitude), Number(longitude), Number(accuracy || 0));
+        } else if (!office) {
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-danger">❌ Belum ada lokasi kantor aktif</span>';
+            document.getElementById('dist-display-wfo').textContent = '-';
+            modeState.wfo.gps = false;
+            checkReady('wfo');
+        }
+    }
+
+    // ============ UI NAVIGATION ============
+    function selectWorkType(type) {
+        currentWorkType = type;
+        document.getElementById('step-choose-type').style.display = 'none';
+        document.getElementById('form-' + type.toLowerCase()).style.display = 'block';
+
+        if (type === 'WFO') {
+            initWFO();
+        } else if (type === 'WFH') {
+            initWFH();
+        } else if (type === 'WFA') {
+            initWFA();
+        }
+    }
+
+    function backToChooseType() {
+        if (gpsWatchId) {
+            navigator.geolocation.clearWatch(gpsWatchId);
+            gpsWatchId = null;
+        }
+
+        ['wfh', 'wfa'].forEach(mode => {
+            if (gpsWatchIds[mode]) {
+                navigator.geolocation.clearWatch(gpsWatchIds[mode]);
+                gpsWatchIds[mode] = null;
+            }
+            if (videoStreams[mode]) {
+                videoStreams[mode].getTracks().forEach(track => track.stop());
+                videoStreams[mode] = null;
+            }
+            if (faceDetectionIntervals[mode]) {
+                clearInterval(faceDetectionIntervals[mode]);
+                faceDetectionIntervals[mode] = null;
+            }
+        });
+
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
+            videoStream = null;
+        }
+        if (faceDetectionInterval) {
+            clearInterval(faceDetectionInterval);
+            faceDetectionInterval = null;
+        }
+
+        document.getElementById('form-wfo').style.display = 'none';
+        document.getElementById('form-wfh').style.display = 'none';
+        document.getElementById('form-wfa').style.display = 'none';
+        document.getElementById('step-choose-type').style.display = 'block';
+        currentWorkType = null;
+    }
+
+    // ============ GENERIC READY CHECK ============
+    function checkReady(mode) {
+        const state = modeState[mode];
+        const isReady = state.gps && state.fingerprint && state.ssid && state.face;
+        const button = document.getElementById('btn-submit-' + mode);
+        if (button) {
+            button.disabled = !isReady;
+        }
+        console.log(mode.toUpperCase() + ' Ready Check:', state, 'isReady:', isReady);
+    }
+
+    // ============ WFO MODE ============
+    async function initWFO() {
+        console.log('Initializing WFO mode...');
+        initFingerprintForMode('wfo');
+        renderWfoOfficeDetails();
+        startGPSForWFO();
+        setTimeout(() => initFaceDetectionForMode('wfo'), 1000);
+    }
+
+    function startGPSForWFO() {
+        const office = getSelectedWfoOffice();
+        if (!office) {
+            renderWfoOfficeDetails();
+            return;
+        }
+
+        document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-warning">🔍 Mencari GPS...</span>';
+
+        if (!navigator.geolocation) {
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-danger">❌ GPS tidak didukung</span>';
+            return;
+        }
+
+        const onSuccess = (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const acc = position.coords.accuracy;
+            updateWfoDistanceStatus(lat, lon, acc);
+        };
+
+        const onError = (error) => {
+            let msg = 'GPS Error: ';
+            if (error.code === error.PERMISSION_DENIED) msg += 'Izin ditolak';
+            else if (error.code === error.POSITION_UNAVAILABLE) msg += 'Tidak tersedia';
+            else if (error.code === error.TIMEOUT) msg += 'Timeout';
+
+            document.getElementById('gps-status-wfo').innerHTML = '<span class="badge bg-danger">❌ ' + msg + '</span>';
+        };
+
+        gpsWatchId = navigator.geolocation.watchPosition(onSuccess, onError, {
+            enableHighAccuracy: true,
+            timeout: 30000,
+            maximumAge: 5000
+        });
+    }
+
+    function refreshGPS() {
+        if (gpsWatchId) {
+            navigator.geolocation.clearWatch(gpsWatchId);
+        }
+        modeState.wfo.gps = false;
+        startGPSForWFO();
+    }
+
+    // ============ WFH MODE ============
+    async function initWFH() {
+        console.log('Initializing WFH mode...');
+        initFingerprintForMode('wfh');
+        startGPSFree('wfh');
+        initSSIDHandler('wfh');
+        setTimeout(() => initFaceDetectionForMode('wfh'), 1000);
+    }
+
+    // ============ WFA MODE ============
+    async function initWFA() {
+        console.log('Initializing WFA mode...');
+        initFingerprintForMode('wfa');
+        startGPSFree('wfa');
+        initSSIDHandler('wfa');
+        setTimeout(() => initFaceDetectionForMode('wfa'), 1000);
+    }
+
+    // ============ GPS FREE (WFH/WFA) ============
+    function startGPSFree(mode) {
+        document.getElementById('gps-status-' + mode).innerHTML = '<span class="badge bg-warning">🔍 Mencari GPS...</span>';
+
+        if (!navigator.geolocation) {
+            document.getElementById('gps-status-' + mode).innerHTML = '<span class="badge bg-danger">❌ GPS tidak didukung</span>';
+            return;
+        }
+
+        const onSuccess = (position) => {
+            const lat = position.coords.latitude;
+            const lon = position.coords.longitude;
+            const acc = position.coords.accuracy;
+
+            document.getElementById('latitude-' + mode).value = lat;
+            document.getElementById('longitude-' + mode).value = lon;
+            document.getElementById('accuracy-' + mode).value = acc;
+
+            document.getElementById('lat-display-' + mode).textContent = lat.toFixed(6);
+            document.getElementById('lon-display-' + mode).textContent = lon.toFixed(6);
+
+            document.getElementById('gps-status-' + mode).innerHTML = '<span class="badge bg-success">✅ GPS OK</span>';
+            modeState[mode].gps = true;
+            checkReady(mode);
+        };
+
+        const onError = (error) => {
+            let msg = 'GPS Error: ';
+            if (error.code === error.PERMISSION_DENIED) msg += 'Izin ditolak';
+            else if (error.code === error.POSITION_UNAVAILABLE) msg += 'Tidak tersedia';
+            else if (error.code === error.TIMEOUT) msg += 'Timeout';
+
+            document.getElementById('gps-status-' + mode).innerHTML = '<span class="badge bg-danger">❌ ' + msg + '</span>';
+        };
+
+        gpsWatchIds[mode] = navigator.geolocation.watchPosition(onSuccess, onError, {
+            enableHighAccuracy: true,
+            timeout: 30000,
+            maximumAge: 5000
+        });
+    }
+
+    function refreshGPSFree(mode) {
+        if (gpsWatchIds[mode]) {
+            navigator.geolocation.clearWatch(gpsWatchIds[mode]);
+        }
+        modeState[mode].gps = false;
+        startGPSFree(mode);
+    }
+
+    // ============ SSID HANDLER (WFH/WFA) ============
+    function initSSIDHandler(mode) {
+        const select = document.getElementById('ssid-select-' + mode);
+        const otherInput = document.getElementById('ssid-other-' + mode);
+        const hiddenField = document.getElementById('ssid-value-' + mode);
+
+        if (!select || !otherInput || !hiddenField || select.dataset.initialized === '1') {
+            return;
+        }
+
+        select.dataset.initialized = '1';
+
+        select.addEventListener('change', function() {
+            if (this.value === '__other__') {
+                otherInput.style.display = 'block';
+                otherInput.focus();
+                hiddenField.value = otherInput.value;
+                modeState[mode].ssid = otherInput.value.trim() !== '';
+            } else if (this.value !== '') {
+                otherInput.style.display = 'none';
+                otherInput.value = '';
+                hiddenField.value = this.value;
+                modeState[mode].ssid = true;
+            } else {
+                otherInput.style.display = 'none';
+                otherInput.value = '';
+                hiddenField.value = '';
+                modeState[mode].ssid = false;
+            }
+            checkReady(mode);
+        });
+
+        otherInput.addEventListener('input', function() {
+            hiddenField.value = this.value;
+            modeState[mode].ssid = this.value.trim() !== '';
+            checkReady(mode);
+        });
+    }
+
+    // ============ FACE DETECTION (All Modes) ============
+    async function initFaceDetectionForMode(mode) {
+        const statusEl = document.getElementById('face-status-' + mode);
+        statusEl.innerHTML = '<span class="badge bg-warning">⏳ Memuat AI Model...</span>';
+
+        try {
+            const MODEL_URL = '<?php echo e(asset('vendor/face-api/weights')); ?>';
+            await faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL);
+
+            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
+            const videoEl = document.getElementById('video-' + mode);
+            videoEl.srcObject = stream;
+
+            if (mode === 'wfo') {
+                videoStream = stream;
+            } else {
+                videoStreams[mode] = stream;
+            }
+
+            statusEl.innerHTML = '<span class="badge bg-info">👤 Deteksi wajah...</span>';
+
+            let detectionCount = 0;
+            const interval = setInterval(async () => {
+                const detections = await faceapi.detectAllFaces(videoEl, new faceapi.TinyFaceDetectorOptions());
+
+                if (detections.length > 0) {
+                    detectionCount++;
+                    if (detectionCount >= 10) {
+                        statusEl.innerHTML = '<span class="badge bg-success">✅ Wajah Terverifikasi</span>';
+                        clearInterval(interval);
+                        modeState[mode].face = true;
+                        checkReady(mode);
+                    }
+                }
+            }, 500);
+
+            if (mode === 'wfo') {
+                faceDetectionInterval = interval;
+            } else {
+                faceDetectionIntervals[mode] = interval;
+            }
+        } catch (err) {
+            statusEl.innerHTML = '<span class="badge bg-danger">❌ Kamera gagal: ' + err.message + '</span>';
+        }
+    }
+
+    // ============ FINGERPRINT (All Modes) ============
+    async function initFingerprintForMode(mode) {
+        try {
+            const statusEl = document.getElementById('fingerprint-status-' + mode);
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="badge bg-warning">⏳ Loading Fingerprint...</span>';
+            }
+
+            const fp = await FingerprintJS.load();
+            const result = await fp.get();
+
+            document.getElementById('fingerprint-' + mode).value = result.visitorId;
+
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            document.getElementById('is_mobile-' + mode).value = isMobile ? '1' : '0';
+
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="badge bg-success">✅ Fingerprint Ready</span>';
+            }
+
+            console.log('Fingerprint ready for ' + mode + ':', result.visitorId);
+
+            modeState[mode].fingerprint = true;
+            checkReady(mode);
+        } catch (err) {
+            console.error('Fingerprint error:', err);
+            const statusEl = document.getElementById('fingerprint-status-' + mode);
+            if (statusEl) {
+                statusEl.innerHTML = '<span class="badge bg-danger">❌ Error: ' + err.message + '</span>';
+            }
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+        const ssidSelect = document.getElementById('ssid-wfo');
+        if (ssidSelect) {
+            ssidSelect.addEventListener('change', function() {
+                modeState.wfo.ssid = this.value !== '';
+                checkReady('wfo');
+            });
+        }
+
+        const officeSelect = document.getElementById('office-location-wfo');
+        if (officeSelect) {
+            officeSelect.addEventListener('change', function() {
+                modeState.wfo.ssid = false;
+                renderWfoOfficeDetails();
+                refreshGPS();
+            });
+        }
+
+        renderWfoOfficeDetails();
+    });
+</script>
+
+<?php $__env->stopSection(); ?>
+
+<?php echo $__env->make('layouts.dashboard', \Illuminate\Support\Arr::except(get_defined_vars(), ['__data', '__path']))->render(); ?><?php /**PATH /home/aratechnology-hris/htdocs/hr-app/resources/views/presences/create.blade.php ENDPATH**/ ?>

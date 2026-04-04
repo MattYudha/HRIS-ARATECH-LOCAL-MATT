@@ -1,0 +1,19 @@
+.sidebar-item.has-sub .submenu {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.3s ease;
+    padding-left: 1rem;
+}
+
+.sidebar-item.has-sub.active .submenu {
+    max-height: 500px; /* cukup besar */
+}
+
+.dropdown-icon {
+    margin-left: auto;
+    transition: transform 0.3s ease;
+}
+
+.sidebar-item.has-sub.active .dropdown-icon {
+    transform: rotate(180deg);
+}
