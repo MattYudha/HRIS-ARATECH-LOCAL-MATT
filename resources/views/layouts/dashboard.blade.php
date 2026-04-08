@@ -128,32 +128,26 @@
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            width: 44px;
-            height: 44px;
-            border-radius: 12px;
-            border: 1px solid rgba(148, 163, 184, 0.24);
-            background: #ffffff;
             color: #25396f;
-            box-shadow: 0 10px 30px rgba(15, 23, 42, 0.08);
-            transition: all 0.2s ease;
+            text-decoration: none;
+            cursor: pointer;
+            padding: 0;
+            background: transparent;
+            border: none;
         }
 
         .mobile-burger-btn:hover,
         .mobile-burger-btn:focus {
             color: #0d6efd;
-            border-color: rgba(13, 110, 253, 0.35);
-            box-shadow: 0 12px 32px rgba(13, 110, 253, 0.15);
+            text-decoration: none;
         }
 
         .mobile-burger-btn i {
-            font-size: 1.35rem;
+            font-size: 2rem;
         }
 
         [data-bs-theme='dark'] .mobile-burger-btn {
-            background: #25304a;
             color: #f8fafc;
-            border-color: rgba(148, 163, 184, 0.2);
-          color: #f8fafc;
         }
       
     </style>
@@ -680,6 +674,15 @@
         drawCallback: function(settings) {
             // Re-initialize tooltips or any global UI components if needed
         }
+    });
+
+    // Make all standard tables responsive by default on mobile
+    $(document).ready(function() {
+        $('table.table').each(function() {
+            if (!$(this).parent().hasClass('table-responsive') && !$(this).parent().hasClass('dt-scroll')) {
+                $(this).wrap('<div class="table-responsive"></div>');
+            }
+        });
     });
 
     // Handle AJAX Errors Globally

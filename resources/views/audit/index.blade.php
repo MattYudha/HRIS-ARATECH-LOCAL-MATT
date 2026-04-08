@@ -15,7 +15,7 @@
         </div>
         <div class="card-body">
             <div class="table-responsive">
-                <table class="table table-bordered table-striped" id="auditTable">
+                <table class="table table-bordered table-striped text-nowrap" style="min-width: 800px;" id="auditTable">
                     <thead>
                         <tr>
                             <th>Time</th>

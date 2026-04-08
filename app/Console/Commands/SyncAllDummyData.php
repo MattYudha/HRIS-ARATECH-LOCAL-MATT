@@ -59,7 +59,7 @@ class SyncAllDummyData extends Command
                 ['name' => 'IT'],
                 ['description' => 'Information Technology', 'status' => 'active']
             );
-            $deptHR Administrator = Department::firstOrCreate(
+            $deptHR = Department::firstOrCreate(
                 ['name' => 'Human Resources'],
                 ['description' => 'Human Resources Department', 'status' => 'active']
             );
@@ -96,7 +96,7 @@ class SyncAllDummyData extends Command
                     'email' => 'admin@example.com',
                     'phone_number' => '081234567890',
                     'address' => '123 Admin Street',
-                    'department_id' => $deptHR Administrator->id,
+                    'department_id' => $deptHR->id,
                     'role_id' => $hrRole->id,
                     'supervisor_id' => null,
                     'hire_date' => '2020-01-01',

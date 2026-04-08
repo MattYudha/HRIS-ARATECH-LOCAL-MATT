@@ -113,7 +113,7 @@ class LeaveRequestController extends Controller
     public function update(Request $request, LeaveRequest $leaveRequest)
     {
         $role = session('role');
-        $isAdminOrManager / Unit Head = in_array($role, ['HR Administrator', 'Super Admin', 'Manager / Unit Head']);
+        $isAdminOrManager = in_array($role, ['HR Administrator', 'Super Admin', 'Manager / Unit Head']);
 
         $rules = [
             'leave_type' => 'required|string',
@@ -121,7 +121,7 @@ class LeaveRequestController extends Controller
             'end_date' => 'required|date|after_or_equal:start_date',
         ];
 
-        if ($isAdminOrManager / Unit Head) {
+        if ($isAdminOrManager) {
             $rules['employee_id'] = 'required|exists:employees,id';
             $rules['status'] = 'required|string';
         }
@@ -130,7 +130,7 @@ class LeaveRequestController extends Controller
 
         $data = $request->except(['status', 'employee_id']);
 
-        if ($isAdminOrManager / Unit Head) {
+        if ($isAdminOrManager) {
             $data['status'] = $request->status;
             $data['employee_id'] = $request->employee_id;
         } else {

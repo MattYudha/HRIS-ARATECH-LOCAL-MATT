@@ -11,7 +11,7 @@
     <div class="container-fluid">
         <!-- Key Metrics -->
         <div class="row mb-4">
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3 mb-3">
                 <div class="card border-left-primary">
                     <div class="card-body">
                         <h6 class="text-primary font-weight-bold mb-1">Total Employees</h6>
@@ -19,7 +19,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3 mb-3">
                 <div class="card border-left-success">
                     <div class="card-body">
                         <h6 class="text-success font-weight-bold mb-1">Excellent</h6>
@@ -28,7 +28,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3 mb-3">
                 <div class="card border-left-info">
                     <div class="card-body">
                         <h6 class="text-info font-weight-bold mb-1">Good Performance</h6>
@@ -37,7 +37,7 @@
                     </div>
                 </div>
             </div>
-            <div class="col-md-3">
+            <div class="col-12 col-sm-6 col-md-3 mb-3">
                 <div class="card border-left-danger">
                     <div class="card-body">
                         <h6 class="text-danger font-weight-bold mb-1">Unresolved Incidents</h6>
@@ -50,7 +50,7 @@
 
         <div class="row">
             <!-- Top Performers -->
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 <div class="card">
                     <div class="card-header bg-success text-white">
                         <h5 class="mb-0">Top 5 Performers</h5>
@@ -62,9 +62,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <div>
                                         <h6 class="mb-1">
-                                            {{ $index + 1 }}. {{ $record->employee->fullname }}
+                                            {{ $index + 1 }}. {{ $record->employee?->fullname ?? 'Unknown' }}
                                         </h6>
-                                        <small class="text-muted">{{ $record->employee->department->name }} • {{ $record->employee->role?->title }}</small>
+                                        <small class="text-muted">{{ $record->employee?->department?->name ?? 'Unknown' }} • {{ $record->employee?->role?->title ?? 'Unknown' }}</small>
                                     </div>
                                     <span class="badge badge-success" style="height: fit-content;">{{ round($record->composite_score, 2) }}</span>
                                 </div>
@@ -81,7 +81,7 @@
             </div>
 
             <!-- Bottom Performers -->
-            <div class="col-md-6">
+            <div class="col-12 col-md-6 mb-3">
                 <div class="card">
                     <div class="card-header bg-warning text-dark">
                         <h5 class="mb-0">Bottom 5 Performers (Development Focus)</h5>
@@ -93,9 +93,9 @@
                                 <div class="d-flex w-100 justify-content-between">
                                     <div>
                                         <h6 class="mb-1">
-                                            {{ $index + 1 }}. {{ $record->employee->fullname }}
+                                            {{ $index + 1 }}. {{ $record->employee?->fullname ?? 'Unknown' }}
                                         </h6>
-                                        <small class="text-muted">{{ $record->employee->department->name }} • {{ $record->employee->role?->title }}</small>
+                                        <small class="text-muted">{{ $record->employee?->department?->name ?? 'Unknown' }} • {{ $record->employee?->role?->title ?? 'Unknown' }}</small>
                                     </div>
                                     <span class="badge badge-warning" style="height: fit-content;">{{ round($record->composite_score, 2) }}</span>
                                 </div>
@@ -114,7 +114,7 @@
 
         <!-- Department Performance -->
         <div class="row mt-4">
-            <div class="col-md-12">
+            <div class="col-12 mb-3">
                 <div class="card">
                     <div class="card-header">
                         <h5 class="card-title mb-0">Department Performance Comparison</h5>
@@ -173,7 +173,7 @@
         <!-- Recent Incidents -->
         @if($recentIncidents->count() > 0)
         <div class="row mt-4">
-            <div class="col-md-12">
+            <div class="col-12 mb-3">
                 <div class="card">
                     <div class="card-header bg-danger text-white">
                         <h5 class="card-title mb-0">Unresolved Incidents</h5>
@@ -194,7 +194,7 @@
                                 <tbody>
                                     @foreach($recentIncidents as $incident)
                                     <tr>
-                                        <td><strong>{{ $incident->employee->fullname }}</strong></td>
+                                        <td><strong>{{ $incident->employee?->fullname ?? 'Unknown' }}</strong></td>
                                         <td>{{ ucfirst(str_replace('_', ' ', $incident->type)) }}</td>
                                         <td>{{ $incident->incident_date->format('d M Y') }}</td>
                                         <td>
@@ -231,7 +231,7 @@
 
         <!-- Export Actions -->
         <div class="row mt-4">
-            <div class="col-md-12">
+            <div class="col-12 mb-3">
                 <a href="{{ route('reports.monthly-recap') }}?period={{ $period }}" class="btn btn-info">
                     <i class="fas fa-list"></i> View Monthly Recap
                 </a>

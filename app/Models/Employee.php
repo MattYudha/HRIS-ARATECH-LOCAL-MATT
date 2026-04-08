@@ -134,6 +134,12 @@ class Employee extends Model
     {
         return $this->hasMany(LeaveBalance::class);
     }
+    
+    public function kpiRecords()
+    {
+        return $this->hasMany(EmployeeKPIRecord::class);
+    }
+
 
     public function incidents()
     {

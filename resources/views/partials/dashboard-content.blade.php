@@ -11,10 +11,10 @@
     ] as [$title, $count, $icon, $bg])
     <div class="col-6 col-lg-3 col-md-6">
         <div class="card shadow-sm h-100">
-            <div class="card-body d-flex justify-content-between align-items-center px-4 py-4">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="text-muted mb-1">{{ $title }}</h6>
-                    <h3 class="fw-bold mb-0">{{ $count }}</h3>
+                    <h6 class="text-muted mb-1 text-truncate" style="max-width: 100px; font-size: 0.85rem;">{{ $title }}</h6>
+                    <h3 class="fw-bold mb-0 fs-4">{{ $count }}</h3>
                 </div>
                 <div class="icon-circle {{ $bg }}">
                     <i class="bi {{ $icon }}"></i>
@@ -56,10 +56,10 @@
     ] as [$title, $count, $icon, $bg])
     <div class="col-6 col-lg-3 col-md-6">
         <div class="card shadow-sm h-100">
-            <div class="card-body d-flex justify-content-between align-items-center px-4 py-4">
+            <div class="card-body p-3 d-flex justify-content-between align-items-center">
                 <div>
-                    <h6 class="text-muted mb-1">{{ $title }}</h6>
-                    <h3 class="fw-bold mb-0">{{ $count }}</h3>
+                    <h6 class="text-muted mb-1 text-truncate" style="max-width: 100px; font-size: 0.85rem;">{{ $title }}</h6>
+                    <h3 class="fw-bold mb-0 fs-4">{{ $count }}</h3>
                 </div>
                 <div class="icon-circle {{ $bg }}">
                     <i class="bi {{ $icon }}"></i>
@@ -152,13 +152,13 @@
 {{-- ================= STYLE ================= --}}
 <style>
 .icon-circle {
-    width: 52px;
-    height: 52px;
-    border-radius: 14px;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 26px;
+    font-size: 20px;
     color: #fff;
 }
 .bg-purple { background: linear-gradient(135deg, #8b5cf6, #a78bfa); }

@@ -4,6 +4,7 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Support\Facades\Blade;
+use Illuminate\Pagination\Paginator;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -22,6 +23,8 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
+        Paginator::useBootstrapFive();
+
         // Register missing signature verification route as a fallback since routes/web.php is read-only
         \Illuminate\Support\Facades\Route::middleware(['web'])
             ->get('verify-signature', [\App\Http\Controllers\SignatureController::class, 'publicVerify'])

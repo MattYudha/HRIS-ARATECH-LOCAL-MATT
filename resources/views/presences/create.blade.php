@@ -199,7 +199,7 @@
                             <div class="mb-3">
                                 <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
                                 <div class="position-relative" style="width: 100%; max-width: 400px;">
-                                    <video id="video-wfo" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                    <video id="video-wfo" autoplay muted playsinline style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; border: 2px solid #ddd;"></video>
                                 </div>
                                 <div id="face-status-wfo" class="mt-2">
                                     <span class="badge bg-secondary">Menunggu Kamera...</span>
@@ -270,7 +270,7 @@
                             <div class="mb-3">
                                 <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
                                 <div class="position-relative" style="width: 100%; max-width: 400px;">
-                                    <video id="video-wfh" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                    <video id="video-wfh" autoplay muted playsinline style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; border: 2px solid #ddd;"></video>
                                 </div>
                                 <div id="face-status-wfh" class="mt-2">
                                     <span class="badge bg-secondary">Menunggu Kamera...</span>
@@ -349,7 +349,7 @@
                             <div class="mb-3">
                                 <label class="form-label"><i class="bi bi-camera"></i> <strong>Verifikasi Wajah</strong></label>
                                 <div class="position-relative" style="width: 100%; max-width: 400px;">
-                                    <video id="video-wfa" width="400" height="300" autoplay muted style="border-radius: 10px; border: 2px solid #ddd;"></video>
+                                    <video id="video-wfa" autoplay muted playsinline style="width: 100%; max-width: 400px; height: auto; border-radius: 10px; border: 2px solid #ddd;"></video>
                                 </div>
                                 <div id="face-status-wfa" class="mt-2">
                                     <span class="badge bg-secondary">Menunggu Kamera...</span>
