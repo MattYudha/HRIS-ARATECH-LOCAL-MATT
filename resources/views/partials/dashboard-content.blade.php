@@ -1,7 +1,7 @@
 {{-- ================= STAT CARDS ================= --}}
 
 @if($isGlobal ?? false)
-{{-- HR Administrator / Super Admin / Super Admin: Show global stats --}}
+{{-- HR Administrator / Master Admin / Master Admin: Show global stats --}}
 <div class="row g-3 mb-4">
     @foreach ([
         ['Departments', $departmentCount ?? 0, 'bi-diagram-3', 'bg-purple'],

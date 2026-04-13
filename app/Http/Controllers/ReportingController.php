@@ -25,14 +25,14 @@ class ReportingController extends Controller
         $period = request('period', now()->format('Y-m'));
         $department = $user->employee?->department;
 
-        // Access: Manager / Unit Head/HR Administrator/Super Admin see broader data; other roles see diri sendiri
-        if (!in_array($roleTitle, ['Manager / Unit Head', 'HR Administrator', 'Super Admin'])) {
+        // Access: Manager / Unit Head/HR Administrator/Master Admin see broader data; other roles see diri sendiri
+        if (!in_array($roleTitle, ['Manager / Unit Head', 'HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
             if (!$user->employee) {
                 abort(403, 'Unauthorized access');
             }
             $employees = collect([$user->employee]);
         } else {
-            // Get employees (department-based for managers, all for HR Administrator/Super Admin)
+            // Get employees (department-based for managers, all for HR Administrator/Master Admin)
             if ($roleTitle === 'Manager / Unit Head') {
                 $employees = Employee::where('department_id', $department->id ?? 0)->get();
             } else {
@@ -82,8 +82,8 @@ class ReportingController extends Controller
         $user = Auth::user();
         $roleTitle = $user->employee?->role->title ?? null;
 
-        if (!in_array($roleTitle, ['HR Administrator', 'Super Admin'])) {
-            abort(403, 'Only HR Administrator can access executive dashboard');
+        if (!in_array($roleTitle, ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
+            abort(403, 'Only HR Administrator or Master Admin can access executive dashboard');
         }
 
         $period = request('period', now()->format('Y-m'));
@@ -193,7 +193,7 @@ class ReportingController extends Controller
             'company_address' => 'Jakarta, Indonesia',
         ]);
 
-        if ($user->id !== $employee->user_id && !in_array($user->employee?->role->title ?? null, ['HR Administrator', 'Super Admin', 'Manager / Unit Head'])) {
+        if ($user->id !== $employee->user_id && !in_array($user->employee?->role->title ?? null, ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN, 'Manager / Unit Head'])) {
             abort(403, 'Unauthorized');
         }
 
@@ -270,8 +270,8 @@ class ReportingController extends Controller
         $period = request('period', now()->format('Y-m'));
         
         // Define data visibility based on role using Eloquent
-        if (in_array($roleTitle, ['HR Administrator', 'Super Admin', 'Super Admin'])) {
-            // HR Administrator/Super Admin/Super Admin see everything
+        if (in_array($roleTitle, ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
+            // HR Administrator/Master Admin see everything
             $records = EmployeeKPIRecord::with(['employee.department', 'kpi'])
                 ->where('period', $period)
                 ->orderBy('employee_id')

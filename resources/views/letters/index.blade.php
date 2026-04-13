@@ -4,7 +4,7 @@
 
 @php
     $userRole = Auth::user()->employee?->role?->title;
-    $isHROrPowerUser = in_array($userRole, ['HR Administrator', 'Super Admin']);
+    $isHROrPowerUser = \App\Constants\Roles::isAdmin($userRole);
     $pendingCount = $isHROrPowerUser ? \App\Models\Letter::where('status', 'pending')->count() : 0;
 @endphp
 <div class="page-heading">

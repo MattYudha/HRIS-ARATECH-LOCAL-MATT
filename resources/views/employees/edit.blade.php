@@ -49,7 +49,7 @@
 
 @php
     $role = session('role');
-    $isAdmin = in_array($role, ['HR Administrator', 'Super Admin']);
+    $isAdmin = \App\Constants\Roles::isAdmin($role);
     // Everyone can edit their own personal data sections (Family, Bank, Documents, etc.)
     $canEditFamily = true;
     $canDeleteFamily = true;
@@ -124,7 +124,7 @@
                                         <i class="bi bi-credit-card me-1"></i> Finance & Docs
                                     </button>
                                 </li>
-                                @if(in_array(session('role'), ['HR Administrator', 'Super Admin']) && $userAccount)
+                                @if(\App\Constants\Roles::isAdmin(session('role')) && $userAccount)
                                 <li class="nav-item" role="presentation">
                                     <button class="nav-link" id="security-tab" data-bs-toggle="tab" data-bs-target="#security" type="button" role="tab" aria-controls="security" aria-selected="false">
                                         <i class="bi bi-shield-lock me-1"></i> Security
@@ -286,7 +286,7 @@
                                                 <label class="form-label">Contract Expiry</label>
                                                 <input type="date" name="contract_expiry" class="form-control" value="{{ old('contract_expiry', $employee->contract_expiry ? $employee->contract_expiry->format('Y-m-d') : '') }}" {{ $isAdmin ? '' : 'readonly' }}>
                                             </div>
-                                            @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+                                            @if(\App\Constants\Roles::isAdmin(session('role')))
                                             <div class="mb-3">
                                                 <label class="form-label">Reporting To (Supervisor)</label>
                                                 <select name="supervisor_id" class="form-select">
@@ -472,7 +472,7 @@
                                 </div>
 
                                 <!-- Security Tab -->
-                                @if(in_array(session('role'), ['HR Administrator', 'Super Admin']) && $userAccount)
+                                @if(\App\Constants\Roles::isAdmin(session('role')) && $userAccount)
                                 <div class="tab-pane fade" id="security" role="tabpanel" aria-labelledby="security-tab">
                                     <div class="alert alert-light-info border-0 rounded-3 mb-4">
                                         <div class="d-flex align-items-center">

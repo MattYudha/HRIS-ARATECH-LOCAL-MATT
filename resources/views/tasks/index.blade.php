@@ -30,7 +30,7 @@
                 <div class="d-flex justify-content-end mb-3">
                     @php
                         $userRole = session('role');
-                        $canManageTasks = in_array($userRole, ['HR Administrator', 'Manager / Unit Head', 'Super Admin']);
+                        $canManageTasks = \App\Constants\Roles::isAdmin($userRole) || $userRole === \App\Constants\Roles::MANAGER_UNIT_HEAD;
                     @endphp
 
                     @if ($canManageTasks)

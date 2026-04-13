@@ -45,7 +45,7 @@
             </div>
         </div>
         <div class="card-footer d-flex justify-content-end">
-            @if(in_array(session('role'), ['HR Administrator', 'Super Admin', 'Super Admin']))
+            @if(\App\Constants\Roles::isAdmin(session('role')))
             <a href="{{ route('inventory-usage-logs.edit', $log->id) }}" class="btn btn-warning me-2">
                 <i class="bi bi-pencil"></i> Edit
             </a>

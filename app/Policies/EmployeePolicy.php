@@ -53,7 +53,7 @@ class EmployeePolicy
     public function update(User $user, Employee $employee): bool
     {
         // Can update if:
-        // 1. Is Admin (HR Administrator/Super Admin)
+        // 1. Is Admin (HR Administrator/Master Admin)
         // 2. Is Manager / Unit Head of same department
         // 3. Is direct Supervisor
         // 4. Is Self (Profile update)

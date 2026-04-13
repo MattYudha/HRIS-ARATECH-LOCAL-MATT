@@ -47,7 +47,7 @@
 
                     <div class="mb-3">
                         <label for="employee_id" class="form-label">Employee</label>
-                        @if(in_array(session('role'), ['HR Administrator', 'Super Admin', 'Manager / Unit Head']))
+                        @if(\App\Constants\Roles::isAdmin(session('role')) || session('role') === \App\Constants\Roles::MANAGER_UNIT_HEAD)
                             <select class="form-select @error('employee_id') is-invalid @enderror" name="employee_id" required>
                                 <option value="">Select Employee</option>
                                 @foreach($employees as $employee)
@@ -92,7 +92,7 @@
 
                     <div class="mb-3">
                         <label for="status" class="form-label">Status</label>
-                        @if(in_array(session('role'), ['HR Administrator', 'Super Admin', 'Manager / Unit Head']))
+                        @if(\App\Constants\Roles::isAdmin(session('role')) || session('role') === \App\Constants\Roles::MANAGER_UNIT_HEAD)
                             <select class="form-select @error('status') is-invalid @enderror" name="status" required>
                                 <option value="">Select Status</option>
                                 @foreach($statuses as $status)

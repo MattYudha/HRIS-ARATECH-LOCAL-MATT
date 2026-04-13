@@ -110,8 +110,8 @@ class SignatureController extends Controller
         $user = Auth::user();
         $query = Signature::with('signer', 'signable', 'verifications');
 
-        // HR Administrator/Super Admin see all signatures
-        if ($user->employee && !in_array($user->employee->role->title, ['HR Administrator', 'Super Admin'])) {
+        // HR Administrator/Master Admin see all signatures
+        if ($user->employee && !\App\Constants\Roles::isAdmin($user->employee->role->title)) {
             $query->where('user_id', $user->id);
         }
 
@@ -121,15 +121,15 @@ class SignatureController extends Controller
     }
 
     /**
-     * Verify a signature (HR Administrator/Super Admin only)
+     * Verify a signature (HR Administrator/Master Admin only)
      */
     public function verify(Request $request, Signature $signature)
     {
-        // Authorization - HR Administrator/Super Admin only
+        // Authorization - HR Administrator/Master Admin only
         $user = Auth::user();
         $userRole = $user->employee->role->title ?? null;
-        if (!in_array($userRole, ['HR Administrator', 'Super Admin'])) {
-            abort(403, 'Only HR Administrator or Super Admins can verify signatures.');
+        if (!\App\Constants\Roles::isAdmin($userRole)) {
+            abort(403, 'Only HR Administrator or Master Admins can verify signatures.');
         }
 
         $request->validate([
@@ -161,7 +161,7 @@ class SignatureController extends Controller
     {
         // Authorization check
         $user = Auth::user();
-        if ($signature->user_id !== $user->id && ($user->employee && !in_array($user->employee->role->title, ['HR Administrator', 'Super Admin', 'Manager / Unit Head', 'Super Admin']))) {
+        if ($signature->user_id !== $user->id && ($user->employee && !\App\Constants\Roles::isAdmin($user->employee->role->title) && $user->employee->role->title !== 'Manager / Unit Head')) {
             abort(403, 'Unauthorized action.');
         }
 

@@ -25,7 +25,7 @@
     <div class="d-flex gap-2 mb-3 no-print">
         <a href="{{ route('payrolls.index') }}" class="btn btn-secondary btn-sm"><i class="bi bi-arrow-left"></i> Kembali</a>
         <button id="btn-print" class="btn btn-success btn-sm"><i class="bi bi-printer"></i> Cetak Slip</button>
-        @if(in_array(session('role'), ['Super Admin', 'HR Administrator', 'Super Admin']))
+        @if(\App\Constants\Roles::isAdmin(session('role')))
             <a href="{{ route('payrolls.edit', $payroll->id) }}" class="btn btn-warning btn-sm"><i class="bi bi-pencil"></i> Edit</a>
         @endif
         <span class="ms-auto">{!! $payroll->status_badge !!}</span>
@@ -273,7 +273,11 @@
                     <div class="signature-space"></div>
                     <p class="border-top d-inline-block mb-0" style="min-width: 140px;">
                         <strong class="text-white">________________</strong><br>
+                        @if(\App\Constants\Roles::isAdmin(session('role')))
+                        <small class="text-gray-400">Master Admin</small>
+                        @else
                         <small class="text-gray-400">HR Administrator Manager / Unit Head</small>
+                        @endif
                     </p>
                 </div>
             </div>

@@ -78,7 +78,7 @@
                         </div>
                         <hr>
                         <div class="d-flex gap-2">
-                            @if($leaveRequest->status == 'pending' && in_array(session('role'), ['HR Administrator', 'Super Admin', 'Manager / Unit Head']))
+                            @if($leaveRequest->status == 'pending' && (\App\Constants\Roles::isAdmin(session('role')) || session('role') === \App\Constants\Roles::MANAGER_UNIT_HEAD))
                                 <a href="{{ url('leave-requests/confirm/'.$leaveRequest->id) }}" class="btn btn-success btn-sm">
                                     <i class="bi bi-check-lg"></i> Confirm
                                 </a>

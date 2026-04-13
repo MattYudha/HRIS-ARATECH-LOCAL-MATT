@@ -61,7 +61,7 @@
                         </button>
                     </div>
                     <div class="col-md-3 text-end">
-                        @if (in_array(session('role'), ['Super Admin', 'HR Administrator', 'Super Admin']))
+                        @if (\App\Constants\Roles::isAdmin(session('role')))
                             <a href="{{ route('payrolls.create') }}" class="btn btn-success btn-sm">
                                 <i class="bi bi-plus-circle"></i> Buat Payroll
                             </a>
@@ -71,11 +71,13 @@
             </div>
         </div>
 
-        @if(session('success'))
-            <div class="alert alert-success alert-dismissible fade show">
-                <i class="bi bi-check-circle"></i> {{ session('success') }}
-                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-            </div>
+        @if(\App\Constants\Roles::isSuperAdmin(session('role')))
+            @if(session('success'))
+                <div class="alert alert-success alert-dismissible fade show">
+                    <i class="bi bi-check-circle"></i> {{ session('success') }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            @endif
         @endif
 
         <div class="card shadow-sm">

@@ -72,7 +72,7 @@ class KPIController extends Controller
         $user = Auth::user();
         $employee = Employee::findOrFail($id);
 
-        if ($user->id !== $employee->user_id && !in_array($user->employee?->role->title ?? null, ['Manager / Unit Head', 'HR Administrator', 'Super Admin'])) {
+        if (($user->employee?->id ?? null) !== $employee->id && !\App\Constants\Roles::isAdmin(session('role')) && ($user->employee?->role?->title ?? '') !== \App\Constants\Roles::MANAGER_UNIT_HEAD) {
             abort(403, 'Unauthorized');
         }
 
@@ -386,7 +386,7 @@ class KPIController extends Controller
         $user = Auth::user();
         
         // Authorization check
-        if (!in_array($user->employee?->role->title ?? null, ['HR Administrator', 'Super Admin'])) {
+        if (!\App\Constants\Roles::isAdmin($user->employee?->role?->title ?? '')) {
             abort(403, 'Unauthorized');
         }
 
@@ -459,7 +459,7 @@ class KPIController extends Controller
         $employee = Employee::findOrFail($id);
 
         // Authorization: User can view their own trend, or managers/HR Administrator can view anyone's
-        if ($user->id !== $employee->user_id && !in_array($user->employee?->role->title ?? null, ['Manager / Unit Head', 'HR Administrator', 'Super Admin'])) {
+        if (($user->employee?->id ?? null) !== $employee->id && !\App\Constants\Roles::isAdmin(session('role')) && ($user->employee?->role?->title ?? '') !== \App\Constants\Roles::MANAGER_UNIT_HEAD) {
             abort(403, 'Unauthorized');
         }
 

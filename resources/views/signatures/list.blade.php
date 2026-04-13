@@ -121,7 +121,7 @@
                                 <div class="btn-group btn-group-sm">
                                     @php
                                         $userRole = Auth::user()->employee->role->title ?? null;
-                                        $canVerify = in_array($userRole, ['HR Administrator', 'Super Admin']);
+                                        $canVerify = \App\Constants\Roles::isAdmin($userRole);
                                     @endphp
 
                                     @if($canVerify && !$signature->is_verified)

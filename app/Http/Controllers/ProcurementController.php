@@ -35,7 +35,7 @@ class ProcurementController extends Controller
                         $btns .= '<a href="'.route('procurements.receive', $row->id).'" class="btn btn-outline-success" title="Mark as Received (Restock)"><i class="bi bi-box-seam"></i></a>';
                     }
 
-                    if (in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
+                    if (\App\Constants\Roles::isAdmin(session('role'))) {
                          $btns .= '<form action="'.route('procurements.destroy', $row->id).'" method="POST" class="d-inline">
                                 '.csrf_field().'
                                 '.method_field('DELETE').'

@@ -16,12 +16,12 @@ use Illuminate\Support\Facades\Auth;
 class DashboardController extends Controller
 {
     /**
-     * Check if current user is global user (HR Administrator, Super Admin, Super Admin)
+     * Check if current user is global user (HR Administrator, Master Admin)
      */
     private function isGlobalUser()
     {
         $role = session('role');
-        return in_array($role, ['HR Administrator', 'Super Admin', 'Super Admin']);
+        return \App\Constants\Roles::isAdmin($role);
     }
 
     /**

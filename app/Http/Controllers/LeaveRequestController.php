@@ -17,7 +17,7 @@ class LeaveRequestController extends Controller
             $role = session('role');
             $query = LeaveRequest::with('employee');
             
-            if (in_array($role, ['HR Administrator', 'Super Admin'])) {
+            if (\App\Constants\Roles::isAdmin($role)) {
                 // Full access
             } elseif ($role === 'Manager / Unit Head') {
                 $deptId = auth()->user()->employee->department_id;
@@ -36,7 +36,7 @@ class LeaveRequestController extends Controller
                     $btns .= '<a href="'.route('leave-requests.edit', $row->id).'" class="btn btn-outline-warning"><i class="bi bi-pencil"></i></a>';
                     
                     $role = session('role');
-                    $canApprove = in_array($role, ['HR Administrator', 'Super Admin', 'Manager / Unit Head']);
+                    $canApprove = \App\Constants\Roles::isAdmin($role) || $role === \App\Constants\Roles::MANAGER_UNIT_HEAD;
                     
                     if($row->status == 'pending' && $canApprove){
                         $btns .= '<a href="'.url('leave-requests/confirm/'.$row->id).'" class="btn btn-outline-success"><i class="bi bi-check-lg"></i></a>';
@@ -77,8 +77,8 @@ class LeaveRequestController extends Controller
 
     public function store(Request $request)
     {
-        if (!in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
-            // Kalau bukan HR Administrator/Super Admin, maka employee_id diambil dari session.
+        if (!\App\Constants\Roles::isAdmin(session('role'))) {
+            // Kalau bukan HR Administrator/Master Admin, maka employee_id diambil dari session.
             $request->merge(['employee_id' => session('employee_id')]);
         }
 
@@ -113,7 +113,7 @@ class LeaveRequestController extends Controller
     public function update(Request $request, LeaveRequest $leaveRequest)
     {
         $role = session('role');
-        $isAdminOrManager = in_array($role, ['HR Administrator', 'Super Admin', 'Manager / Unit Head']);
+        $isAdminOrManager = \App\Constants\Roles::isAdmin($role) || $role === \App\Constants\Roles::MANAGER_UNIT_HEAD;
 
         $rules = [
             'leave_type' => 'required|string',

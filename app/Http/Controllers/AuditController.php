@@ -9,8 +9,8 @@ class AuditController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized: Only Super Admins can view Audit Trail.');
+        if (!auth()->user()->isMasterAdmin()) {
+            abort(403, 'Unauthorized: Only Master Admins can view Audit Trail.');
         }
 
         $logs = AuditLog::with('user', 'auditable')

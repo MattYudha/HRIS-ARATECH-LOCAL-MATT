@@ -32,11 +32,27 @@
             
             <div class="card-body">
 
-                <div class="d-flex gap-2 mb-3">
-                    <a href="{{ route('presences.create') }}" class="btn btn-primary">New Presence</a>
-                    <a href="{{ route('presences.calendar') }}" class="btn btn-info">Calendar View</a>
-                    <a href="{{ route('presences.statistics') }}" class="btn btn-secondary">Statistics</a>
-                    @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+<style>
+    @media (max-width: 768px) {
+        .presence-actions {
+            display: grid !important;
+            grid-template-columns: 1fr 1fr;
+            gap: 0.5rem;
+        }
+        .presence-actions .btn {
+            font-size: 0.8rem;
+            padding: 0.45rem 0.5rem;
+            text-align: center;
+            width: 100%;
+        }
+    }
+</style>
+
+                <div class="d-flex flex-wrap gap-2 mb-3 presence-actions">
+                    <a href="{{ route('presences.create') }}" class="btn btn-primary"><i class="bi bi-plus-circle"></i> New Presence</a>
+                    <a href="{{ route('presences.calendar') }}" class="btn btn-info"><i class="bi bi-calendar3"></i> Calendar View</a>
+                    <a href="{{ route('presences.statistics') }}" class="btn btn-secondary"><i class="bi bi-bar-chart"></i> Statistics</a>
+                    @if(\App\Constants\Roles::isAdmin(session('role')))
                         <a href="{{ route('presences.export') }}" class="btn btn-success"><i class="bi bi-download"></i> Export CSV</a>
                     @endif
                 </div>

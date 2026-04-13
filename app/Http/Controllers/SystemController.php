@@ -8,8 +8,8 @@ class SystemController extends Controller
 {
     public function index()
     {
-        if (!auth()->user()->isSuperAdmin()) {
-            abort(403, 'Unauthorized: Only Super Admins can manage system.');
+        if (!auth()->user()->isMasterAdmin()) {
+            abort(403, 'Unauthorized: Only Master Admins can manage system.');
         }
 
         return view('system.index');
@@ -17,7 +17,7 @@ class SystemController extends Controller
 
     public function backup()
     {
-        if (!auth()->user()->isSuperAdmin()) {
+        if (!auth()->user()->isMasterAdmin()) {
             abort(403);
         }
 

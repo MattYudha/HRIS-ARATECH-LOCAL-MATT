@@ -31,6 +31,7 @@ fi
 
 # ─── Clear & cache config ─────────────────────────────────────────────────────
 echo "🧹 Clearing caches..."
+mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions
 php artisan config:clear
 php artisan route:clear
 php artisan view:clear

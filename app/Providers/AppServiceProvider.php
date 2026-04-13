@@ -31,7 +31,7 @@ class AppServiceProvider extends ServiceProvider
             ->name('signatures.public-verify');
 
         // Fix for route collision: specific POST route for verification
-        \Illuminate\Support\Facades\Route::middleware(['web', 'auth', 'role:HR Administrator,Super Admin'])
+        \Illuminate\Support\Facades\Route::middleware(['web', 'auth', 'role:HR Administrator,' . \App\Constants\Roles::MASTER_ADMIN])
             ->post('signature-approve/{signature}', [\App\Http\Controllers\SignatureController::class, 'verify'])
             ->name('signatures.verify.fixed');
     }

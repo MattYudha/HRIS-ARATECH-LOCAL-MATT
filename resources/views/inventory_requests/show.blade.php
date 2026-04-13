@@ -105,7 +105,7 @@
                     </div>
                     <div class="card-body d-grid gap-2">
                         @php $role = session('role'); @endphp
-                        @if($inventoryRequest->status == 'pending' && in_array($role, ['HR Administrator', 'Super Admin']))
+                        @if($inventoryRequest->status == 'pending' && \App\Constants\Roles::isAdmin($role))
                             <a href="{{ route('inventory-requests.approve', $inventoryRequest->id) }}" class="btn btn-success">
                                 <i class="bi bi-check-lg"></i> Approve Request
                             </a>
@@ -114,7 +114,7 @@
                             </button>
                         @endif
 
-                        @if(in_array($role, ['HR Administrator', 'Super Admin']) || $inventoryRequest->employee_id == session('employee_id'))
+                        @if(\App\Constants\Roles::isAdmin($role) || $inventoryRequest->employee_id == session('employee_id'))
                             <a href="{{ route('inventory-requests.edit', $inventoryRequest->id) }}" class="btn btn-warning">
                                 <i class="bi bi-pencil"></i> Edit Details
                             </a>
@@ -124,7 +124,7 @@
                             <i class="bi bi-arrow-left"></i> Back to List
                         </a>
 
-                        @if(in_array($role, ['HR Administrator', 'Super Admin']))
+                        @if(\App\Constants\Roles::isAdmin($role))
                             <form action="{{ route('inventory-requests.destroy', $inventoryRequest->id) }}" method="POST" onsubmit="return confirm('Hapus pengajuan ini?')">
                                 @csrf
                                 @method('DELETE')

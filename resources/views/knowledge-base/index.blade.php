@@ -802,7 +802,7 @@
             @endforeach
         @endif
         <div class="alert alert-warning mb-3">
-            <i class="bi bi-lock"></i> Panduan ini khusus untuk role <strong>HR Administrator</strong>, <strong>Super Admin</strong>, <strong>Manager / Unit Head</strong>, dan <strong>Super Admin</strong>.
+            <i class="bi bi-lock"></i> Panduan ini khusus untuk role <strong>HR Administrator</strong>, <strong>Master Admin</strong>, <strong>Manager / Unit Head</strong>, dan <strong>Master Admin</strong>.
         </div>
 
         {{-- 3.1 Kelola Karyawan --}}
@@ -871,9 +871,9 @@
                     <table class="table table-bordered table-sm">
                         <thead class="table-light"><tr><th>Role</th><th>Akses</th></tr></thead>
                         <tbody>
-                            <tr><td><span class="badge bg-dark">Super Admin</span></td><td>Akses penuh ke semua fitur</td></tr>
+                            <tr><td><span class="badge bg-dark">Master Admin</span></td><td>Akses penuh ke semua fitur</td></tr>
                             <tr><td><span class="badge bg-danger">HR Administrator</span></td><td>Kelola karyawan, payroll, cuti, inventory, surat</td></tr>
-                            <tr><td><span class="badge bg-warning text-dark">Super Admin</span></td><td>Sama seperti HR Administrator</td></tr>
+                            <tr><td><span class="badge bg-warning text-dark">Master Admin</span></td><td>Sama seperti HR Administrator</td></tr>
                             <tr><td><span class="badge bg-primary">Manager / Unit Head</span></td><td>Lihat tim, approve KPI/cuti, buat task</td></tr>
                             <tr><td><span class="badge bg-info">Employee</span></td><td>Akses dasar: absensi, task, profil</td></tr>
                             <tr><td><span class="badge bg-secondary">Employee</span></td><td>Akses dasar: absensi, task, profil</td></tr>
@@ -945,7 +945,7 @@
                     </ol>
                     <p class="fw-bold mt-2">Siapa bisa assign ke siapa?</p>
                     <ul>
-                        <li><strong>HR Administrator / Super Admin / Super Admin</strong> → semua karyawan aktif.</li>
+                        <li><strong>HR Administrator / Master Admin / Master Admin</strong> → semua karyawan aktif.</li>
                         <li><strong>Manager / Unit Head</strong> → karyawan di departemennya.</li>
                         <li><strong>Supervisor</strong> → bawahan langsung saja.</li>
                     </ul>
@@ -1050,7 +1050,7 @@
             ['q' => 'Task saya tidak muncul di daftar?', 'a' => 'Pastikan Anda login dengan akun yang benar. Task hanya muncul untuk karyawan yang di-assign. Jika yakin seharusnya muncul, hubungi atasan atau HR Administrator.', 'kw' => 'task tidak muncul hilang kosong daftar'],
             ['q' => 'Bagaimana cara submit KPI?', 'a' => 'Buka <strong>Payroll & KPI → KPI Dashboard</strong>, lalu klik <strong>"Submit KPI"</strong>. Isi self-assessment Anda dan tunggu persetujuan atasan.', 'kw' => 'kpi submit kirim penilaian kinerja'],
             ['q' => 'Apakah data saya aman di sistem HRIS?', 'a' => 'Ya. Sistem menggunakan enkripsi dan hak akses berbasis role. Data pribadi hanya bisa diakses oleh Anda sendiri dan HR Administrator. Pastikan selalu logout setelah selesai.', 'kw' => 'data aman keamanan privasi rahasia'],
-            ['q' => 'Siapa yang harus dihubungi jika butuh bantuan?', 'a' => '<table class="table table-bordered table-sm mb-0"><tr><th>Masalah HR Administrator/Umum</th><td>Tim HR Administrator</td></tr><tr><th>Masalah Teknis</th><td>IT Admin / Super Admin</td></tr><tr><th>Masalah Keuangan</th><td>Finance / HR Administrator</td></tr><tr><th>Keluhan/Saran</th><td>Atasan langsung / HR Administrator</td></tr></table>', 'kw' => 'kontak hubungi bantuan help support admin'],
+            ['q' => 'Siapa yang harus dihubungi jika butuh bantuan?', 'a' => '<table class="table table-bordered table-sm mb-0"><tr><th>Masalah HR Administrator/Umum</th><td>Tim HR Administrator</td></tr><tr><th>Masalah Teknis</th><td>IT Admin / Master Admin</td></tr><tr><th>Masalah Keuangan</th><td>Finance / HR Administrator</td></tr><tr><th>Keluhan/Saran</th><td>Atasan langsung / HR Administrator</td></tr></table>', 'kw' => 'kontak hubungi bantuan help support admin'],
         ];
         @endphp
 

@@ -99,7 +99,7 @@ class EmployeeController extends Controller
         $officeLocations = OfficeLocation::orderBy('name')->get();
         // Filter supervisors to only those with "Manager / Unit Head" role
         $employees = Employee::whereHas('role', function($q) {
-            $q->where('title', 'Manager / Unit Head');
+            $q->where('title', \App\Constants\Roles::MANAGER_UNIT_HEAD);
         })->orderBy('fullname')->get();
         return view('employees.create', compact('departments', 'roles', 'officeLocations', 'employees'));
     }

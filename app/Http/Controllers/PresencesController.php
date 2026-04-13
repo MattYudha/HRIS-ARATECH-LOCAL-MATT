@@ -18,7 +18,7 @@ class PresencesController extends Controller
         if ($request->ajax()) {
             $query = Presence::with(['employee.officeLocation', 'officeLocation']);
             
-            if (!in_array(session('role'), ['HR Administrator', 'Super Admin', ])) {
+            if (!in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
                 $query->where('employee_id', session('employee_id'));
             }
             
@@ -27,7 +27,7 @@ class PresencesController extends Controller
                 ->addColumn('action', function($row){
                     $btns = '<div class="btn-group btn-group-sm" role="group">';
                     
-                    if (in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
+                    if (in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
                         $btns .= '<a href="'.route('presences.edit', $row->id).'" class="btn btn-outline-warning"><i class="bi bi-pencil"></i></a>';
                         $csrf = csrf_token();
                         $btns .= '
@@ -342,13 +342,13 @@ class PresencesController extends Controller
             // Show warning if late
             if ($isLate) {
                 $lateMinutes = $checkInTime->diffInMinutes($workStartTime->copy()->addMinutes($lateThreshold));
-                $targetRoute = in_array(session('role'), ['HR Administrator', 'Super Admin']) ? 'presences.index' : 'dashboard';
+                $targetRoute = in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN]) ? 'presences.index' : 'dashboard';
                 return redirect()->route($targetRoute)->with('warning', "Presensi berhasil dicatat. Anda terlambat {$lateMinutes} menit.");
             }
             
         }
 
-        $targetRoute = in_array(session('role'), ['HR Administrator', 'Super Admin']) ? 'presences.index' : 'dashboard';
+        $targetRoute = in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN]) ? 'presences.index' : 'dashboard';
         return redirect()->route($targetRoute)->with('success', 'Presensi berhasil dicatat.');
     }
 
@@ -605,7 +605,7 @@ class PresencesController extends Controller
             'longitude' => $request->longitude ?? $presence->longitude,
         ]);
 
-        $targetRoute = in_array(session('role'), ['HR Administrator', 'Super Admin']) ? 'presences.index' : 'dashboard';
+        $targetRoute = in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN]) ? 'presences.index' : 'dashboard';
         return redirect()->route($targetRoute)->with('success', 'Check-out berhasil dicatat.');
     }
 
@@ -640,7 +640,7 @@ class PresencesController extends Controller
             ->whereYear('date', $year)
             ->whereMonth('date', $month);
 
-        if (!in_array(session('role'), ['HR Administrator', 'Super Admin']) && $employeeId) {
+        if (!in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN]) && $employeeId) {
             $query->where('employee_id', $employeeId);
         }
 
@@ -704,7 +704,7 @@ class PresencesController extends Controller
         $query = Presence::with('employee')
             ->whereBetween('date', [$startDate, $endDate]);
 
-        if (in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
+        if (in_array(session('role'), ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN])) {
             $employees = Employee::orderBy('fullname')->get();
             if ($selectedEmployeeId) {
                 $query->where('employee_id', $selectedEmployeeId);

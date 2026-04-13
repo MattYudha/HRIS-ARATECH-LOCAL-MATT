@@ -22,11 +22,11 @@ class TaskController extends Controller
             $query = Task::with('employee');
 
             // Access rules:
-            // - Super Admin       : can see all tasks
+            // - Master Admin       : can see all tasks
             // - HR Administrator               : see tasks in their department (or filtered department_id)
             // - Manager / Unit Head          : see tasks of their direct subordinates (+ own tasks)
-            // - Super Admin/Staff  : see only their own tasks
-            if ($role === 'Super Admin') {
+            // - Master Admin/Staff  : see only their own tasks
+            if ($role === \App\Constants\Roles::MASTER_ADMIN) {
                 // no additional restriction
             } elseif ($role === 'HR Administrator') {
                 // HR Administrator: by department. If department_id is provided, use it; otherwise use HR Administrator's own department.
@@ -51,7 +51,7 @@ class TaskController extends Controller
                       });
                 });
             } else {
-                // Super Admin, Employee, Employee, and any other roles:
+                // Master Admin, Employee, and any other roles:
                 // only see their own tasks
                 if ($employeeId) {
                     $query->where('assigned_to', $employeeId);
@@ -74,7 +74,7 @@ class TaskController extends Controller
                     }
                     
                     $userRole = session('role');
-                    if (in_array($userRole, ['HR Administrator', 'Manager / Unit Head', 'Super Admin'])) {
+                    if (\App\Constants\Roles::isAdmin($userRole) || $userRole === \App\Constants\Roles::MANAGER_UNIT_HEAD) {
                         $btns .= '<a href="'.route('tasks.edit', $row->id).'" class="btn btn-outline-primary"><i class="bi bi-pencil"></i></a>';
                         $csrf = csrf_token();
                         $btns .= '
@@ -231,8 +231,8 @@ class TaskController extends Controller
 
         $query = Employee::query()->where('status', 'active');
 
-        // HR Administrator and Super Admin can assign to everyone
-        if (in_array($role, ['HR Administrator', 'Super Admin', 'Super Admin'])) {
+        // HR Administrator and Master Admin can assign to everyone
+        if (\App\Constants\Roles::isAdmin($role)) {
             return $query->orderBy('fullname')->get();
         }
 

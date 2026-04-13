@@ -26,7 +26,7 @@ class InventoryDispatchController extends Controller
                     $btns = '<div class="btn-group btn-group-sm" role="group">';
                     $btns .= '<a href="'.route('inventory-dispatches.show', $row->id).'" class="btn btn-outline-info" title="Detail / Barcode"><i class="bi bi-eye"></i></a>';
                     
-                    if (in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
+                    if (\App\Constants\Roles::isAdmin(session('role'))) {
                         $btns .= '<form action="'.route('inventory-dispatches.destroy', $row->id).'" method="POST" class="d-inline">
                                 '.csrf_field().'
                                 '.method_field('DELETE').'

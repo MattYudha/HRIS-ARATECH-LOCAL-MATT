@@ -83,7 +83,7 @@
                                 <i class="bi bi-arrow-left"></i> Back
                             </a>
 
-                            @if (in_array(session('role'), ['HR Administrator', 'Manager / Unit Head', 'Super Admin']))
+                            @if (\App\Constants\Roles::isAdmin(session('role')) || session('role') === \App\Constants\Roles::MANAGER_UNIT_HEAD)
                                 <a href="{{ route('tasks.edit', $task->id) }}" class="btn btn-primary">
                                     <i class="bi bi-pencil"></i> Edit Task
                                 </a>

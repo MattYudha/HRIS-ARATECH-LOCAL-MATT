@@ -36,6 +36,10 @@ services:
       - ./storage/app:/var/www/html/storage/app
       - ./storage/logs:/var/www/html/storage/logs
       - ./bootstrap/cache:/var/www/html/bootstrap/cache
+      - ./resources/views:/var/www/html/resources/views
+      - ./routes:/var/www/html/routes
+      - ./app:/var/www/html/app
+      - ./database:/var/www/html/database
     depends_on:
       db:
         condition: service_healthy

@@ -28,7 +28,7 @@
         <div class="card mb-3">
             <div class="card-body">
                 <form method="GET" action="{{ route('presences.statistics') }}" class="row g-3">
-                    @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+                    @if(\App\Constants\Roles::isAdmin(session('role')))
                     <div class="col-md-4">
                         <label for="employee_id" class="form-label">Employee</label>
                         <select class="form-select" id="employee_id" name="employee_id">
@@ -47,7 +47,7 @@
                         <label for="start_date" class="form-label">Start Date</label>
                         <input type="date" class="form-control" id="start_date" name="start_date" value="{{ $startDate }}" required>
                     </div>
-                    @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+                    @if(\App\Constants\Roles::isAdmin(session('role')))
                     <div class="col-md-3">
                     @else
                     <div class="col-md-5">

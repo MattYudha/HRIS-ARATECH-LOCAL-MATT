@@ -19,7 +19,7 @@ class InventoryRequestController extends Controller
             $role = session('role');
             $query = InventoryRequest::with(['employee', 'inventory']);
             
-            if (in_array($role, ['HR Administrator', 'Super Admin'])) {
+            if (\App\Constants\Roles::isAdmin($role)) {
                 // Full access
             } elseif ($role === 'Manager / Unit Head') {
                 $deptId = auth()->user()->employee->department_id;
@@ -37,7 +37,7 @@ class InventoryRequestController extends Controller
                     $btns .= '<a href="'.route('inventory-requests.show', $row->id).'" class="btn btn-outline-info" title="Detail"><i class="bi bi-eye"></i></a>';
                     
                     $role = session('role');
-                    $isAdmin = in_array($role, ['HR Administrator', 'Super Admin']);
+                    $isAdmin = \App\Constants\Roles::isAdmin($role);
                     
                     if($isAdmin || $row->employee_id == session('employee_id')) {
                          $btns .= '<a href="'.route('inventory-requests.edit', $row->id).'" class="btn btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>';
@@ -137,7 +137,7 @@ class InventoryRequestController extends Controller
     public function update(Request $request, InventoryRequest $inventoryRequest)
     {
         $role = session('role');
-        $isAdmin = in_array($role, ['HR Administrator', 'Super Admin']);
+        $isAdmin = \App\Constants\Roles::isAdmin($role);
 
         $rules = [
             'request_type' => 'required|in:new,repair,replacement',

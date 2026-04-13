@@ -18,8 +18,8 @@ class LetterController extends Controller
             $user = Auth::user();
             $query = Letter::with('user', 'approver', 'template');
             
-            // Only show own letters to non-HR Administrator users
-            if ($user->employee && $user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin') {
+            // Only show own letters to non-admin users
+            if ($user->employee && $user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN) {
                 $query->where('user_id', $user->id);
             }
             
@@ -98,9 +98,8 @@ class LetterController extends Controller
 
     public function show(Letter $letter)
     {
-        // IDOR Fix: Only allow creator or HR Administrator/Super Admin to view
         $user = Auth::user();
-        if ($letter->user_id !== $user->id && (!$user->employee || !in_array($user->employee->role->title, ['HR Administrator', 'Super Admin']))) {
+        if ($letter->user_id !== $user->id && (!$user->employee || !in_array($user->employee->role->title, ['HR Administrator', \App\Constants\Roles::MASTER_ADMIN]))) {
             abort(403, 'Unauthorized access to letter.');
         }
 
@@ -160,9 +159,8 @@ class LetterController extends Controller
 
     public function destroy(Letter $letter)
     {
-        // Only allow user who created the letter or HR Administrator/Super Admin to delete
         $user = Auth::user();
-        if ($letter->user_id !== $user->id && ($user->employee && $user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin')) {
+        if ($letter->user_id !== $user->id && ($user->employee && $user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN)) {
             return redirect()->route('letters.index')->with('error', 'You cannot delete this letter.');
         }
         
@@ -199,9 +197,9 @@ class LetterController extends Controller
 
     public function approve(Letter $letter)
     {
-        // Authorization check - only HR Administrator and Super Admin can approve
+        // Authorization check - only HR Administrator and Master Admin can approve
         $user = Auth::user();
-        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin')) {
+        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN)) {
             abort(403, 'Unauthorized action.');
         }
         
@@ -220,9 +218,9 @@ class LetterController extends Controller
 
     public function reject(Request $request, Letter $letter)
     {
-        // Authorization check - only HR Administrator and Super Admin can reject
+        // Authorization check - only HR Administrator and Master Admin can reject
         $user = Auth::user();
-        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin')) {
+        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN)) {
             abort(403, 'Unauthorized action.');
         }
         
@@ -238,9 +236,9 @@ class LetterController extends Controller
 
     public function print(Letter $letter)
     {
-        // Authorization check - only HR Administrator and Super Admin can print
+        // Authorization check - only HR Administrator and Master Admin can print
         $user = Auth::user();
-        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin')) {
+        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN)) {
             abort(403, 'Unauthorized action.');
         }
         
@@ -258,9 +256,9 @@ class LetterController extends Controller
 
     public function export(Letter $letter)
     {
-        // Authorization - only approved/printed letters can be exported, by HR Administrator/Super Admin
+        // Authorization - only approved/printed letters can be exported, by HR Administrator/Master Admin
         $user = Auth::user();
-        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== 'Super Admin')) {
+        if (!$user->employee || ($user->employee->role->title !== 'HR Administrator' && $user->employee->role->title !== \App\Constants\Roles::MASTER_ADMIN)) {
             abort(403, 'Unauthorized action.');
         }
         

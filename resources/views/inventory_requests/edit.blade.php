@@ -40,7 +40,7 @@
                     @csrf
                     @method('PUT')
                     
-                    @php $isAdmin = in_array(session('role'), ['HR Administrator', 'Super Admin']); @endphp
+                    @php $isAdmin = \App\Constants\Roles::isAdmin(session('role')); @endphp
 
                     <div class="row">
                         <div class="col-md-6">

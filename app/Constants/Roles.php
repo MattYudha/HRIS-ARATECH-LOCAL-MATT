@@ -5,30 +5,53 @@ namespace App\Constants;
 class Roles
 {
     // Role Titles
-    const SUPER_ADMIN = 'Super Admin';
-    const HR_ADMINISTRATOR = 'HR Administrator';
-    const MANAGER_UNIT_HEAD = 'Manager / Unit Head';
-    const SUPERVISOR = 'Supervisor';
-    const EMPLOYEE = 'Employee';
-    
+    const MASTER_ADMIN       = 'Master Admin'; // Rebranded from Super Admin
+    const HR_ADMINISTRATOR   = 'HR Administrator';
+    const MANAGER_UNIT_HEAD  = 'Manager / Unit Head';
+    const SUPERVISOR         = 'Supervisor';
+    const EMPLOYEE           = 'Employee';
+    const MARKETING          = 'Marketing';
+
     // Role Groups
-    const ADMIN_ROLES = [self::SUPER_ADMIN, self::HR_ADMINISTRATOR];
-    
-    const SUPERVISOR_ROLES = [
-        self::SUPER_ADMIN,
+    const ADMIN_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR, 'Super Admin'];
+
+    const FINANCE_FULL_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR, 'Super Admin'];
+
+    const FINANCE_OPERATOR_ROLES = [
+        self::MASTER_ADMIN,
         self::HR_ADMINISTRATOR,
         self::MANAGER_UNIT_HEAD,
-        self::SUPERVISOR
+        self::MARKETING,
+        'Super Admin',
     ];
-    
-    const ALL_ROLES = [
-        self::SUPER_ADMIN,
+
+    const FINANCE_VIEW_ROLES = [
+        self::MASTER_ADMIN,
+        self::HR_ADMINISTRATOR,
+        self::MANAGER_UNIT_HEAD,
+        self::MARKETING,
+        self::SUPERVISOR,
+        'Super Admin',
+    ];
+
+    const SUPERVISOR_ROLES = [
+        self::MASTER_ADMIN,
         self::HR_ADMINISTRATOR,
         self::MANAGER_UNIT_HEAD,
         self::SUPERVISOR,
-        self::EMPLOYEE
+        'Super Admin',
     ];
-    
+
+    const ALL_ROLES = [
+        self::MASTER_ADMIN,
+        self::HR_ADMINISTRATOR,
+        self::MANAGER_UNIT_HEAD,
+        self::SUPERVISOR,
+        self::EMPLOYEE,
+        self::MARKETING,
+        'Super Admin',
+    ];
+
     /**
      * Check if role is admin role
      */
@@ -36,7 +59,23 @@ class Roles
     {
         return in_array($role, self::ADMIN_ROLES);
     }
-    
+
+    /**
+     * Check if role has full finance access
+     */
+    public static function hasFullFinanceAccess(string $role): bool
+    {
+        return in_array($role, self::FINANCE_FULL_ROLES);
+    }
+
+    /**
+     * Check if role can operate (input) finance transactions
+     */
+    public static function canOperateFinance(string $role): bool
+    {
+        return in_array($role, self::FINANCE_OPERATOR_ROLES);
+    }
+
     /**
      * Check if role is supervisor role
      */
@@ -44,7 +83,7 @@ class Roles
     {
         return in_array($role, self::SUPERVISOR_ROLES);
     }
-    
+
     /**
      * Get all role names
      */

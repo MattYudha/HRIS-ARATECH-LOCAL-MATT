@@ -99,7 +99,7 @@
                                 <div class="mb-3">
                                     <label class="text-muted">Salary</label>
                                     <div class="fw-semibold">
-                                        @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+                                        @if(\App\Constants\Roles::isAdmin(session('role')))
                                             Rp {{ number_format($employee->salary, 0, ',', '.') }}
                                         @else
                                             ***
@@ -166,7 +166,7 @@
                                                             <div><strong>Role:</strong> {{ $mutation->oldRole->title ?? '-' }} <i class="bi bi-arrow-right mx-1"></i> {{ $mutation->newRole->title ?? '-' }}</div>
                                                         @endif
                                                         @if((float)$mutation->old_salary !== (float)$mutation->new_salary)
-                                                            @if(in_array(session('role'), ['HR Administrator', 'Super Admin']))
+                                                            @if(\App\Constants\Roles::isAdmin(session('role')))
                                                                 <div><strong>Salary:</strong> Rp {{ number_format($mutation->old_salary, 0, ',', '.') }} <i class="bi bi-arrow-right mx-1"></i> Rp {{ number_format($mutation->new_salary, 0, ',', '.') }}</div>
                                                             @else
                                                                 <div><strong>Salary:</strong> *** <i class="bi bi-arrow-right mx-1"></i> ***</div>
@@ -253,7 +253,7 @@
 
                             @php
                                 $role = session('role');
-                                $isAdmin = in_array($role, ['HR Administrator', 'Super Admin']);
+                                $isAdmin = \App\Constants\Roles::isAdmin($role);
                                 $currentEmployeeId = session('employee_id');
                             @endphp
 

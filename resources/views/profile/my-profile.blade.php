@@ -3,146 +3,362 @@
 @section('content')
 
 @php
-    $isAdmin = in_array(session('role'), ['HR Administrator', 'Super Admin']);
+    $isAdmin = \App\Constants\Roles::isAdmin(session('role'));
 @endphp
 
 <style>
-    .profile-header {
-        background: linear-gradient(90deg, #1e3a8a 0%, #3b82f6 100%);
+    /* ═══════════════════════════════════════════
+       PROFILE HEADER
+    ═══════════════════════════════════════════ */
+    .profile-card {
+        background: linear-gradient(135deg, #1e3a8a 0%, #2563eb 60%, #3b82f6 100%);
         color: white;
-        padding: 2rem;
-        border-radius: 0.5rem;
-        margin-bottom: 2rem;
+        border-radius: 12px;
+        margin-bottom: 1.5rem;
+        overflow: hidden;
+        box-shadow: 0 4px 20px rgba(30, 58, 138, 0.25);
+        position: relative;
+    }
+
+    .profile-card-body {
         display: flex;
         align-items: center;
-        gap: 2rem;
+        gap: 1.5rem;
+        padding: 1.75rem 2rem;
+        position: relative;
     }
 
     .profile-avatar {
-        width: 120px;
-        height: 120px;
+        width: 100px;
+        height: 100px;
+        min-width: 100px;
         border-radius: 50%;
-        border: 4px solid rgba(255, 255, 255, 0.3);
-        background-color: #f3f4f6;
+        border: 3px solid rgba(255, 255, 255, 0.4);
+        background: rgba(255,255,255,0.15);
         display: flex;
         align-items: center;
         justify-content: center;
         overflow: hidden;
+        flex-shrink: 0;
+    }
+
+    .profile-avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
     }
 
     .profile-avatar i {
-        font-size: 4rem;
-        color: #9ca3af;
+        font-size: 3rem;
+        color: rgba(255,255,255,0.7);
     }
 
-    .profile-info h3 {
-        color: #facc15;
-        margin-bottom: 0.25rem;
-        font-weight: 700;
-        text-transform: uppercase;
+    .profile-meta {
+        flex: 1;
+        min-width: 0;
     }
 
-    .profile-info .emp-code {
-        color: #facc15;
-        font-size: 1.25rem;
+    .profile-emp-code {
+        font-size: 0.8rem;
         font-weight: 600;
-        margin-bottom: 0.5rem;
-    }
-
-    .profile-info .position {
-        font-size: 0.9rem;
+        color: #fde68a;
+        letter-spacing: 0.1em;
         text-transform: uppercase;
-        letter-spacing: 0.05em;
+        margin-bottom: 0.2rem;
     }
 
-    .nav-tabs-custom .nav-link {
+    .profile-name {
+        font-size: 1.4rem;
+        font-weight: 700;
+        color: #facc15;
+        text-transform: uppercase;
+        letter-spacing: 0.03em;
+        margin-bottom: 0.3rem;
+        line-height: 1.2;
+        word-break: break-word;
+    }
+
+    .profile-position {
+        font-size: 0.8rem;
+        color: rgba(255,255,255,0.8);
+        text-transform: uppercase;
+        letter-spacing: 0.06em;
+    }
+
+    .profile-edit-btn {
+        flex-shrink: 0;
+    }
+
+    .profile-edit-btn .btn {
+        background: #facc15;
+        border: none;
+        color: #1e3a8a;
+        font-weight: 700;
+        font-size: 0.8rem;
+        padding: 0.5rem 1rem;
+        border-radius: 8px;
+        white-space: nowrap;
+        transition: all 0.2s ease;
+    }
+
+    .profile-edit-btn .btn:hover {
+        background: #fde68a;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+
+    /* ═══════════════════════════════════════════
+       TAB NAVIGATION WRAPPER
+    ═══════════════════════════════════════════ */
+    .profile-tabs-wrapper {
+        overflow-x: auto;
+        overflow-y: hidden;
+        -webkit-overflow-scrolling: touch;
+        scrollbar-width: none; /* Firefox */
+    }
+    .profile-tabs-wrapper::-webkit-scrollbar {
+        display: none; /* Chrome/Safari */
+    }
+
+    .profile-tabs-wrapper .nav {
+        display: flex;
+        flex-wrap: nowrap;
+        border-bottom: 2px solid #e5e7eb;
+        min-width: max-content;
+    }
+
+    .profile-tabs-wrapper .nav-link {
         border: none;
         border-bottom: 3px solid transparent;
+        margin-bottom: -2px;
         color: #6b7280;
         font-weight: 600;
         text-transform: uppercase;
-        font-size: 0.8rem;
-        padding: 1rem 1.5rem;
+        font-size: 0.75rem;
+        padding: 0.85rem 1.25rem;
+        white-space: nowrap;
+        transition: color 0.2s, border-color 0.2s;
+        background: transparent;
     }
 
-    .nav-tabs-custom .nav-link.active {
+    .profile-tabs-wrapper .nav-link:hover {
+        color: #1e3a8a;
+    }
+
+    .profile-tabs-wrapper .nav-link.active {
         color: #1e3a8a;
         border-bottom-color: #facc15;
         background: transparent;
     }
 
+    /* ═══════════════════════════════════════════
+       INFO TABLE (desktop: side by side)
+    ═══════════════════════════════════════════ */
+    .info-table {
+        width: 100%;
+    }
+
     .info-table th {
-        width: 250px;
+        width: 220px;
         font-weight: 500;
         color: #4b5563;
         border: none;
-        padding: 0.75rem 0;
+        padding: 0.7rem 0;
+        vertical-align: top;
     }
 
     .info-table td {
         border: none;
-        padding: 0.75rem 0;
-        color: #1f2937;
+        padding: 0.7rem 0;
+        color: #111827;
+        font-weight: 500;
+    }
+
+    .info-table tr {
+        border-bottom: 1px solid #f3f4f6;
+    }
+
+    .info-table tr:last-child {
+        border-bottom: none;
+    }
+
+    /* ═══════════════════════════════════════════
+       MOBILE RESPONSIVE  ≤ 768px
+    ═══════════════════════════════════════════ */
+    @media (max-width: 768px) {
+
+        /* Profile Card: stack avatar / meta / button */
+        .profile-card-body {
+            flex-direction: column;
+            align-items: center;
+            text-align: center;
+            padding: 1.5rem 1rem 1.25rem;
+            gap: 0.9rem;
+        }
+
+        .profile-avatar {
+            width: 80px;
+            height: 80px;
+            min-width: 80px;
+        }
+
+        .profile-avatar i {
+            font-size: 2.5rem;
+        }
+
+        .profile-meta {
+            width: 100%;
+        }
+
+        .profile-name {
+            font-size: 1.15rem;
+        }
+
+        /* Edit button: full width at bottom of card */
+        .profile-edit-btn {
+            width: 100%;
+        }
+
+        .profile-edit-btn .btn {
+            width: 100%;
+            padding: 0.6rem 1rem;
+            font-size: 0.85rem;
+            justify-content: center;
+            display: flex;
+            align-items: center;
+            gap: 0.4rem;
+        }
+
+        /* Tab content padding */
+        .tab-content.tablet-pad {
+            padding: 1rem !important;
+        }
+
+        /* Info table: stacked label above value */
+        .info-table tr {
+            display: flex;
+            flex-direction: column;
+            padding: 0.6rem 0;
+            border-bottom: 1px solid #f1f5f9;
+        }
+
+        .info-table tr:last-child {
+            border-bottom: none;
+        }
+
+        .info-table th {
+            width: 100%;
+            font-size: 0.7rem;
+            color: #9ca3af;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            font-weight: 700;
+            padding: 0 0 0.15rem;
+            border: none;
+        }
+
+        .info-table td {
+            width: 100%;
+            font-size: 0.92rem;
+            color: #111827;
+            font-weight: 500;
+            padding: 0;
+            border: none;
+        }
+    }
+
+    /* ═══════════════════════════════════════════
+       TABLET  769px – 1024px
+    ═══════════════════════════════════════════ */
+    @media (min-width: 769px) and (max-width: 1024px) {
+        .profile-card-body {
+            padding: 1.5rem;
+            gap: 1.25rem;
+        }
+
+        .profile-name {
+            font-size: 1.25rem;
+        }
+
+        .info-table th {
+            width: 180px;
+        }
     }
 </style>
 
 <div class="page-heading">
-    <div class="profile-header shadow-sm">
-        <div class="profile-avatar">
-            @if($employee->profile_photo)
-                <img src="{{ asset('storage/' . $employee->profile_photo) }}" alt="Profile" style="width: 100%; height: 100%; object-fit: cover;">
-            @else
-                <i class="bi bi-person-fill"></i>
-            @endif
-        </div>
-        <div class="profile-info">
-            <div class="emp-code">{{ $employee->emp_code ?? 'N/A' }}</div>
-            <h3>{{ $employee->fullname }}</h3>
-            <div class="position">
-                {{ $employee->department->name ?? 'N/A' }} & {{ $employee->role->title ?? 'N/A' }}
+
+    {{-- ══════════════════ Profile Header Card ══════════════════ --}}
+    <div class="profile-card shadow-sm">
+        <div class="profile-card-body">
+            {{-- Avatar --}}
+            <div class="profile-avatar">
+                @if($employee->profile_photo)
+                    <img src="{{ asset('storage/' . $employee->profile_photo) }}" alt="Profile Photo">
+                @else
+                    <i class="bi bi-person-fill"></i>
+                @endif
             </div>
-        </div>
-            <div class="ms-auto align-self-start">
-                <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-warning">
+
+            {{-- Employee Info --}}
+            <div class="profile-meta">
+                <div class="profile-emp-code">{{ $employee->emp_code ?? 'N/A' }}</div>
+                <div class="profile-name">{{ $employee->fullname }}</div>
+                <div class="profile-position">
+                    {{ $employee->department->name ?? 'N/A' }} &bull; {{ $employee->role->title ?? 'N/A' }}
+                </div>
+            </div>
+
+            {{-- Edit Button --}}
+            <div class="profile-edit-btn">
+                <a href="{{ route('employees.edit', $employee->id) }}" class="btn">
                     <i class="bi bi-pencil-square"></i> Edit Profile
                 </a>
             </div>
+        </div>
     </div>
 
+    {{-- ══════════════════ Tabs Section ══════════════════ --}}
     <section class="section">
-        <div class="card">
+        <div class="card shadow-sm border-0">
             <div class="card-body p-0">
-                <ul class="nav nav-tabs nav-tabs-custom border-bottom" id="profileTabs" role="tablist">
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link active" id="working-tab" data-bs-toggle="tab" data-bs-target="#working" type="button" role="tab" aria-controls="working" aria-selected="true">Working Information</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-controls="personal" aria-selected="false">Personal Information</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab" aria-controls="education" aria-selected="false">Education</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button" role="tab" aria-controls="family" aria-selected="false">Family Relation</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="career-tab" data-bs-toggle="tab" data-bs-target="#career" type="button" role="tab" aria-controls="career" aria-selected="false">Career History</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab" aria-controls="bank" aria-selected="false">Bank Account</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab" aria-controls="training" aria-selected="false">Training History</button>
-                    </li>
-                    <li class="nav-item" role="presentation">
-                        <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-controls="documents" aria-selected="false">Documents</button>
-                    </li>
-                </ul>
 
-                <div class="tab-content p-4" id="profileTabsContent">
-                    <!-- Working Information -->
+                {{-- Tab Navigation wrapped in scrollable div --}}
+                <div class="profile-tabs-wrapper">
+                    <ul class="nav" id="profileTabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="working-tab" data-bs-toggle="tab" data-bs-target="#working" type="button" role="tab" aria-selected="true">Working Information</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="personal-tab" data-bs-toggle="tab" data-bs-target="#personal" type="button" role="tab" aria-selected="false">Personal Information</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="education-tab" data-bs-toggle="tab" data-bs-target="#education" type="button" role="tab" aria-selected="false">Education</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="family-tab" data-bs-toggle="tab" data-bs-target="#family" type="button" role="tab" aria-selected="false">Family Relation</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="career-tab" data-bs-toggle="tab" data-bs-target="#career" type="button" role="tab" aria-selected="false">Career History</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="bank-tab" data-bs-toggle="tab" data-bs-target="#bank" type="button" role="tab" aria-selected="false">Bank Account</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="training-tab" data-bs-toggle="tab" data-bs-target="#training" type="button" role="tab" aria-selected="false">Training History</button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="documents-tab" data-bs-toggle="tab" data-bs-target="#documents" type="button" role="tab" aria-selected="false">Documents</button>
+                        </li>
+                    </ul>
+                </div>
+
+                {{-- Tab Content --}}
+                <div class="tab-content tablet-pad p-4" id="profileTabsContent">
+
+                    {{-- Working Information --}}
                     <div class="tab-pane fade show active" id="working" role="tabpanel" aria-labelledby="working-tab">
-                        <table class="table info-table">
+                        <table class="table info-table mb-0">
                             <tbody>
                                 <tr>
                                     <th>Join Date</th>
@@ -152,14 +368,14 @@
                                     <th>Resign Date</th>
                                     <td>{{ $employee->resign_date ? \Carbon\Carbon::parse($employee->resign_date)->format('d/m/Y') : '-' }}</td>
                                 </tr>
-                                 <tr>
-                                     <th>Permanent Date</th>
-                                     <td>{{ $employee->permanent_date ? $employee->permanent_date->format('d/m/Y') : '-' }}</td>
-                                 </tr>
-                                 <tr>
-                                     <th>Contract Expiry</th>
-                                     <td>{{ $employee->contract_expiry ? $employee->contract_expiry->format('d/m/Y') : '-' }}</td>
-                                 </tr>
+                                <tr>
+                                    <th>Permanent Date</th>
+                                    <td>{{ $employee->permanent_date ? $employee->permanent_date->format('d/m/Y') : '-' }}</td>
+                                </tr>
+                                <tr>
+                                    <th>Contract Expiry</th>
+                                    <td>{{ $employee->contract_expiry ? $employee->contract_expiry->format('d/m/Y') : '-' }}</td>
+                                </tr>
                                 <tr>
                                     <th>Work Location</th>
                                     <td>{{ $employee->department->name ?? 'Head Office' }}</td>
@@ -168,17 +384,17 @@
                                     <th>Homebase</th>
                                     <td>Head Office</td>
                                 </tr>
-                                 @if($isAdmin)
-                                 <tr>
-                                     <th>JG / PG</th>
-                                     <td>
-                                         @php
-                                             $latestPos = $employee->employeePositions->sortByDesc('start_date')->first();
-                                         @endphp
-                                         {{ $latestPos->pay_grade_id ?? '-' }}
-                                     </td>
-                                 </tr>
-                                 @endif
+                                @if($isAdmin)
+                                <tr>
+                                    <th>JG / PG</th>
+                                    <td>
+                                        @php
+                                            $latestPos = $employee->employeePositions->sortByDesc('start_date')->first();
+                                        @endphp
+                                        {{ $latestPos->pay_grade_id ?? '-' }}
+                                    </td>
+                                </tr>
+                                @endif
                                 <tr>
                                     <th>Employment Status</th>
                                     <td>{{ ucfirst($employee->employee_status ?? 'Permanent') }}</td>
@@ -187,9 +403,9 @@
                         </table>
                     </div>
 
-                    <!-- Personal Information -->
+                    {{-- Personal Information --}}
                     <div class="tab-pane fade" id="personal" role="tabpanel" aria-labelledby="personal-tab">
-                        <table class="table info-table">
+                        <table class="table info-table mb-0">
                             <tbody>
                                 <tr>
                                     <th>NIK</th>
@@ -231,9 +447,9 @@
                         </table>
                     </div>
 
-                    <!-- Education -->
+                    {{-- Education --}}
                     <div class="tab-pane fade" id="education" role="tabpanel" aria-labelledby="education-tab">
-                        <table class="table info-table">
+                        <table class="table info-table mb-0">
                             <tbody>
                                 <tr>
                                     <th>Latest Education Level</th>
@@ -243,11 +459,11 @@
                         </table>
                     </div>
 
-                    <!-- Family Relation -->
+                    {{-- Family Relation --}}
                     <div class="tab-pane fade" id="family" role="tabpanel" aria-labelledby="family-tab">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Name</th>
                                         <th>Relation</th>
@@ -265,7 +481,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center">No family data available.</td>
+                                            <td colspan="4" class="text-center text-muted py-4">No family data available.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -273,11 +489,11 @@
                         </div>
                     </div>
 
-                    <!-- Career History -->
+                    {{-- Career History --}}
                     <div class="tab-pane fade" id="career" role="tabpanel" aria-labelledby="career-tab">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
                                         <th>Type</th>
@@ -291,13 +507,13 @@
                                         <tr>
                                             <td>{{ $mutation->mutation_date->format('d/m/Y') }}</td>
                                             <td>{{ ucfirst($mutation->type) }}</td>
-                                            <td>{{ $mutation->oldDepartment->name ?? '-' }} - {{ $mutation->oldRole->title ?? '-' }}</td>
-                                            <td>{{ $mutation->newDepartment->name ?? '-' }} - {{ $mutation->newRole->title ?? '-' }}</td>
+                                            <td>{{ $mutation->oldDepartment->name ?? '-' }} – {{ $mutation->oldRole->title ?? '-' }}</td>
+                                            <td>{{ $mutation->newDepartment->name ?? '-' }} – {{ $mutation->newRole->title ?? '-' }}</td>
                                             <td>{{ $mutation->reason }}</td>
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted">No career history available.</td>
+                                            <td colspan="5" class="text-center text-muted py-4">No career history available.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -305,11 +521,11 @@
                         </div>
                     </div>
 
-                    <!-- Bank Account -->
+                    {{-- Bank Account --}}
                     <div class="tab-pane fade" id="bank" role="tabpanel" aria-labelledby="bank-tab">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Bank Name</th>
                                         <th>Account No</th>
@@ -333,7 +549,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted">No bank account information available.</td>
+                                            <td colspan="4" class="text-center text-muted py-4">No bank account information available.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
@@ -341,11 +557,11 @@
                         </div>
                     </div>
 
-                    <!-- Training History -->
+                    {{-- Training History --}}
                     <div class="tab-pane fade" id="training" role="tabpanel" aria-labelledby="training-tab">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Date</th>
                                         <th>Training Name</th>
@@ -366,11 +582,11 @@
                         </div>
                     </div>
 
-                    <!-- Documents -->
+                    {{-- Documents --}}
                     <div class="tab-pane fade" id="documents" role="tabpanel" aria-labelledby="documents-tab">
                         <div class="table-responsive">
-                            <table class="table table-bordered">
-                                <thead>
+                            <table class="table table-bordered mb-0">
+                                <thead class="table-light">
                                     <tr>
                                         <th>Document Type</th>
                                         <th>ID Number</th>
@@ -396,17 +612,19 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="4" class="text-center text-muted">No documents available.</td>
+                                            <td colspan="4" class="text-center text-muted py-4">No documents available.</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
                             </table>
                         </div>
                     </div>
-                </div>
+
+                </div>{{-- /tab-content --}}
             </div>
         </div>
     </section>
+
 </div>
 
 @endsection

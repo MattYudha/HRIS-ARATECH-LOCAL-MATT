@@ -59,7 +59,7 @@ class PayrollsController extends Controller
                     $btns = '<div class="btn-group btn-group-sm" role="group">';
                     $btns .= '<a href="' . route('payrolls.show', $row->id) . '" class="btn btn-outline-info" title="Lihat Slip"><i class="bi bi-eye"></i></a>';
 
-                    if (in_array(session('role'), ['Super Admin', 'HR Administrator', 'Super Admin'])) {
+                    if (in_array(session('role'), [\App\Constants\Roles::MASTER_ADMIN, 'HR Administrator'])) {
                         $btns .= '<a href="' . route('payrolls.edit', $row->id) . '" class="btn btn-outline-warning" title="Edit"><i class="bi bi-pencil"></i></a>';
                         $csrf = csrf_token();
                         $btns .= '

@@ -77,7 +77,7 @@
             @if($letter->status === 'pending')
                 @php
                     $userRole = Auth::user()->employee->role->title ?? null;
-                    $canApprove = in_array($userRole, ['HR Administrator', 'Super Admin']);
+                    $canApprove = \App\Constants\Roles::isAdmin($userRole);
                 @endphp
                 @if($canApprove)
                     <hr>
@@ -99,7 +99,7 @@
             @if($letter->status === 'approved')
                 @php
                     $userRole = Auth::user()->employee->role->title ?? null;
-                    $canPrint = in_array($userRole, ['HR Administrator', 'Super Admin']);
+                    $canPrint = \App\Constants\Roles::isAdmin($userRole);
                 @endphp
                 @if($canPrint)
                     <hr>
@@ -121,7 +121,7 @@
             @if($letter->status === 'printed')
                 @php
                     $userRole = Auth::user()->employee->role->title ?? null;
-                    $canPrint = in_array($userRole, ['HR Administrator', 'Super Admin']);
+                    $canPrint = \App\Constants\Roles::isAdmin($userRole);
                 @endphp
                 @if($canPrint)
                     <hr>
@@ -182,7 +182,7 @@
 <!-- Reject Modal -->
 @php
     $userRole = Auth::user()->employee->role->title ?? null;
-    $canReject = in_array($userRole, ['HR Administrator', 'Super Admin']);
+    $canReject = \App\Constants\Roles::isAdmin($userRole);
 @endphp
 @if($canReject)
 <div class="modal fade" id="rejectModal" tabindex="-1">

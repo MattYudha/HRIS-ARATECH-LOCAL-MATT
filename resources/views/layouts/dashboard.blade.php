@@ -177,15 +177,17 @@
                     @php
                         $user = Auth::user();
                         $role = session('role');
-                        $isSuperAdmin = $role === \App\Constants\Roles::SUPER_ADMIN;
+                        $isMasterAdmin = $role === \App\Constants\Roles::MASTER_ADMIN;
                         $isAdmin = in_array($role, \App\Constants\Roles::ADMIN_ROLES);
                         $isManager = $role === \App\Constants\Roles::MANAGER_UNIT_HEAD;
                         $isSupervisor = $role === \App\Constants\Roles::SUPERVISOR;
                         $isEmployee = $role === \App\Constants\Roles::EMPLOYEE;
+                        $isMarketing = $role === \App\Constants\Roles::MARKETING;
 
-                        $isDevOrAdmin = $isAdmin || $isSuperAdmin;
-                        $isManagerOrAdmin = $isAdmin || $isSuperAdmin || $isManager;
-                        $isStaff = $isManagerOrAdmin || $isSupervisor || $isEmployee;
+                        $isDevOrAdmin = $isAdmin || $isMasterAdmin;
+                        $isManagerOrAdmin = $isAdmin || $isMasterAdmin || $isManager;
+                        $isMarketingOrAdmin = $isAdmin || $isMasterAdmin || $isMarketing;
+                        $isStaff = $isManagerOrAdmin || $isSupervisor || $isEmployee || $isMarketing;
 
                         $activeDashboard = request()->is('dashboard');
                         $activeEmployees = request()->is('employees*');
@@ -197,11 +199,18 @@
                         $activeLeaveRequests = request()->is('leave-requests*');
                         $activeIncidents = request()->is('incidents*');
 
-                        $activePayrolls = request()->is('payrolls*');
                         $activeKpiDashboard = request()->is('kpi/dashboard*') || request()->is('kpi-dashboard*');
                         $activeKpiTeam = request()->is('kpi/team*');
                         $activeKpiDepartment = request()->is('kpi/department*');
                         $activeKpiPending = request()->is('kpi/pending*') || request()->is('kpi/pending-approvals*');
+
+                        $activeFinanceTransactions = request()->is('finance/transactions*');
+                        $activeFinanceEntities = request()->is('finance/entities*');
+                        $activeFinanceAccounts = request()->is('finance/accounts*');
+                        $activeFinanceReports = request()->is('finance/reports*');
+                        $activeFinanceCharts = request()->is('finance/charts*');
+                        $activeFinanceClaims = request()->is('finance/claims*');
+                        $activeMyFinance = request()->is('finance/my-finance*');
 
                         $activeInventoryCategories = request()->is('inventory-categories*');
                         $activeInventories = request()->is('inventories*');
@@ -227,18 +236,19 @@
                         $hasAttendanceAccess = $user->hasAccess('attendance');
 
                         // Visibility helpers
-                        $isSuperAdmin = $user->isSuperAdmin();
-                        $showPayrollGroup = $isSuperAdmin || $isAdmin || $isManager || $hasKpiAccess;
-                        $showInventoryLogs = $isSuperAdmin || $isAdmin || $isManager || $user->hasAccess('inventory_logs');
-                        $showInventoryAdmin = $isSuperAdmin || $isAdmin || $user->hasAccess('inventory');
+                        $isMasterAdmin = $user->isMasterAdmin();
+                        $showPayrollGroup = $isMasterAdmin || $isAdmin || $isManager || $hasKpiAccess;
+                        $showInventoryLogs = $isMasterAdmin || $isAdmin || $isManager || $user->hasAccess('inventory_logs');
+                        $showInventoryAdmin = $isMasterAdmin || $isAdmin || $user->hasAccess('inventory');
 
                         $systemMenuActive = $activeRoles || request()->is('audit-trail*') || request()->is('system*');
                         $hrMenuActive = $activeEmployees || $activeEmployeeApprovals || $activeDepartments || $activeOfficeLocations || $activeTasks || $activeLeaveRequests || $activeIncidents;
-                        $payrollMenuActive = $activePayrolls || $activeKpiDashboard || $activeKpiTeam || $activeKpiDepartment || $activeKpiPending;
+                        $kpiMenuActive = $activeKpiDashboard || $activeKpiTeam || $activeKpiDepartment || $activeKpiPending;
+                        $financeMenuActive = $activeFinanceTransactions || $activeFinanceEntities || $activeFinanceAccounts || $activeFinanceReports || $activeFinanceCharts || $activeFinanceClaims;
                         $inventoryMenuActive = $activeInventoryCategories || $activeInventories || $activeInventoryUsage || $activeInventoryRequests || $activeVendors || $activeProcurements || $activeInventoryDispatches || $activeLogisticsShipments;
                         $lettersMenuActive = $activeLetters || $activeLetterTemplates || $activeLetterConfigs || $activeLetterArchives || $activeSignatureLogs;
                         $reportsMenuActive = $activeReportsExec || $activeReportsMonthly;
-                        $personalMenuActive = request()->is('my-profile') || request()->is('presences') || request()->is('knowledge-base*');
+                        $personalMenuActive = request()->is('my-profile') || request()->is('presences') || request()->is('knowledge-base*') || $activeMyFinance || $activeFinanceClaims;
                     @endphp
 
                     <!-- DASHBOARD -->
@@ -249,8 +259,8 @@
                         </a>
                     </li>
 
-                    <!-- SYSTEM SETTINGS (Super Admin Only) -->
-                    @if($isSuperAdmin)
+                    <!-- SYSTEM SETTINGS (Master Admin Only) -->
+                    @if($isMasterAdmin)
                     <li class="menu-group {{ $systemMenuActive ? 'expanded' : '' }}">
                         <div class="menu-group-header">
                             <i class="bi bi-gear-fill group-icon"></i>
@@ -296,7 +306,7 @@
                                 </a>
                             </li>
                             @endif
-                            @if($isAdmin || $isSuperAdmin)
+                            @if($isAdmin || $isMasterAdmin)
                             <li class="sidebar-item {{ $activeEmployeeApprovals ? 'active' : '' }}">
                                 <a href="{{ url('/employee-approvals') }}" class="sidebar-link">
                                     <i class="bi bi-check-circle"></i>
@@ -337,23 +347,15 @@
                         </ul>
                     </li>
 
-                    <!-- PAYROLL & KPI -->
+                    <!-- KEY PERFORMANCE (KPI) -->
                     @if($showPayrollGroup)
-                    <li class="menu-group {{ $payrollMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group {{ $kpiMenuActive ? 'expanded' : '' }}">
                         <div class="menu-group-header">
-                            <i class="bi bi-currency-dollar group-icon"></i>
-                            <span>Payroll & KPI</span>
+                            <i class="bi bi-speedometer group-icon"></i>
+                            <span>Key Performance (KPI)</span>
                             <i class="bi bi-chevron-right chevron"></i>
                         </div>
                         <ul class="menu-group-items">
-                            @if($isSuperAdmin || false || $hasKpiAccess)
-                            <li class="sidebar-item {{ $activePayrolls ? 'active' : '' }}">
-                                <a href="{{ url('/payrolls') }}" class="sidebar-link">
-                                    <i class="bi bi-currency-dollar"></i>
-                                    <span>Payrolls</span>
-                                </a>
-                            </li>
-                            @endif
                             @if($user->hasAccess('hr_reports') || $isAdmin || $isManager)
                             <li class="sidebar-item {{ $activeKpiDashboard ? 'active' : '' }}">
                                 <a href="{{ url('/kpi/dashboard') }}" class="sidebar-link">
@@ -362,7 +364,7 @@
                                 </a>
                             </li>
                             @endif
-                            @if($isSuperAdmin || $isManager)
+                            @if($isMasterAdmin || $isManager)
                             <li class="sidebar-item {{ $activeKpiTeam ? 'active' : '' }}">
                                 <a href="{{ url('/kpi/team') }}" class="sidebar-link">
                                     <i class="bi bi-people"></i>
@@ -379,6 +381,68 @@
                                 <a href="{{ url('/kpi/pending') }}" class="sidebar-link">
                                     <i class="bi bi-hourglass-split"></i>
                                     <span>Pending Approvals</span>
+                                </a>
+                            </li>
+                            @endif
+                        </ul>
+                    </li>
+                    @endif
+
+                    <!-- BUKU KAS & KEUANGAN MODULE (RBAC) -->
+                    @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isSupervisor)
+                    <li class="menu-group {{ $financeMenuActive ? 'expanded' : '' }}">
+                        <div class="menu-group-header">
+                            <i class="bi bi-wallet2 group-icon"></i>
+                            <span>Buku Kas & Keuangan</span>
+                            <i class="bi bi-chevron-right chevron"></i>
+                        </div>
+                        <ul class="menu-group-items">
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            <li class="sidebar-item {{ $activeFinanceTransactions ? 'active' : '' }}">
+                                <a href="{{ url('/finance/transactions') }}" class="sidebar-link">
+                                    <i class="bi bi-pencil-square"></i>
+                                    <span>Buku Kas (Ledger)</span>
+                                </a>
+                            </li>
+                            @endif
+                            
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            <li class="sidebar-item {{ $activeFinanceEntities ? 'active' : '' }}">
+                                <a href="{{ url('/finance/entities') }}" class="sidebar-link">
+                                    <i class="bi bi-building"></i>
+                                    <span>Master Entitas</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item {{ $activeFinanceAccounts ? 'active' : '' }}">
+                                <a href="{{ url('/finance/accounts') }}" class="sidebar-link">
+                                    <i class="bi bi-journal-bookmark"></i>
+                                    <span>Kategori Akun (CoA)</span>
+                                </a>
+                            </li>
+                            @endif
+
+                            <li class="sidebar-item {{ $activeFinanceReports ? 'active' : '' }}">
+                                <a href="{{ url('/finance/reports') }}" class="sidebar-link">
+                                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                                    <span>Laporan Keuangan</span>
+                                </a>
+                            </li>
+
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            <li class="sidebar-item {{ $activeFinanceCharts ? 'active' : '' }}">
+                                <a href="{{ url('/finance/charts') }}" class="sidebar-link">
+                                    <i class="bi bi-graph-up-arrow"></i>
+                                    <span>Grafik Analitik</span>
+                                </a>
+                            </li>
+                            @endif
+
+                            {{-- Admin: Claim Management --}}
+                            @if($isAdmin || $isMasterAdmin)
+                            <li class="sidebar-item {{ $activeFinanceClaims ? 'active' : '' }}">
+                                <a href="{{ url('/finance/claims') }}" class="sidebar-link">
+                                    <i class="bi bi-clipboard-check"></i>
+                                    <span>Kelola Klaim Biaya</span>
                                 </a>
                             </li>
                             @endif
@@ -424,7 +488,7 @@
                                 </a>
                             </li>
                             @endif
-                            @if($isSuperAdmin || false || $user->hasAccess('inventory'))
+                            @if($isMasterAdmin || false || $user->hasAccess('inventory'))
                             <hr class="mx-3 my-1 border-light opacity-25">
                             <li class="sidebar-item {{ $activeVendors ? 'active' : '' }}">
                                 <a href="{{ url('/vendors') }}" class="sidebar-link">
@@ -546,6 +610,20 @@
                                 <a href="{{ url('/presences') }}" class="sidebar-link">
                                     <i class="bi bi-table"></i>
                                     <span>Presences</span>
+                                </a>
+                            </li>
+
+                            <hr class="mx-3 my-1 border-light opacity-25">
+                            <li class="sidebar-item {{ $activeMyFinance ? 'active' : '' }}">
+                                <a href="{{ url('/finance/my-finance') }}" class="sidebar-link">
+                                    <i class="bi bi-wallet-fill"></i>
+                                    <span>Keuangan Saya</span>
+                                </a>
+                            </li>
+                            <li class="sidebar-item {{ $activeFinanceClaims ? 'active' : '' }}">
+                                <a href="{{ url('/finance/claims') }}" class="sidebar-link">
+                                    <i class="bi bi-receipt"></i>
+                                    <span>Klaim Biaya Saya</span>
                                 </a>
                             </li>
 

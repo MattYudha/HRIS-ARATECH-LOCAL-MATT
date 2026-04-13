@@ -17,7 +17,7 @@ class RoleController extends Controller
     // Show the form to create a new role
     public function create()
     {
-        $this->ensureSuperAdmin();
+        $this->ensureMasterAdmin();
         $modules = $this->accessModules();
         return view('roles.create', compact('modules'));
     }
@@ -25,7 +25,7 @@ class RoleController extends Controller
     // Store a newly created role
     public function store(Request $request)
     {
-        $this->ensureSuperAdmin();
+        $this->ensureMasterAdmin();
 
         $request->validate([
             'title' => 'required|unique:roles,title|max:255',
@@ -46,7 +46,7 @@ class RoleController extends Controller
     // Show the form for editing a role
     public function edit(Role $role)
     {
-        $this->ensureSuperAdmin();
+        $this->ensureMasterAdmin();
         $modules = $this->accessModules();
         return view('roles.edit', compact('role', 'modules'));
     }
@@ -54,7 +54,7 @@ class RoleController extends Controller
     // Update the specified role
     public function update(Request $request, Role $role)
     {
-        $this->ensureSuperAdmin();
+        $this->ensureMasterAdmin();
 
         $request->validate([
             'title' => 'required|max:255|unique:roles,title,' . $role->id,
@@ -75,7 +75,7 @@ class RoleController extends Controller
     // Delete a role
     public function destroy(Role $role)
     {
-        $this->ensureSuperAdmin();
+        $this->ensureMasterAdmin();
 
         $role->delete();
 
@@ -83,22 +83,22 @@ class RoleController extends Controller
     }
 
     /**
-     * Ensure current user is Super Admin
+     * Ensure current user is Master Admin
      * Checks database role, not session (prevents bypass via stale session)
      */
-    private function ensureSuperAdmin(): void
+    private function ensureMasterAdmin(): void
     {
         $user = auth()->user();
         $employee = $user?->employee;
         
-        // Check if employee exists and has Super Admin role
-        if (!$employee || !$employee->role || $employee->role->title !== \App\Constants\Roles::SUPER_ADMIN) {
-            \Log::warning('Non-Super Admin attempted role management', [
+        // Check if employee exists and has Master Admin role
+        if (!$employee || !$employee->role || $employee->role->title !== \App\Constants\Roles::MASTER_ADMIN) {
+            \Log::warning('Non-Master Admin attempted role management', [
                 'user_id' => $user?->id,
                 'role' => $employee?->role?->title ?? 'none'
             ]);
             
-            abort(403, 'Unauthorized: Only Super Admins can manage roles.');
+            abort(403, 'Unauthorized: Only Master Admins can manage roles.');
         }
     }
 

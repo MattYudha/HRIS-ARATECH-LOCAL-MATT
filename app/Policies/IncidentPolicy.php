@@ -48,7 +48,7 @@ class IncidentPolicy
      */
     public function create(User $user): bool
     {
-        // Only HR Administrator, Super Admin, or Manager / Unit Heads can record incidents/awards
+        // Only HR Administrator, Master Admin, or Manager / Unit Heads can record incidents/awards
         return $user->isAdmin() || $user->isManager();
     }
 
@@ -73,7 +73,7 @@ class IncidentPolicy
      */
     public function delete(User $user, Incident $incident): bool
     {
-        // Only HR Administrator and Super Admin can delete incident records
+        // Only HR Administrator and Master Admin can delete incident records
         return $user->isAdmin();
     }
 }

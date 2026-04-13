@@ -29,7 +29,7 @@ class InventoryController extends Controller
                     $btns = '<div class="btn-group btn-group-sm" role="group">';
                     $btns .= '<a href="'.route('inventories.show', $row->id).'" class="btn btn-outline-info"><i class="bi bi-eye"></i></a>';
                     
-                    if (in_array(session('role'), ['HR Administrator', 'Super Admin'])) {
+                    if (\App\Constants\Roles::isAdmin(session('role'))) {
                         $btns .= '<a href="'.route('inventories.edit', $row->id).'" class="btn btn-outline-warning"><i class="bi bi-pencil"></i></a>';
                         $btns .= '
                             <form action="'.route('inventories.destroy', $row->id).'" method="POST" class="d-inline" id="delete-form-'.$row->id.'">

@@ -14,7 +14,7 @@ use Illuminate\Support\Facades\DB;
 
 try {
     // Pastikan Role dan Department ada
-    $superAdminRole = Role::firstOrCreate(['title' => 'Super Admin'], ['description' => 'System Administrator']);
+    $superAdminRole = Role::firstOrCreate(['title' => 'Master Admin'], ['description' => 'System Administrator']);
     $hrDept = Department::firstOrCreate(['name' => 'Human Resources'], ['description' => 'HR Department', 'status' => 'active']);
 
     // Buat/Update User
