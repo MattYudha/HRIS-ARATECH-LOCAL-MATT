@@ -28,6 +28,14 @@
 .cat-card-lbl .cc-icon { font-size:1.6rem; }
 .cat-card-lbl .cc-name { font-size:.78rem; font-weight:800; color:#344767; }
 .cat-card-opt:checked + .cat-card-lbl { border-color:#5e72e4; background:#f0f2ff; box-shadow:0 0 0 3px rgba(94,114,228,.12); }
+
+/* Quick Add Button */
+.btn-quick-add {
+    background: none; border: none; color: #5e72e4; font-size: .68rem;
+    font-weight: 700; padding: 0; transition: color .15s;
+    display: inline-flex; align-items: center; gap: .25rem;
+}
+.btn-quick-add:hover { color: #233dd2; text-decoration: underline; }
 </style>
 @endpush
 
@@ -98,7 +106,12 @@
                     </div>
 
                     <div class="mb-4">
-                        <label class="fin-label" for="account_id">Akun Biaya <span class="text-danger">*</span></label>
+                        <label class="fin-label d-flex justify-content-between align-items-center" for="account_id">
+                            <span>Akun Biaya <span class="text-danger">*</span></span>
+                            <button type="button" class="btn-quick-add" onclick="quickModal.show()">
+                                <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                            </button>
+                        </label>
                         <select name="account_id" id="account_id" class="fin-input @error('account_id') is-invalid @enderror" required>
                             <option value="">— Pilih Akun Biaya —</option>
                             @foreach($accounts as $acc)
@@ -133,4 +146,97 @@
         </div>
     </div>
 </div>
+
+{{-- ── MODAL QUICK ADD ACCOUNT ────────────────── --}}
+<div class="modal fade" id="quickAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:16px">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color:#1a1f3c">Tambah Akun Biaya Baru</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="quickAccountForm">
+                <div class="modal-body p-4">
+                    <div class="mb-3">
+                        <label class="fin-label">Kode Akun <span class="text-danger">*</span></label>
+                        <input type="text" name="code" id="acc_code" class="fin-input" placeholder="Contoh: 5-1004" required>
+                        <p class="text-xs text-muted mt-1">Kode unik untuk mengidentifikasi akun (CoA).</p>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="fin-label">Nama Akun <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="acc_name" class="fin-input" placeholder="Contoh: Biaya Makan Siang" required>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="fin-label">Deskripsi <span class="opt">(Opsional)</span></label>
+                        <textarea name="description" id="acc_desc" class="fin-input" placeholder="Detail kegunaan akun ini..."></textarea>
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn text-xs fw-bold" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn px-4 text-white text-xs fw-bold" style="background:#5e72e4; border-radius:8px">
+                        <i class="bi bi-save me-1"></i> Simpan Akun
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
+
+@push('scripts')
+<script>
+const quickModal = new bootstrap.Modal(document.getElementById('quickAccountModal'));
+
+document.getElementById('quickAccountForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+
+    const formData = {
+        _token: '{{ csrf_token() }}',
+        category: 'expense', // Fixed for claims
+        code: document.getElementById('acc_code').value,
+        name: document.getElementById('acc_name').value,
+        description: document.getElementById('acc_desc').value,
+        is_active: 1
+    };
+
+    fetch('{{ route("finance.accounts.store") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Add to dropdown and select it
+            const select = document.getElementById('account_id');
+            const newOption = new Option(`[${result.data.code}] ${result.data.name}`, result.data.id, true, true);
+            select.add(newOption);
+            
+            quickModal.hide();
+            alert('Akun biaya baru berhasil ditambahkan!');
+        } else {
+            alert('Gagal: ' + result.message);
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan. Pastikan kode akun belum digunakan.');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+});
+</script>
+@endpush

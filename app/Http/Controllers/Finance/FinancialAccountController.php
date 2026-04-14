@@ -43,9 +43,17 @@ class FinancialAccountController extends Controller
             'is_active' => 'boolean',
         ]);
 
-        $validated['is_active'] = $request->has('is_active') ? true : false;
+        $validated['is_active'] = $request->has('is_active') ? $request->is_active : true;
 
-        FinancialAccount::create($validated);
+        $account = FinancialAccount::create($validated);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Akun berhasil ditambahkan.',
+                'data' => $account
+            ]);
+        }
 
         return redirect()->route('finance.accounts.index')->with('success', 'Akun/CoA berhasil ditambahkan.');
     }
