@@ -1,134 +1,526 @@
 @extends('layouts.dashboard')
 
-@section('title', 'Input Transaksi Kas Baru')
+@section('title', 'Catat Transaksi Baru')
 
 @push('styles')
 <style>
-.form-hero {
-    background: linear-gradient(135deg,#1a1f3c 0%,#2d3561 100%);
-    border-radius: 16px; padding: 1.2rem 1.6rem; margin-bottom: 1.25rem;
+/* ─── Enterprise Finance Form System ─────────────────────────────── */
+:root {
+    --ef-navy:        #1b2a4a;
+    --ef-slate:       #3d4e6c;
+    --ef-muted:       #6b7a99;
+    --ef-border:      #dce1ec;
+    --ef-border-soft: #eaecf3;
+    --ef-bg:          #f5f7fa;
+    --ef-white:       #ffffff;
+    --ef-debit-text:  #155c38;
+    --ef-debit-bg:    #eef7f2;
+    --ef-debit-ring:  #2d6a4f;
+    --ef-kredit-text: #7b1d22;
+    --ef-kredit-bg:   #fdf0f1;
+    --ef-kredit-ring: #9d2129;
 }
-.form-hero .fh-title { font-size:1rem; font-weight:800; color:#fff; margin:0; }
-.form-hero .fh-sub   { font-size:.74rem; color:rgba(255,255,255,.5); margin:.2rem 0 0; }
 
-.form-section-title {
-    font-size:.68rem; font-weight:800; letter-spacing:.09em; text-transform:uppercase;
-    color:#8392ab; border-left:3px solid #5e72e4; padding-left:.65rem; margin-bottom:1rem;
+/* Page Header */
+.ef-page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    padding-bottom: 1.2rem;
+    border-bottom: 1px solid var(--ef-border);
+    margin-bottom: 1.75rem;
 }
-.fin-label { font-size:.78rem; font-weight:700; color:#344767; margin-bottom:.4rem; display:block; }
-.fin-input {
-    border-radius:10px; border:1.5px solid #e4e8f0; font-size:.85rem;
-    padding:.6rem .9rem; transition:border-color .15s, box-shadow .15s; width:100%;
-    background:#fff;
+.ef-breadcrumb {
+    font-size: .73rem;
+    color: var(--ef-muted);
+    margin-bottom: .3rem;
+    display: flex;
+    align-items: center;
+    gap: .35rem;
 }
-.fin-input:focus { border-color:#5e72e4; box-shadow:0 0 0 3px rgba(94,114,228,.12); outline:none; }
-.fin-input.is-invalid { border-color:#f5365c; }
+.ef-breadcrumb a {
+    color: var(--ef-muted);
+    text-decoration: none;
+}
+.ef-breadcrumb a:hover { color: var(--ef-navy); }
+.ef-breadcrumb .sep { opacity: .5; }
+.ef-page-title {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    letter-spacing: -.02em;
+    margin: 0;
+}
+.ef-btn-back {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .42rem 1rem;
+    font-size: .77rem;
+    font-weight: 600;
+    border: 1px solid var(--ef-border);
+    border-radius: 6px;
+    background: var(--ef-white);
+    color: var(--ef-slate);
+    text-decoration: none;
+    transition: all .15s;
+    white-space: nowrap;
+}
+.ef-btn-back:hover {
+    background: var(--ef-bg);
+    color: var(--ef-navy);
+}
 
-/* Debit/Kredit toggle */
-.type-toggle { display:flex; gap:.6rem; }
-.type-radio  { display:none; }
-.type-btn {
-    flex:1; padding:.75rem 1.2rem; border-radius:12px; cursor:pointer;
-    border:2px solid #e4e8f0; background:#fff; transition:all .15s;
-    display:flex; align-items:center; justify-content:center; gap:.6rem;
-    font-size:.85rem; font-weight:700; color:#8392ab;
-    user-select:none;
+/* Main Card */
+.ef-card {
+    background: var(--ef-white);
+    border: 1px solid var(--ef-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 6px rgba(27,42,74,.06);
+    overflow: hidden;
 }
-.type-btn .tb-icon { font-size:1.3rem; }
-.type-btn .tb-label { line-height:1.2; }
-.type-btn .tb-label small { font-size:.65rem; font-weight:500; display:block; }
-.type-radio[value="debit"]:checked  + .type-btn { border-color:#1aae6f; background:#e2faf0; color:#1aae6f; box-shadow:0 0 0 3px rgba(26,174,111,.12); }
-.type-radio[value="kredit"]:checked + .type-btn { border-color:#f5365c; background:#fce8e8; color:#f5365c; box-shadow:0 0 0 3px rgba(245,54,92,.12); }
-.type-btn:hover { border-color:#adb5bd; background:#f8f9fa; }
+.ef-card-header {
+    display: flex;
+    align-items: center;
+    gap: .55rem;
+    padding: .9rem 1.5rem;
+    border-bottom: 1px solid var(--ef-border-soft);
+    background: #fcfcfe;
+}
+.ef-card-icon {
+    font-size: .9rem;
+    color: var(--ef-muted);
+    line-height: 1;
+}
+.ef-card-title-text {
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ef-muted);
+    margin: 0;
+}
+.ef-card-body { padding: 1.6rem; }
 
-/* Amount display */
-.amount-preview {
-    background:#f4f6fb; border-radius:10px; padding:.65rem 1rem;
-    font-size:1.3rem; font-weight:900; letter-spacing:-.01em;
-    text-align:center; border:1.5px solid #e4e8f0;
-    transition:color .2s, background .2s;
+/* Form Fields */
+.ef-field { margin-bottom: 1.25rem; }
+.ef-label {
+    display: block;
+    font-size: .77rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    margin-bottom: .45rem;
+    letter-spacing: -.01em;
 }
-.amount-preview.debit  { color:#1aae6f; background:#e6fbf2; border-color:#b0f0d4; }
-.amount-preview.kredit { color:#f5365c; background:#fce8e8; border-color:#f5bfc8; }
+.ef-label .req { color: #b91c1c; font-weight: 400; margin-left: .1rem; }
+.ef-label .opt {
+    font-size: .68rem;
+    font-weight: 400;
+    color: var(--ef-muted);
+    margin-left: .35rem;
+}
 
-/* Entity quick select */
-.entity-quick {
-    display:flex; flex-wrap:wrap; gap:.4rem; margin-top:.5rem;
+.ef-input,
+.ef-select,
+.ef-textarea {
+    display: block;
+    width: 100%;
+    padding: .52rem .9rem;
+    font-size: .83rem;
+    font-family: inherit;
+    color: var(--ef-navy);
+    background: var(--ef-white);
+    border: 1px solid var(--ef-border);
+    border-radius: 6px;
+    transition: border-color .15s, box-shadow .15s;
+    appearance: none;
+    -webkit-appearance: none;
 }
-.entity-chip {
-    border:1.5px solid #e4e8f0; background:#fff; border-radius:7px;
-    padding:.28rem .75rem; font-size:.73rem; font-weight:600; color:#525f7f;
-    cursor:pointer; transition:all .12s;
+.ef-input:focus,
+.ef-select:focus,
+.ef-textarea:focus {
+    outline: none;
+    border-color: #8baed6;
+    box-shadow: 0 0 0 3px rgba(75,131,200,.12);
 }
-.entity-chip:hover, .entity-chip.active { border-color:#5e72e4; background:#eef0ff; color:#5e72e4; }
+.ef-input.ef-error,
+.ef-select.ef-error,
+.ef-textarea.ef-error { border-color: #c0392b; }
+.ef-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%236b7a99' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right .8rem center;
+    padding-right: 2.25rem;
+    cursor: pointer;
+}
+.ef-textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
+.ef-field-error { font-size: .7rem; color: #b91c1c; margin-top: .3rem; }
+.ef-field-hint { font-size: .7rem; color: var(--ef-muted); margin-top: .3rem; }
+
+/* Input with prefix */
+.ef-input-prefix-group { display: flex; }
+.ef-prefix-label {
+    display: flex;
+    align-items: center;
+    padding: .52rem .85rem;
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--ef-muted);
+    background: var(--ef-bg);
+    border: 1px solid var(--ef-border);
+    border-right: 0;
+    border-radius: 6px 0 0 6px;
+    white-space: nowrap;
+    letter-spacing: .02em;
+}
+.ef-input-prefix-group .ef-input {
+    border-radius: 0 6px 6px 0;
+    border-left-color: transparent;
+}
+.ef-input-prefix-group .ef-input:focus { border-left-color: #8baed6; }
+
+/* Amount Result Display */
+.ef-amount-display {
+    display: flex;
+    align-items: baseline;
+    gap: .65rem;
+    padding: .75rem 1rem;
+    margin-top: .6rem;
+    background: var(--ef-bg);
+    border: 1px solid var(--ef-border-soft);
+    border-radius: 6px;
+}
+.ef-amount-display-label {
+    font-size: .69rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: .06em;
+    color: var(--ef-muted);
+    white-space: nowrap;
+}
+.ef-amount-display-value {
+    font-size: 1.25rem;
+    font-weight: 800;
+    letter-spacing: -.03em;
+    color: var(--ef-navy);
+    transition: color .2s;
+}
+.ef-amount-display-value.debit  { color: var(--ef-debit-text); }
+.ef-amount-display-value.kredit { color: var(--ef-kredit-text); }
+
+/* Transaction Type Selector */
+.ef-type-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .6rem;
+}
+.ef-type-radio { position: absolute; opacity: 0; width: 0; height: 0; }
+.ef-type-card {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    padding: .8rem 1.1rem;
+    border: 1.5px solid var(--ef-border);
+    border-radius: 8px;
+    cursor: pointer;
+    background: var(--ef-white);
+    transition: all .15s;
+    position: relative;
+}
+.ef-type-card:hover {
+    border-color: #b0bac9;
+    background: #fafbfc;
+}
+.ef-type-radio:checked + .ef-type-card {
+    box-shadow: 0 0 0 3px rgba(75,131,200,.1);
+}
+.ef-type-radio[value="debit"]:checked + .ef-type-card {
+    border-color: var(--ef-debit-ring);
+    background: var(--ef-debit-bg);
+}
+.ef-type-radio[value="kredit"]:checked + .ef-type-card {
+    border-color: var(--ef-kredit-ring);
+    background: var(--ef-kredit-bg);
+}
+.ef-type-indicator {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .95rem;
+    flex-shrink: 0;
+    background: var(--ef-bg);
+    color: var(--ef-muted);
+    transition: all .15s;
+}
+.ef-type-radio[value="debit"]:checked  ~ * .ef-type-indicator,
+.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-indicator {
+    background: #d4eddf;
+    color: var(--ef-debit-text);
+}
+.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-indicator {
+    background: #f8d7da;
+    color: var(--ef-kredit-text);
+}
+.ef-type-text-wrap { line-height: 1.3; }
+.ef-type-main {
+    font-size: .84rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    display: block;
+}
+.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-main { color: var(--ef-debit-text); }
+.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-main { color: var(--ef-kredit-text); }
+.ef-type-sub {
+    font-size: .69rem;
+    color: var(--ef-muted);
+    display: block;
+    font-weight: 400;
+}
+.ef-type-check {
+    position: absolute;
+    top: .55rem;
+    right: .7rem;
+    font-size: .75rem;
+    color: var(--ef-muted);
+    opacity: 0;
+    transition: opacity .15s;
+}
+.ef-type-radio:checked + .ef-type-card .ef-type-check { opacity: 1; }
+.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-check { color: var(--ef-debit-ring); }
+.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-check { color: var(--ef-kredit-ring); }
+
+/* Section Divider */
+.ef-divider {
+    border: none;
+    border-top: 1px solid var(--ef-border-soft);
+    margin: 1.5rem 0;
+}
+.ef-section-heading {
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ef-muted);
+    margin-bottom: 1rem;
+}
+
+/* Period Checkboxes */
+.ef-check-row { display: flex; flex-wrap: wrap; gap: 1.25rem; }
+.ef-check-wrap { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
+.ef-check-wrap input[type="checkbox"] {
+    width: 15px;
+    height: 15px;
+    accent-color: var(--ef-navy);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+.ef-check-wrap label {
+    font-size: .78rem;
+    color: var(--ef-slate);
+    cursor: pointer;
+}
+
+/* Action Buttons */
+.ef-action-row {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .6rem;
+    padding-top: 1.4rem;
+    border-top: 1px solid var(--ef-border-soft);
+    margin-top: 1.5rem;
+}
+.ef-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    padding: .52rem 1.3rem;
+    font-size: .8rem;
+    font-weight: 700;
+    border-radius: 6px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s;
+    text-decoration: none;
+    letter-spacing: .01em;
+    font-family: inherit;
+}
+.ef-btn-secondary {
+    background: var(--ef-white);
+    border-color: var(--ef-border);
+    color: var(--ef-slate);
+}
+.ef-btn-secondary:hover {
+    background: var(--ef-bg);
+    color: var(--ef-navy);
+}
+.ef-btn-primary {
+    background: var(--ef-navy);
+    border-color: var(--ef-navy);
+    color: #fff;
+}
+.ef-btn-primary:hover {
+    background: #14203a;
+    border-color: #14203a;
+}
+
+/* ─── Sidebar ─────────────────────────────────────── */
+.ef-sidebar-card {
+    background: var(--ef-white);
+    border: 1px solid var(--ef-border);
+    border-radius: 10px;
+    box-shadow: 0 1px 5px rgba(27,42,74,.05);
+    overflow: hidden;
+    margin-bottom: 1rem;
+}
+.ef-sidebar-header {
+    display: flex;
+    align-items: center;
+    gap: .5rem;
+    padding: .8rem 1.1rem;
+    border-bottom: 1px solid var(--ef-border-soft);
+    background: #fcfcfe;
+}
+.ef-sidebar-heading {
+    font-size: .67rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: .1em;
+    color: var(--ef-muted);
+    margin: 0;
+}
+.ef-sidebar-body { padding: 1.1rem; }
+
+/* Balance rows */
+.ef-bal-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--ef-border-soft);
+    font-size: .8rem;
+}
+.ef-bal-row:last-child { border-bottom: none; padding-bottom: 0; }
+.ef-bal-key { color: var(--ef-muted); }
+.ef-bal-val { font-weight: 700; color: var(--ef-navy); }
+.ef-bal-val.green { color: var(--ef-debit-text); }
+.ef-bal-val.red   { color: var(--ef-kredit-text); }
+.ef-bal-row-total { padding-top: .75rem; margin-top: .35rem; border-top: 1.5px solid var(--ef-border); }
+.ef-bal-val-total { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; }
+
+/* SOP tip items */
+.ef-tip-item {
+    display: flex;
+    gap: .55rem;
+    padding: .55rem 0;
+    border-bottom: 1px solid var(--ef-border-soft);
+    font-size: .77rem;
+    color: var(--ef-slate);
+    line-height: 1.55;
+}
+.ef-tip-item:last-child { border-bottom: none; padding-bottom: 0; }
+.ef-tip-dot {
+    width: 5px;
+    height: 5px;
+    background: var(--ef-muted);
+    border-radius: 50%;
+    flex-shrink: 0;
+    margin-top: .52rem;
+}
 </style>
 @endpush
 
 @section('content')
 
-<div class="form-hero shadow">
-    <div class="d-flex align-items-center justify-content-between">
-        <div>
-            <p class="fh-title">➕ Input Transaksi Kas Baru</p>
-            <p class="fh-sub">Catat transaksi debit (masuk) atau kredit (keluar) ke dalam buku kas</p>
+{{-- Page Header --}}
+<div class="ef-page-header">
+    <div>
+        <div class="ef-breadcrumb">
+            <a href="{{ route('finance.transactions.index') }}">Buku Kas</a>
+            <span class="sep">/</span>
+            <span>Catat Transaksi Baru</span>
         </div>
-        <a href="{{ route('finance.transactions.index') }}" class="btn btn-sm mb-0"
-           style="background:rgba(255,255,255,.15);color:#fff;border-radius:8px;font-size:.78rem;padding:.4rem 1rem;border:1px solid rgba(255,255,255,.25)">
-            ← Kembali ke Ledger
-        </a>
+        <h1 class="ef-page-title">Catat Transaksi Baru</h1>
     </div>
+    <a href="{{ route('finance.transactions.index') }}" class="ef-btn-back">
+        <i class="bi bi-arrow-left"></i> Kembali
+    </a>
 </div>
 
 @if($errors->any())
-    <div class="alert mb-3 text-white py-2" style="background:#f5365c;border-radius:10px;font-size:.84rem">
-        <i class="bi bi-exclamation-circle-fill me-1"></i>
-        <strong>Periksa kembali isian:</strong>
-        <ul class="mb-0 mt-1 ps-3">@foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach</ul>
-    </div>
+<div style="background:#fff8f8;border:1px solid #f5c6cb;border-radius:8px;padding:.8rem 1.1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--ef-kredit-text)">
+    <i class="bi bi-exclamation-triangle-fill me-2"></i>
+    <strong>Terdapat kesalahan pada formulir:</strong>
+    <ul class="mb-0 mt-1 ps-4" style="line-height:1.8">
+        @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+    </ul>
+</div>
 @endif
 
-<div class="row g-3">
-    {{-- ── MAIN FORM ─────────────── --}}
+<div class="row g-4">
+
+    {{-- ── FORMULIR UTAMA ──────────────────────────────── --}}
     <div class="col-lg-8">
-        <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden">
-            <div style="height:3px;background:linear-gradient(90deg,#5e72e4,#1aae6f,#f5365c)"></div>
-            <div class="card-body p-4">
+        <div class="ef-card">
+            <div class="ef-card-header">
+                <i class="bi bi-file-earmark-text ef-card-icon"></i>
+                <p class="ef-card-title-text">Formulir Pencatatan Transaksi</p>
+            </div>
+            <div class="ef-card-body">
                 <form action="{{ route('finance.transactions.store') }}" method="POST" id="trxForm">
                     @csrf
 
-                    {{-- ① Tipe Transaksi --}}
-                    <p class="form-section-title">① Tipe Transaksi</p>
-                    <div class="type-toggle mb-4">
-                        <input type="radio" name="transaction_type" id="type_debit" value="debit"
-                               class="type-radio" {{ old('transaction_type','debit') === 'debit' ? 'checked':'' }}>
-                        <label for="type_debit" class="type-btn">
-                            <span class="tb-icon">📥</span>
-                            <span class="tb-label">DEBIT<small>Uang Masuk / Penerimaan</small></span>
-                        </label>
+                    {{-- Tipe Transaksi --}}
+                    <div class="ef-field">
+                        <span class="ef-label">Tipe Transaksi <span class="req">*</span></span>
+                        <div class="ef-type-grid">
+                            <input type="radio" name="transaction_type" id="type_debit" value="debit"
+                                   class="ef-type-radio"
+                                   {{ old('transaction_type','debit') === 'debit' ? 'checked':'' }}>
+                            <label for="type_debit" class="ef-type-card">
+                                <div class="ef-type-indicator">
+                                    <i class="bi bi-arrow-down-left-circle"></i>
+                                </div>
+                                <div class="ef-type-text-wrap">
+                                    <span class="ef-type-main">Debit</span>
+                                    <span class="ef-type-sub">Uang Masuk / Penerimaan</span>
+                                </div>
+                                <i class="bi bi-check-circle-fill ef-type-check"></i>
+                            </label>
 
-                        <input type="radio" name="transaction_type" id="type_kredit" value="kredit"
-                               class="type-radio" {{ old('transaction_type') === 'kredit' ? 'checked':'' }}>
-                        <label for="type_kredit" class="type-btn">
-                            <span class="tb-icon">📤</span>
-                            <span class="tb-label">KREDIT<small>Uang Keluar / Pembayaran</small></span>
-                        </label>
+                            <input type="radio" name="transaction_type" id="type_kredit" value="kredit"
+                                   class="ef-type-radio"
+                                   {{ old('transaction_type') === 'kredit' ? 'checked':'' }}>
+                            <label for="type_kredit" class="ef-type-card">
+                                <div class="ef-type-indicator">
+                                    <i class="bi bi-arrow-up-right-circle"></i>
+                                </div>
+                                <div class="ef-type-text-wrap">
+                                    <span class="ef-type-main">Kredit</span>
+                                    <span class="ef-type-sub">Uang Keluar / Pembayaran</span>
+                                </div>
+                                <i class="bi bi-check-circle-fill ef-type-check"></i>
+                            </label>
+                        </div>
                     </div>
 
-                    {{-- ② Tanggal & Akun --}}
-                    <p class="form-section-title">② Tanggal & Akun</p>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-5">
-                            <label class="fin-label" for="transaction_date">Tanggal Transaksi <span class="text-danger">*</span></label>
+                    {{-- Tanggal & Akun --}}
+                    <div class="row g-3 mb-0">
+                        <div class="col-md-5 ef-field">
+                            <label class="ef-label" for="transaction_date">Tanggal Transaksi <span class="req">*</span></label>
                             <input type="date" name="transaction_date" id="transaction_date"
-                                   class="fin-input @error('transaction_date') is-invalid @enderror"
+                                   class="ef-input {{ $errors->has('transaction_date') ? 'ef-error' : '' }}"
                                    value="{{ old('transaction_date', date('Y-m-d')) }}" required>
-                            @error('transaction_date')<div class="invalid-feedback" style="font-size:.75rem">{{ $message }}</div>@enderror
+                            @error('transaction_date')<p class="ef-field-error">{{ $message }}</p>@enderror
                         </div>
-                        <div class="col-md-7">
-                            <label class="fin-label" for="account_id">Akun / CoA <span class="text-danger">*</span></label>
+                        <div class="col-md-7 ef-field">
+                            <label class="ef-label" for="account_id">Akun / Kategori <span style="font-size:.68rem;font-weight:400;color:var(--ef-muted)">(CoA)</span> <span class="req">*</span></label>
                             <select name="account_id" id="account_id"
-                                    class="fin-input @error('account_id') is-invalid @enderror" required>
-                                <option value="">— Pilih Akun —</option>
+                                    class="ef-select {{ $errors->has('account_id') ? 'ef-error' : '' }}" required>
+                                <option value="">— Pilih Kategori Akun —</option>
                                 @php $cats = ['asset'=>'Harta','liability'=>'Kewajiban','equity'=>'Modal','revenue'=>'Pendapatan','expense'=>'Biaya']; @endphp
                                 @foreach($cats as $cat => $label)
                                     @if($accounts->where('category',$cat)->count())
@@ -142,44 +534,45 @@
                                     @endif
                                 @endforeach
                             </select>
-                            @error('account_id')<div class="invalid-feedback" style="font-size:.75rem">{{ $message }}</div>@enderror
+                            @error('account_id')<p class="ef-field-error">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
-                    {{-- ③ Nominal --}}
-                    <p class="form-section-title">③ Nominal</p>
-                    <div class="mb-4">
-                        <label class="fin-label" for="amount">Jumlah (Rp) <span class="text-danger">*</span></label>
-                        <div class="input-group mb-2">
-                            <span class="input-group-text fw-bold" style="background:#f4f6fb;border:1.5px solid #e4e8f0;border-right:0;border-radius:10px 0 0 10px;font-size:.85rem;color:#344767">Rp</span>
+                    {{-- Nominal --}}
+                    <div class="ef-field">
+                        <label class="ef-label" for="amount">Nominal <span class="req">*</span></label>
+                        <div class="ef-input-prefix-group">
+                            <span class="ef-prefix-label">Rp</span>
                             <input type="number" name="amount" id="amount"
-                                   class="fin-input @error('amount') is-invalid @enderror"
-                                   style="border-left:0;border-radius:0 10px 10px 0"
-                                   value="{{ old('amount') }}"
-                                   placeholder="0" min="0" step="any" required
+                                   class="ef-input {{ $errors->has('amount') ? 'ef-error' : '' }}"
+                                   value="{{ old('amount') }}" placeholder="0"
+                                   min="0" step="any" required
                                    oninput="updateAmountPreview(this.value)">
                         </div>
-                        <div class="amount-preview" id="amountPreview">Rp 0</div>
-                        @error('amount')<div class="text-danger" style="font-size:.75rem;margin-top:.3rem">{{ $message }}</div>@enderror
+                        <div class="ef-amount-display">
+                            <span class="ef-amount-display-label">Terbilang</span>
+                            <span class="ef-amount-display-value" id="amountPreview">Rp 0</span>
+                        </div>
+                        @error('amount')<p class="ef-field-error">{{ $message }}</p>@enderror
                     </div>
 
-                    {{-- ④ Keterangan --}}
-                    <p class="form-section-title">④ Keterangan</p>
-                    <div class="mb-4">
-                        <label class="fin-label" for="description">Deskripsi / Keterangan <span class="text-danger">*</span></label>
-                        <input type="text" name="description" id="description"
-                               class="fin-input @error('description') is-invalid @enderror"
-                               value="{{ old('description') }}"
-                               placeholder="Contoh: Pembayaran sewa kantor Februari, Penerimaan dari klien ABC..." required>
-                        @error('description')<div class="invalid-feedback" style="font-size:.75rem">{{ $message }}</div>@enderror
+                    {{-- Deskripsi --}}
+                    <div class="ef-field">
+                        <label class="ef-label" for="description">Deskripsi / Keterangan <span class="req">*</span></label>
+                        <textarea name="description" id="description"
+                                  class="ef-textarea {{ $errors->has('description') ? 'ef-error' : '' }}"
+                                  placeholder="Contoh: Penerimaan pembayaran tagihan dari PT. XYZ untuk periode Maret 2026" required>{{ old('description') }}</textarea>
+                        <p class="ef-field-hint">Tulis deskripsi sejelas dan selengkap mungkin untuk kebutuhan audit trail.</p>
+                        @error('description')<p class="ef-field-error">{{ $message }}</p>@enderror
                     </div>
 
-                    {{-- ⑤ Entitas --}}
-                    <p class="form-section-title">⑤ Entitas (Opsional)</p>
-                    <div class="row g-3 mb-4">
-                        <div class="col-md-6">
-                            <label class="fin-label" for="sender_entity_id">Entitas Pengirim (Dari)</label>
-                            <select name="sender_entity_id" id="sender_entity_id" class="fin-input">
+                    {{-- Entitas --}}
+                    <hr class="ef-divider">
+                    <p class="ef-section-heading"><i class="bi bi-people me-1" style="font-size:.8rem"></i> Entitas Terkait <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
+                    <div class="row g-3">
+                        <div class="col-md-6 ef-field">
+                            <label class="ef-label" for="sender_entity_id">Entitas Pengirim <span class="opt">(Dari)</span></label>
+                            <select name="sender_entity_id" id="sender_entity_id" class="ef-select">
                                 <option value="">— Tidak Ada —</option>
                                 @foreach($entities as $ent)
                                     <option value="{{ $ent->id }}" {{ old('sender_entity_id') == $ent->id ? 'selected':'' }}>
@@ -188,9 +581,9 @@
                                 @endforeach
                             </select>
                         </div>
-                        <div class="col-md-6">
-                            <label class="fin-label" for="receiver_entity_id">Entitas Penerima (Ke)</label>
-                            <select name="receiver_entity_id" id="receiver_entity_id" class="fin-input">
+                        <div class="col-md-6 ef-field">
+                            <label class="ef-label" for="receiver_entity_id">Entitas Penerima <span class="opt">(Ke)</span></label>
+                            <select name="receiver_entity_id" id="receiver_entity_id" class="ef-select">
                                 <option value="">— Tidak Ada —</option>
                                 @foreach($entities as $ent)
                                     <option value="{{ $ent->id }}" {{ old('receiver_entity_id') == $ent->id ? 'selected':'' }}>
@@ -201,32 +594,25 @@
                         </div>
                     </div>
 
-                    {{-- ⑥ Marker --}}
-                    <p class="form-section-title">⑥ Penanda Periode (Opsional)</p>
-                    <div class="d-flex flex-wrap gap-3 mb-4">
-                        <div class="form-check form-switch" style="min-width:0">
-                            <input class="form-check-input" type="checkbox" role="switch"
-                                   id="is_end_of_month" name="is_end_of_month" value="1"
-                                   {{ old('is_end_of_month') ? 'checked':'' }}>
-                            <label class="form-check-label text-sm" for="is_end_of_month">
-                                🗓 Tandai sebagai <strong>Akhir Bulan</strong>
-                            </label>
+                    {{-- Penanda Periode --}}
+                    <hr class="ef-divider">
+                    <p class="ef-section-heading"><i class="bi bi-calendar3 me-1" style="font-size:.8rem"></i> Penanda Periode Pembukuan <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
+                    <div class="ef-check-row">
+                        <div class="ef-check-wrap">
+                            <input type="checkbox" id="is_end_of_month" name="is_end_of_month" value="1" {{ old('is_end_of_month') ? 'checked':'' }}>
+                            <label for="is_end_of_month">Tandai sebagai Akhir Bulan</label>
                         </div>
-                        <div class="form-check form-switch">
-                            <input class="form-check-input" type="checkbox" role="switch"
-                                   id="is_end_of_year" name="is_end_of_year" value="1"
-                                   {{ old('is_end_of_year') ? 'checked':'' }}>
-                            <label class="form-check-label text-sm" for="is_end_of_year">
-                                📅 Tandai sebagai <strong>Akhir Tahun</strong>
-                            </label>
+                        <div class="ef-check-wrap">
+                            <input type="checkbox" id="is_end_of_year" name="is_end_of_year" value="1" {{ old('is_end_of_year') ? 'checked':'' }}>
+                            <label for="is_end_of_year">Tandai sebagai Akhir Tahun</label>
                         </div>
                     </div>
 
                     {{-- Actions --}}
-                    <div class="d-flex justify-content-end gap-2 pt-3 border-top">
-                        <a href="{{ route('finance.transactions.index') }}" class="btn btn-outline-secondary mb-0" style="border-radius:9px">Batal</a>
-                        <button type="submit" class="btn btn-primary mb-0 px-4" style="border-radius:9px">
-                            <i class="bi bi-save me-1"></i>Simpan Transaksi
+                    <div class="ef-action-row">
+                        <a href="{{ route('finance.transactions.index') }}" class="ef-btn ef-btn-secondary">Batal</a>
+                        <button type="submit" class="ef-btn ef-btn-primary">
+                            <i class="bi bi-check2-circle"></i> Simpan Transaksi
                         </button>
                     </div>
                 </form>
@@ -234,69 +620,61 @@
         </div>
     </div>
 
-    {{-- ── SIDEBAR INFO ───────────── --}}
+    {{-- ── SIDEBAR ──────────────────────────────────────── --}}
     <div class="col-lg-4">
-        {{-- Summary saldo terakhir --}}
-        <div class="card border-0 shadow-sm mb-3" style="border-radius:14px;overflow:hidden">
-            <div style="height:3px;background:linear-gradient(90deg,#1aae6f,#5e72e4)"></div>
-            <div class="card-body p-3">
-                <p class="text-xs fw-bold mb-3" style="color:#8392ab;letter-spacing:.08em;text-transform:uppercase">
-                    💰 Ringkasan Saldo Saat Ini
-                </p>
-                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                    <span class="text-xs text-muted">Total Debit (Masuk)</span>
-                    <span class="text-success fw-bold text-sm">Rp {{ number_format(\App\Models\FinancialTransaction::where('transaction_type','debit')->sum('amount'),0,',','.') }}</span>
+
+        @php
+            $totalDebit  = \App\Models\FinancialTransaction::where('transaction_type','debit')->sum('amount');
+            $totalKredit = \App\Models\FinancialTransaction::where('transaction_type','kredit')->sum('amount');
+            $latestBal   = \App\Models\FinancialTransaction::orderByDesc('transaction_date')->orderByDesc('id')->value('running_balance') ?? 0;
+        @endphp
+
+        {{-- Ringkasan Saldo --}}
+        <div class="ef-sidebar-card">
+            <div class="ef-sidebar-header">
+                <i class="bi bi-bar-chart-line" style="font-size:.82rem;color:var(--ef-muted)"></i>
+                <p class="ef-sidebar-heading">Ringkasan Buku Kas</p>
+            </div>
+            <div class="ef-sidebar-body">
+                <div class="ef-bal-row">
+                    <span class="ef-bal-key">Total Debit</span>
+                    <span class="ef-bal-val green">Rp {{ number_format($totalDebit,0,',','.') }}</span>
                 </div>
-                <div class="d-flex justify-content-between align-items-center mb-2 pb-2 border-bottom">
-                    <span class="text-xs text-muted">Total Kredit (Keluar)</span>
-                    <span class="text-danger fw-bold text-sm">Rp {{ number_format(\App\Models\FinancialTransaction::where('transaction_type','kredit')->sum('amount'),0,',','.') }}</span>
+                <div class="ef-bal-row">
+                    <span class="ef-bal-key">Total Kredit</span>
+                    <span class="ef-bal-val red">Rp {{ number_format($totalKredit,0,',','.') }}</span>
                 </div>
-                @php
-                    $latestBalance = \App\Models\FinancialTransaction::orderByDesc('transaction_date')->orderByDesc('id')->value('running_balance') ?? 0;
-                @endphp
-                <div class="d-flex justify-content-between align-items-center">
-                    <span class="text-xs fw-bold" style="color:#344767">Saldo Bersih</span>
-                    <span class="fw-bold" style="font-size:1rem;color:{{ $latestBalance < 0 ? '#f5365c' : '#5e72e4' }}">
-                        {{ $latestBalance < 0 ? '−' : '' }}Rp {{ number_format(abs($latestBalance),0,',','.') }}
+                <div class="ef-bal-row ef-bal-row-total">
+                    <span class="ef-bal-key" style="color:var(--ef-navy);font-weight:700">Saldo Berjalan</span>
+                    <span class="ef-bal-val ef-bal-val-total {{ $latestBal < 0 ? 'red' : '' }}">
+                        {{ $latestBal < 0 ? '−' : '' }}Rp {{ number_format(abs($latestBal),0,',','.') }}
                     </span>
                 </div>
             </div>
         </div>
 
-        {{-- Tips Card --}}
-        <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden">
-            <div style="height:3px;background:linear-gradient(90deg,#ffd600,#fb6340)"></div>
-            <div class="card-body p-3">
-                <p class="text-xs fw-bold mb-3" style="color:#8392ab;letter-spacing:.08em;text-transform:uppercase">
-                    💡 Panduan Input
-                </p>
-                <div class="d-flex gap-2 mb-2">
-                    <span style="font-size:1rem">📥</span>
-                    <div>
-                        <p class="text-xs fw-bold mb-0" style="color:#1aae6f">DEBIT = Uang Masuk</p>
-                        <p class="text-xs text-muted mb-0">Penerimaan kas, pendapatan, setoran</p>
-                    </div>
+        {{-- SOP --}}
+        <div class="ef-sidebar-card">
+            <div class="ef-sidebar-header">
+                <i class="bi bi-journal-text" style="font-size:.82rem;color:var(--ef-muted)"></i>
+                <p class="ef-sidebar-heading">SOP Formulir Transaksi</p>
+            </div>
+            <div class="ef-sidebar-body">
+                <div class="ef-tip-item">
+                    <div class="ef-tip-dot"></div>
+                    <span>Gunakan <strong>Debit</strong> untuk setiap kas yang masuk ke rekening perusahaan, seperti penerimaan pembayaran, pendapatan jasa, atau setoran modal.</span>
                 </div>
-                <div class="d-flex gap-2 mb-2">
-                    <span style="font-size:1rem">📤</span>
-                    <div>
-                        <p class="text-xs fw-bold mb-0" style="color:#f5365c">KREDIT = Uang Keluar</p>
-                        <p class="text-xs text-muted mb-0">Pembayaran, biaya, pengeluaran kas</p>
-                    </div>
+                <div class="ef-tip-item">
+                    <div class="ef-tip-dot"></div>
+                    <span>Gunakan <strong>Kredit</strong> untuk setiap kas yang keluar, seperti pembayaran vendor, biaya operasional, atau pengeluaran rutin lainnya.</span>
                 </div>
-                <div class="d-flex gap-2 mb-2">
-                    <span style="font-size:1rem">🔄</span>
-                    <div>
-                        <p class="text-xs fw-bold mb-0" style="color:#5e72e4">Running Balance</p>
-                        <p class="text-xs text-muted mb-0">Dihitung otomatis setelah simpan</p>
-                    </div>
+                <div class="ef-tip-item">
+                    <div class="ef-tip-dot"></div>
+                    <span>Pilih <strong>Akun CoA</strong> yang sesuai klasifikasinya agar laporan keuangan dan jurnal dapat digenerate secara otomatis dan akurat.</span>
                 </div>
-                <div class="d-flex gap-2">
-                    <span style="font-size:1rem">📊</span>
-                    <div>
-                        <p class="text-xs fw-bold mb-0" style="color:#344767">Pilih Akun CoA</p>
-                        <p class="text-xs text-muted mb-0">Klasifikasikan transaksi dengan benar agar laporan akurat</p>
-                    </div>
+                <div class="ef-tip-item">
+                    <div class="ef-tip-dot"></div>
+                    <span>Isi kolom <strong>Deskripsi</strong> secara rinci dan spesifik. Informasi ini akan muncul pada laporan Buku Kas dan diperlukan dalam proses rekonsiliasi atau audit.</span>
                 </div>
             </div>
         </div>
@@ -307,28 +685,22 @@
 
 @push('scripts')
 <script>
-// Live amount preview
 function updateAmountPreview(val) {
     const preview = document.getElementById('amountPreview');
     const num = parseFloat(val) || 0;
-    const formatted = 'Rp ' + num.toLocaleString('id-ID', {minimumFractionDigits:0});
-    preview.textContent = formatted;
+    preview.textContent = 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 0 });
 
-    const checkedType = document.querySelector('input[name="transaction_type"]:checked');
-    preview.className = 'amount-preview ' + (checkedType ? checkedType.value : '');
+    const checked = document.querySelector('input[name="transaction_type"]:checked');
+    preview.className = 'ef-amount-display-value ' + (checked ? checked.value : '');
 }
 
-// Update amount preview color when type changes
-document.querySelectorAll('input[name="transaction_type"]').forEach(radio => {
-    radio.addEventListener('change', () => {
-        updateAmountPreview(document.getElementById('amount').value);
-    });
+document.querySelectorAll('input[name="transaction_type"]').forEach(r => {
+    r.addEventListener('change', () => updateAmountPreview(document.getElementById('amount').value));
 });
 
-// Init on load
 window.addEventListener('DOMContentLoaded', () => {
     const amt = document.getElementById('amount').value;
-    if (amt) updateAmountPreview(amt);
+    updateAmountPreview(amt || '0');
 });
 </script>
 @endpush

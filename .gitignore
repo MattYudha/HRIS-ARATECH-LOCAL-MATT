@@ -1,4 +1,6 @@
 *.log
+/scratch/
+
 .DS_Store
 .env
 .env.backup
@@ -29,3 +31,29 @@ Thumbs.db
 mysql_data/
 docker/mysql_data/
 .env.local
+
+# Debug & scratch files (jangan pernah commit)
+*.pem
+*.key
+debug_*.php
+verify_*.php
+create_admin.php
+reset*.php
+list_users.php
+sync_*.php
+insert_*.php
+*_password.php
+cookies.txt
+debug_log.txt
+admin_error.txt
+routes.json
+routes_kb*.json
+*.code-workspace
+.DS_Store
+
+# SQL dumps (sensitif, jangan di-commit)
+*.sql
+
+# Excel & binary docs
+*.xlsx
+*.pdf

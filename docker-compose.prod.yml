@@ -1,0 +1,19 @@
+# ─────────────────────────────────────────────────────────────────────────────
+# docker-compose.prod.yml
+#
+# Override file khusus PRODUCTION.
+# Penggunaan: docker compose -f docker-compose.yml -f docker-compose.prod.yml up -d
+#
+# Perbedaan utama dari docker-compose.yml:
+#   - Tidak ada directive "build:" — image diambil dari GHCR
+#   - Variabel IMAGE_TAG diset oleh GitHub Actions saat deploy
+# ─────────────────────────────────────────────────────────────────────────────
+
+services:
+  app:
+    image: ghcr.io/mattyudha/hris-aratech-local-matt:${IMAGE_TAG:-latest}
+    build: !reset null   # Hapus directive build dari base file
+    restart: always
+
+  webserver:
+    restart: always
