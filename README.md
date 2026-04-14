@@ -87,4 +87,3 @@ Sistem sekarang dapat diakses di `http://localhost:8000`.
 Project ini bersifat **Proprietary** dan dikembangkan khusus untuk **Aratech Software Solution**. Seluruh hak cipta dilindungi undang-undang.
 
 ---
-*Developed with ❤️ by Aratech Engineering Team.*
