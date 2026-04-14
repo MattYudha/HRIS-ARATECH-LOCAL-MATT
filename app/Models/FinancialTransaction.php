@@ -15,6 +15,8 @@ class FinancialTransaction extends Model
     protected $casts = [
         'transaction_date' => 'date',
         'amount'           => 'decimal:2',
+        'dpp_amount'       => 'decimal:2',
+        'tax_amount'       => 'decimal:2',
         'running_balance'  => 'decimal:2',
         'is_end_of_month'  => 'boolean',
         'is_end_of_year'   => 'boolean',

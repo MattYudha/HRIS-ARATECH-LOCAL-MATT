@@ -9,6 +9,7 @@ use App\Models\FinancialAccount;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Storage;
 
 class FinancialTransactionController extends Controller
 {
@@ -84,8 +85,16 @@ class FinancialTransactionController extends Controller
             'receiver_entity_id'=> 'nullable|exists:financial_entities,id',
             'account_id'        => 'required|exists:financial_accounts,id',
             'transaction_type'  => 'required|in:debit,kredit',
-            'amount'            => 'required|numeric|min:0.01',
+            'amount'            => 'required|numeric|min:0',
+            'dpp_amount'        => 'nullable|numeric|min:0',
+            'tax_type'          => 'nullable|in:none,ppn,pph_21,pph_23,pph_4_ayat_2',
+            'tax_amount'        => 'nullable|numeric|min:0',
+            'document'          => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
+
+        if ($request->hasFile('document')) {
+            $validated['document_path'] = $request->file('document')->store('finance/documents', 'local');
+        }
 
         $validated['created_by'] = Auth::id();
 
@@ -120,8 +129,24 @@ class FinancialTransactionController extends Controller
             'receiver_entity_id'=> 'nullable|exists:financial_entities,id',
             'account_id'        => 'required|exists:financial_accounts,id',
             'transaction_type'  => 'required|in:debit,kredit',
-            'amount'            => 'required|numeric|min:0.01',
+            'amount'            => 'required|numeric|min:0',
+            'dpp_amount'        => 'nullable|numeric|min:0',
+            'tax_type'          => 'nullable|in:none,ppn,pph_21,pph_23,pph_4_ayat_2',
+            'tax_amount'        => 'nullable|numeric|min:0',
+            'document'          => 'nullable|file|mimes:pdf,jpg,jpeg,png|max:5120',
         ]);
+
+        if ($request->hasFile('document')) {
+            if ($transaction->document_path) {
+                Storage::disk('local')->delete($transaction->document_path);
+            }
+            $validated['document_path'] = $request->file('document')->store('finance/documents', 'local');
+        } elseif ($request->boolean('remove_document')) {
+            if ($transaction->document_path) {
+                Storage::disk('local')->delete($transaction->document_path);
+            }
+            $validated['document_path'] = null;
+        }
 
         DB::transaction(function () use ($validated, $transaction) {
             $transaction->update($validated);
@@ -138,12 +163,31 @@ class FinancialTransactionController extends Controller
     public function destroy(FinancialTransaction $transaction)
     {
         DB::transaction(function () use ($transaction) {
+            if ($transaction->document_path) {
+                Storage::disk('local')->delete($transaction->document_path);
+            }
             $transaction->delete();
             $this->recalculateRunningBalance();
         });
 
         return redirect()->route('finance.transactions.index')
             ->with('success', 'Transaksi berhasil dihapus.');
+    }
+
+    /**
+     * Securely download document associated with transaction.
+     */
+    public function downloadDocument(FinancialTransaction $transaction)
+    {
+        if (!$transaction->document_path) {
+            abort(404, 'Dokumen tidak ditemukan.');
+        }
+
+        if (!Storage::disk('local')->exists($transaction->document_path)) {
+            abort(404, 'File fisik tidak ditemukan di server.');
+        }
+
+        return response()->file(Storage::disk('local')->path($transaction->document_path));
     }
 
     /**

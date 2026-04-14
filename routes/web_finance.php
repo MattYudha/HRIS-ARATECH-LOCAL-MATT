@@ -51,4 +51,9 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
     // ── 5. Personal Finance & Claims (All Auth Users) ─────────────────────────────
     Route::get('my-finance', [PersonalFinanceController::class, 'index'])->name('my-finance');
     Route::resource('claims', ClaimController::class)->except(['destroy']);
+
+    // ── 6. Secure Document Download (all roles that can view transactions) ─────────
+    Route::get('transactions/{transaction}/document', [FinancialTransactionController::class, 'downloadDocument'])
+        ->name('transactions.document')
+        ->middleware(['role:Master Admin,HR Administrator,Manager / Unit Head,Marketing,Supervisor']);
 });

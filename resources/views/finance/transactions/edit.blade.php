@@ -53,6 +53,27 @@
 }
 .edit-warn .ew-icon { font-size:1.3rem; flex-shrink:0; }
 .edit-warn p { margin:0; font-size:.8rem; color:#856404; }
+/* Upload Zone */
+.ef-upload-zone {
+    border:2px dashed #dce1ec; border-radius:8px; padding:1.6rem 1rem;
+    text-align:center; cursor:pointer; background:#f5f7fa; transition:all .2s;
+}
+.ef-upload-zone:hover,.ef-upload-zone.drag-over { border-color:#8baed6; background:#f0f5fb; }
+.ef-upload-icon { font-size:1.5rem; color:#8392ab; margin-bottom:.3rem; }
+.ef-upload-text { font-size:.83rem; font-weight:600; color:#3d4e6c; }
+.ef-upload-hint { font-size:.7rem; color:#8392ab; margin-top:.2rem; }
+.ef-upload-name {
+    margin-top:.5rem; display:inline-flex; align-items:center; gap:.4rem;
+    background:#e8f2fd; color:#1a5fb4; border-radius:5px;
+    padding:.3rem .75rem; font-size:.75rem; font-weight:600;
+}
+.ef-file-hidden { display:none; }
+.existing-doc {
+    display:flex; align-items:center; gap:.5rem;
+    padding:.6rem 1rem; background:#eef7f2; border:1px solid #b0f0d4;
+    border-radius:7px; font-size:.8rem; font-weight:600; color:#1aae6f;
+    margin-bottom:.5rem;
+}
 </style>
 @endpush
 
@@ -93,7 +114,7 @@
         <div class="card border-0 shadow-sm" style="border-radius:14px;overflow:hidden">
             <div style="height:3px;background:linear-gradient(90deg,#fb6340,#ffd600,#1aae6f)"></div>
             <div class="card-body p-4">
-                <form action="{{ route('finance.transactions.update', $transaction->id) }}" method="POST">
+                <form action="{{ route('finance.transactions.update', $transaction->id) }}" method="POST" enctype="multipart/form-data">
                     @csrf @method('PUT')
 
                     {{-- ① Tipe --}}
@@ -197,8 +218,70 @@
                         </div>
                     </div>
 
-                    {{-- ⑥ Period marker --}}
-                    <p class="form-section-title">⑥ Penanda Periode</p>
+                    {{-- ⑥ Pajak Coretax --}}
+                    <p class="form-section-title">⑥ Informasi Pajak <small style="text-transform:none;font-weight:400;font-size:.7rem">(Coretax – Opsional)</small></p>
+                    <div class="row g-3 mb-4">
+                        <div class="col-md-4">
+                            <label class="fin-label" for="dpp_amount">DPP (Dasar Pengenaan Pajak)</label>
+                            <div class="input-group">
+                                <span class="input-group-text fw-bold" style="background:#f4f6fb;border:1.5px solid #e4e8f0;border-right:0;border-radius:10px 0 0 10px;font-size:.85rem;color:#344767">Rp</span>
+                                <input type="number" name="dpp_amount" id="dpp_amount"
+                                       class="fin-input {{ $errors->has('dpp_amount') ? 'is-invalid' : '' }}"
+                                       style="border-left:0;border-radius:0 10px 10px 0"
+                                       value="{{ old('dpp_amount', $transaction->dpp_amount) }}"
+                                       placeholder="0" min="0" step="any" oninput="recalcTax()">
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="fin-label" for="tax_type">Jenis Pajak</label>
+                            <select name="tax_type" id="tax_type" class="fin-input {{ $errors->has('tax_type') ? 'is-invalid' : '' }}" onchange="recalcTax()">
+                                <option value="none" {{ old('tax_type', $transaction->tax_type ?? 'none') === 'none' ? 'selected':'' }}>— Tidak Ada —</option>
+                                <option value="ppn" {{ old('tax_type', $transaction->tax_type) === 'ppn' ? 'selected':'' }}>PPN (11%)</option>
+                                <option value="pph_21" {{ old('tax_type', $transaction->tax_type) === 'pph_21' ? 'selected':'' }}>PPh 21</option>
+                                <option value="pph_23" {{ old('tax_type', $transaction->tax_type) === 'pph_23' ? 'selected':'' }}>PPh 23</option>
+                                <option value="pph_4_ayat_2" {{ old('tax_type', $transaction->tax_type) === 'pph_4_ayat_2' ? 'selected':'' }}>PPh 4 Ayat 2</option>
+                            </select>
+                        </div>
+                        <div class="col-md-4">
+                            <label class="fin-label" for="tax_amount">Nominal Pajak</label>
+                            <div class="input-group">
+                                <span class="input-group-text fw-bold" style="background:#f4f6fb;border:1.5px solid #e4e8f0;border-right:0;border-radius:10px 0 0 10px;font-size:.85rem;color:#344767">Rp</span>
+                                <input type="number" name="tax_amount" id="tax_amount"
+                                       class="fin-input {{ $errors->has('tax_amount') ? 'is-invalid' : '' }}"
+                                       style="border-left:0;border-radius:0 10px 10px 0"
+                                       value="{{ old('tax_amount', $transaction->tax_amount) }}"
+                                       placeholder="Auto / Manual" min="0" step="any">
+                            </div>
+                        </div>
+                    </div>
+
+                    {{-- ⑦ Lampiran Dokumen --}}
+                    <p class="form-section-title">⑦ Lampiran Dokumen <small style="text-transform:none;font-weight:400;font-size:.7rem">(Bukti Transfer / Faktur)</small></p>
+                    <div class="mb-4">
+                        @if($transaction->document_path)
+                            <div class="existing-doc">
+                                <i class="bi bi-file-earmark-check-fill"></i>
+                                Dokumen terlampir:
+                                <a href="{{ route('finance.transactions.document', $transaction->id) }}" target="_blank" class="ms-1">Lihat / Unduh</a>
+                            </div>
+                            <div class="form-check mb-2">
+                                <input type="checkbox" name="remove_document" id="remove_document" value="1" class="form-check-input">
+                                <label class="form-check-label text-sm text-danger" for="remove_document">Hapus dokumen terlampir</label>
+                            </div>
+                        @endif
+                        <div class="ef-upload-zone" id="uploadZone" onclick="document.getElementById('document').click()">
+                            <div class="ef-upload-icon"><i class="bi bi-cloud-upload"></i></div>
+                            <div class="ef-upload-text">{{ $transaction->document_path ? 'Klik untuk ganti dokumen' : 'Klik untuk pilih file' }}</div>
+                            <div class="ef-upload-hint">Format: PDF, JPG, PNG — Maks. 5 MB</div>
+                            <div class="ef-upload-name" id="uploadName" style="display:none"></div>
+                        </div>
+                        <input type="file" name="document" id="document" class="ef-file-hidden"
+                               accept=".pdf,.jpg,.jpeg,.png" onchange="showFileName(this)">
+                        @error('document')<p class="text-danger" style="font-size:.75rem;margin-top:.3rem">{{ $message }}</p>@enderror
+                    </div>
+
+                    {{-- ⑧ Period marker --}}
+                    <p class="form-section-title">⑧ Penanda Periode</p>
                     <div class="d-flex flex-wrap gap-3 mb-4">
                         <div class="form-check form-switch">
                             <input class="form-check-input" type="checkbox" role="switch"
@@ -274,5 +357,39 @@ function updateAmountPreview(val) {
 document.querySelectorAll('input[name="transaction_type"]').forEach(r => {
     r.addEventListener('change', () => updateAmountPreview(document.getElementById('amount').value));
 });
+
+const TAX_RATES = { ppn: 0.11, pph_21: 0.05, pph_23: 0.02, pph_4_ayat_2: 0.1 };
+const DEDUCTION_TYPES = ['pph_21', 'pph_23', 'pph_4_ayat_2'];
+function recalcTax() {
+    const dpp   = parseFloat(document.getElementById('dpp_amount').value) || 0;
+    const type  = document.getElementById('tax_type').value;
+    const taxEl = document.getElementById('tax_amount');
+    const amtEl = document.getElementById('amount');
+    if (type === 'none' || dpp === 0) return;
+    const tax = Math.round(dpp * (TAX_RATES[type] || 0));
+    taxEl.value = tax;
+    const total = DEDUCTION_TYPES.includes(type) ? dpp - tax : dpp + tax;
+    amtEl.value = total;
+    updateAmountPreview(total);
+}
+function showFileName(input) {
+    const nameEl = document.getElementById('uploadName');
+    const zone   = document.getElementById('uploadZone');
+    if (input.files && input.files[0]) {
+        nameEl.innerHTML = '<i class="bi bi-file-earmark-check"></i> ' + input.files[0].name;
+        nameEl.style.display = 'inline-flex';
+        zone.style.borderColor = '#2d6a4f';
+        zone.style.background  = '#eef7f2';
+    }
+}
+const zone = document.getElementById('uploadZone');
+if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault(); zone.classList.remove('drag-over');
+        const f = document.getElementById('document'); f.files = e.dataTransfer.files; showFileName(f);
+    });
+}
 </script>
 @endpush

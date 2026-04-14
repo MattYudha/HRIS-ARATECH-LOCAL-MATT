@@ -430,6 +430,36 @@
     flex-shrink: 0;
     margin-top: .52rem;
 }
+/* Upload Zone */
+.ef-upload-zone {
+    border: 2px dashed var(--ef-border);
+    border-radius: 8px;
+    padding: 1.8rem 1rem;
+    text-align: center;
+    cursor: pointer;
+    background: var(--ef-bg);
+    transition: all .2s;
+}
+.ef-upload-zone:hover, .ef-upload-zone.drag-over {
+    border-color: #8baed6;
+    background: #f0f5fb;
+}
+.ef-upload-icon { font-size: 1.6rem; color: var(--ef-muted); margin-bottom: .4rem; }
+.ef-upload-text { font-size: .83rem; font-weight: 600; color: var(--ef-slate); }
+.ef-upload-hint { font-size: .7rem; color: var(--ef-muted); margin-top: .2rem; }
+.ef-upload-name {
+    margin-top: .6rem;
+    display: inline-flex;
+    align-items: center;
+    gap: .4rem;
+    background: #e8f2fd;
+    color: #1a5fb4;
+    border-radius: 5px;
+    padding: .3rem .75rem;
+    font-size: .75rem;
+    font-weight: 600;
+}
+.ef-file-hidden { display: none; }
 </style>
 @endpush
 
@@ -470,7 +500,7 @@
                 <p class="ef-card-title-text">Formulir Pencatatan Transaksi</p>
             </div>
             <div class="ef-card-body">
-                <form action="{{ route('finance.transactions.store') }}" method="POST" id="trxForm">
+                <form action="{{ route('finance.transactions.store') }}" method="POST" id="trxForm" enctype="multipart/form-data">
                     @csrf
 
                     {{-- Tipe Transaksi --}}
@@ -594,6 +624,64 @@
                         </div>
                     </div>
 
+                    {{-- ── BLOK PAJAK CORETAX ──────────────────────── --}}
+                    <hr class="ef-divider">
+                    <p class="ef-section-heading"><i class="bi bi-receipt-cutoff me-1" style="font-size:.8rem"></i> Informasi Pajak <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Coretax – Opsional)</span></p>
+
+                    <div class="row g-3 mb-0">
+                        <div class="col-md-4 ef-field">
+                            <label class="ef-label" for="dpp_amount">DPP <span class="opt">(Dasar Pengenaan Pajak)</span></label>
+                            <div class="ef-input-prefix-group">
+                                <span class="ef-prefix-label">Rp</span>
+                                <input type="number" name="dpp_amount" id="dpp_amount"
+                                       class="ef-input {{ $errors->has('dpp_amount') ? 'ef-error' : '' }}"
+                                       value="{{ old('dpp_amount') }}" placeholder="0" min="0" step="any"
+                                       oninput="recalcTax()">
+                            </div>
+                            <p class="ef-field-hint">Nominal sebelum pajak (Base Amount).</p>
+                            @error('dpp_amount')<p class="ef-field-error">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="col-md-4 ef-field">
+                            <label class="ef-label" for="tax_type">Jenis Pajak</label>
+                            <select name="tax_type" id="tax_type" class="ef-select {{ $errors->has('tax_type') ? 'ef-error' : '' }}" onchange="recalcTax()">
+                                <option value="none" {{ old('tax_type','none') === 'none' ? 'selected':'' }}>— Tidak Ada Pajak —</option>
+                                <option value="ppn" {{ old('tax_type') === 'ppn' ? 'selected':'' }}>PPN (Saat ini 11%)</option>
+                                <option value="pph_21" {{ old('tax_type') === 'pph_21' ? 'selected':'' }}>PPh 21 (Penghasilan Karyawan)</option>
+                                <option value="pph_23" {{ old('tax_type') === 'pph_23' ? 'selected':'' }}>PPh 23 (Jasa / Royalti)</option>
+                                <option value="pph_4_ayat_2" {{ old('tax_type') === 'pph_4_ayat_2' ? 'selected':'' }}>PPh 4 Ayat 2 (Sewa Bangunan)</option>
+                            </select>
+                            @error('tax_type')<p class="ef-field-error">{{ $message }}</p>@enderror
+                        </div>
+                        <div class="col-md-4 ef-field">
+                            <label class="ef-label" for="tax_amount">Nominal Pajak <span class="opt">(Auto / Manual)</span></label>
+                            <div class="ef-input-prefix-group">
+                                <span class="ef-prefix-label">Rp</span>
+                                <input type="number" name="tax_amount" id="tax_amount"
+                                       class="ef-input {{ $errors->has('tax_amount') ? 'ef-error' : '' }}"
+                                       value="{{ old('tax_amount') }}" placeholder="Dihitung otomatis" min="0" step="any">
+                            </div>
+                            <p class="ef-field-hint">Nilai otomatis dihitung, boleh diedit manual jika ada selisih pembulatan.</p>
+                            @error('tax_amount')<p class="ef-field-error">{{ $message }}</p>@enderror
+                        </div>
+                    </div>
+
+                    {{-- ── BLOK UPLOAD DOKUMEN ─────────────────────── --}}
+                    <hr class="ef-divider">
+                    <p class="ef-section-heading"><i class="bi bi-paperclip me-1" style="font-size:.8rem"></i> Lampiran Dokumen <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Bukti Transfer / Faktur – Opsional)</span></p>
+
+                    <div class="ef-field">
+                        <label class="ef-label" for="document">Upload Bukti / Faktur</label>
+                        <div class="ef-upload-zone" id="uploadZone" onclick="document.getElementById('document').click()">
+                            <div class="ef-upload-icon"><i class="bi bi-cloud-upload"></i></div>
+                            <div class="ef-upload-text">Klik untuk pilih file atau seret ke sini</div>
+                            <div class="ef-upload-hint">Format: PDF, JPG, PNG — Maks. 5 MB</div>
+                            <div class="ef-upload-name" id="uploadName" style="display:none"></div>
+                        </div>
+                        <input type="file" name="document" id="document" class="ef-file-hidden {{ $errors->has('document') ? 'ef-error' : '' }}"
+                               accept=".pdf,.jpg,.jpeg,.png" onchange="showFileName(this)">
+                        @error('document')<p class="ef-field-error">{{ $message }}</p>@enderror
+                    </div>
+
                     {{-- Penanda Periode --}}
                     <hr class="ef-divider">
                     <p class="ef-section-heading"><i class="bi bi-calendar3 me-1" style="font-size:.8rem"></i> Penanda Periode Pembukuan <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
@@ -697,6 +785,64 @@ function updateAmountPreview(val) {
 document.querySelectorAll('input[name="transaction_type"]').forEach(r => {
     r.addEventListener('change', () => updateAmountPreview(document.getElementById('amount').value));
 });
+
+/* ── Tax Auto Calculator ─────────────────────── */
+const TAX_RATES = { ppn: 0.11, pph_21: 0.05, pph_23: 0.02, pph_4_ayat_2: 0.1 };
+// PPh types are withholding (deducted from total)
+const DEDUCTION_TYPES = ['pph_21', 'pph_23', 'pph_4_ayat_2'];
+
+function recalcTax() {
+    const dpp   = parseFloat(document.getElementById('dpp_amount').value) || 0;
+    const type  = document.getElementById('tax_type').value;
+    const taxEl = document.getElementById('tax_amount');
+    const amtEl = document.getElementById('amount');
+
+    if (type === 'none' || dpp === 0) {
+        taxEl.placeholder = 'Tidak ada pajak';
+        // Sync amount with whatever is in amount field if no tax
+        return;
+    }
+
+    const rate = TAX_RATES[type] || 0;
+    const tax  = Math.round(dpp * rate);
+
+    // Auto-fill tax amount (keep editable)
+    taxEl.value = tax;
+
+    // Auto-fill total amount field
+    const totalAmt = DEDUCTION_TYPES.includes(type)
+        ? dpp - tax   // Withholding: total = DPP - pajak
+        : dpp + tax;  // PPN: total = DPP + pajak
+
+    amtEl.value = totalAmt;
+    updateAmountPreview(totalAmt);
+}
+
+/* ── File Upload Display ─────────────────────── */
+function showFileName(input) {
+    const nameEl = document.getElementById('uploadName');
+    const zone   = document.getElementById('uploadZone');
+    if (input.files && input.files[0]) {
+        nameEl.innerHTML = '<i class="bi bi-file-earmark-check"></i> ' + input.files[0].name;
+        nameEl.style.display = 'inline-flex';
+        zone.style.borderColor = '#2d6a4f';
+        zone.style.background  = '#eef7f2';
+    }
+}
+
+// Drag-and-drop support
+const zone = document.getElementById('uploadZone');
+if (zone) {
+    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
+    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
+    zone.addEventListener('drop', e => {
+        e.preventDefault();
+        zone.classList.remove('drag-over');
+        const fileInput = document.getElementById('document');
+        fileInput.files = e.dataTransfer.files;
+        showFileName(fileInput);
+    });
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     const amt = document.getElementById('amount').value;

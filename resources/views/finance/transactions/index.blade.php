@@ -82,6 +82,14 @@
 .act-edit:hover   { background:#5e72e4; color:#fff; }
 .act-delete { background:#fce8e8; color:#f5365c; }
 .act-delete:hover { background:#f5365c; color:#fff; }
+.act-doc    { background:#e8f2fd; color:#1a5fb4; }
+.act-doc:hover    { background:#1a5fb4; color:#fff; }
+/* Tax badge */
+.tax-badge {
+    display:inline-block; border-radius:5px; padding:.15rem .5rem;
+    font-size:.6rem; font-weight:800; letter-spacing:.04em; text-transform:uppercase;
+    background:#fff4de; color:#8a5700; border:1px solid #f5dfa0;
+}
 </style>
 @endpush
 
@@ -226,6 +234,10 @@
                     <td>
                         <p class="fw-semibold text-sm mb-0" style="color:#344767">{{ $trx->description }}</p>
                         <p class="text-xs text-muted mb-0">oleh {{ $trx->creator->name ?? 'System' }}</p>
+                        @if($trx->tax_type && $trx->tax_type !== 'none')
+                            @php $taxLabels = ['ppn'=>'PPN','pph_21'=>'PPh 21','pph_23'=>'PPh 23','pph_4_ayat_2'=>'PPh 4(2)']; @endphp
+                            <span class="tax-badge mt-1">{{ $taxLabels[$trx->tax_type] ?? $trx->tax_type }} Rp {{ number_format($trx->tax_amount,0,',','.') }}</span>
+                        @endif
                     </td>
                     <td>
                         <span class="coa-chip">{{ $trx->account->code ?? '—' }}</span>
@@ -265,6 +277,12 @@
                     </td>
                     <td>
                         <div class="d-flex gap-1 justify-content-end">
+                            @if($trx->document_path)
+                            <a href="{{ route('finance.transactions.document', $trx->id) }}" target="_blank"
+                               class="act-btn act-doc" title="Unduh Dokumen">
+                                <i class="bi bi-paperclip"></i>
+                            </a>
+                            @endif
                             <a href="{{ route('finance.transactions.edit', $trx->id) }}" class="act-btn act-edit" title="Edit">
                                 <i class="bi bi-pencil-fill"></i>
                             </a>
