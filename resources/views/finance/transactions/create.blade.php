@@ -430,6 +430,13 @@
     flex-shrink: 0;
     margin-top: .52rem;
 }
+/* Quick Add Button */
+.btn-quick-add {
+    background: none; border: none; color: #5e72e4; font-size: .68rem;
+    font-weight: 700; padding: 0; transition: color .15s;
+    display: inline-flex; align-items: center; gap: .25rem;
+}
+.btn-quick-add:hover { color: #233dd2; text-decoration: underline; }
 /* Upload Zone */
 .ef-upload-zone {
     border: 2px dashed var(--ef-border);
@@ -601,8 +608,13 @@
                     <p class="ef-section-heading"><i class="bi bi-people me-1" style="font-size:.8rem"></i> Entitas Terkait <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
                     <div class="row g-3">
                         <div class="col-md-6 ef-field">
-                            <label class="ef-label" for="sender_entity_id">Entitas Pengirim <span class="opt">(Dari)</span></label>
-                            <select name="sender_entity_id" id="sender_entity_id" class="ef-select">
+                            <label class="ef-label d-flex justify-content-between align-items-center" for="sender_entity_id">
+                                <span>Entitas Pengirim <span class="opt">(Dari)</span></span>
+                                <button type="button" class="btn-quick-add" onclick="openEntityModal('sender')">
+                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                                </button>
+                            </label>
+                            <select name="sender_entity_id" id="sender_entity_id" class="ef-select {{ $errors->has('sender_entity_id') ? 'ef-error' : '' }}">
                                 <option value="">— Tidak Ada —</option>
                                 @foreach($entities as $ent)
                                     <option value="{{ $ent->id }}" {{ old('sender_entity_id') == $ent->id ? 'selected':'' }}>
@@ -610,10 +622,16 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('sender_entity_id')<p class="ef-field-error">{{ $message }}</p>@enderror
                         </div>
                         <div class="col-md-6 ef-field">
-                            <label class="ef-label" for="receiver_entity_id">Entitas Penerima <span class="opt">(Ke)</span></label>
-                            <select name="receiver_entity_id" id="receiver_entity_id" class="ef-select">
+                            <label class="ef-label d-flex justify-content-between align-items-center" for="receiver_entity_id">
+                                <span>Entitas Penerima <span class="opt">(Ke)</span></span>
+                                <button type="button" class="btn-quick-add" onclick="openEntityModal('receiver')">
+                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                                </button>
+                            </label>
+                            <select name="receiver_entity_id" id="receiver_entity_id" class="ef-select {{ $errors->has('receiver_entity_id') ? 'ef-error' : '' }}">
                                 <option value="">— Tidak Ada —</option>
                                 @foreach($entities as $ent)
                                     <option value="{{ $ent->id }}" {{ old('receiver_entity_id') == $ent->id ? 'selected':'' }}>
@@ -621,6 +639,7 @@
                                     </option>
                                 @endforeach
                             </select>
+                            @error('receiver_entity_id')<p class="ef-field-error">{{ $message }}</p>@enderror
                         </div>
                     </div>
 
@@ -769,6 +788,50 @@
     </div>
 </div>
 
+{{-- ── MODAL QUICK ADD ENTITY ──────────────────── --}}
+<div class="modal fade" id="quickEntityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content border-0 shadow-lg" style="border-radius:16px">
+            <div class="modal-header border-0 pb-0">
+                <h5 class="modal-title fw-bold" style="color:#1a1f3c">Tambah Entitas Cepat</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <form id="quickEntityForm">
+                <div class="modal-body p-4">
+                    <input type="hidden" id="target_dropdown" value="">
+                    
+                    <div class="mb-3">
+                        <label class="ef-label">Nama Entitas <span class="text-danger">*</span></label>
+                        <input type="text" name="name" id="entity_name" class="ef-input" placeholder="Contoh: PT Sumber Rejeki" required>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="ef-label">Tipe Entitas <span class="text-danger">*</span></label>
+                        <select name="type" id="entity_type" class="ef-select" required>
+                            <option value="vendor">Vendor / Supplier</option>
+                            <option value="bank">Bank</option>
+                            <option value="client">Client / Pelanggan</option>
+                            <option value="internal">Internal Perusahaan</option>
+                            <option value="other">Lainnya</option>
+                        </select>
+                    </div>
+
+                    <div class="mb-0">
+                        <label class="ef-label">Info Kontak <span class="opt">(Opsional)</span></label>
+                        <input type="text" name="contact_info" id="entity_contact" class="ef-input" placeholder="Email / No HP">
+                    </div>
+                </div>
+                <div class="modal-footer border-0 pt-0">
+                    <button type="button" class="btn text-xs fw-bold" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="btn px-4 text-white text-xs fw-bold" style="background:#5e72e4; border-radius:8px">
+                        <i class="bi bi-save me-1"></i> Simpan Entitas
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 @endsection
 
 @push('scripts')
@@ -843,6 +906,65 @@ if (zone) {
         showFileName(fileInput);
     });
 }
+
+/* ── Quick Add Entity Logic ─────────────────── */
+const quickModal = new bootstrap.Modal(document.getElementById('quickEntityModal'));
+
+function openEntityModal(target) {
+    document.getElementById('target_dropdown').value = target;
+    document.getElementById('quickEntityForm').reset();
+    quickModal.show();
+}
+
+document.getElementById('quickEntityForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = this.querySelector('button[type="submit"]');
+    const target = document.getElementById('target_dropdown').value;
+    const originalText = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+
+    const formData = {
+        _token: '{{ csrf_token() }}',
+        name: document.getElementById('entity_name').value,
+        type: document.getElementById('entity_type').value,
+        contact_info: document.getElementById('entity_contact').value
+    };
+
+    fetch('{{ route("finance.entities.store") }}', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-Requested-With': 'XMLHttpRequest'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(response => response.json())
+    .then(result => {
+        if (result.success) {
+            // Append and select the new entity in both dropdowns
+            const newOption = new Option(`${result.data.name} (${result.data.type})`, result.data.id, true, true);
+            
+            document.getElementById('sender_entity_id').add(new Option(newOption.text, newOption.value));
+            document.getElementById('receiver_entity_id').add(new Option(newOption.text, newOption.value));
+
+            // Select the one that was clicked
+            document.getElementById(`${target}_entity_id`).value = result.data.id;
+            
+            quickModal.hide();
+            alert('Entitas baru berhasil ditambahkan!');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Terjadi kesalahan saat menyimpan entitas.');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalText;
+    });
+});
 
 window.addEventListener('DOMContentLoaded', () => {
     const amt = document.getElementById('amount').value;

@@ -42,7 +42,15 @@ class FinancialEntityController extends Controller
             'description' => 'nullable|string',
         ]);
 
-        FinancialEntity::create($validated);
+        $entity = FinancialEntity::create($validated);
+
+        if ($request->ajax()) {
+            return response()->json([
+                'success' => true,
+                'message' => 'Entitas berhasil ditambahkan.',
+                'data' => $entity
+            ]);
+        }
 
         return redirect()->route('finance.entities.index')->with('success', 'Entitas kas & keuangan berhasil ditambahkan.');
     }
