@@ -14,6 +14,29 @@ use Illuminate\Support\Facades\Storage;
 class FinancialTransactionController extends Controller
 {
     /**
+     * Apply common filters efficiently to ensure summary and table data are in sync.
+     */
+    private function applyTransactionFilters(Request $request, $query)
+    {
+        if ($request->filled('start_date')) {
+            $query->whereDate('transaction_date', '>=', $request->start_date);
+        }
+        if ($request->filled('end_date')) {
+            $query->whereDate('transaction_date', '<=', $request->end_date);
+        }
+        if ($request->filled('type')) {
+            $query->where('transaction_type', $request->type);
+        }
+        if ($request->filled('account_id')) {
+            $query->where('account_id', $request->account_id);
+        }
+        if ($request->filled('search')) {
+            $query->where('description', 'like', '%' . $request->search . '%');
+        }
+        return $query;
+    }
+
+    /**
      * Display a listing of transactions (Buku Kas Ledger).
      */
     public function index(Request $request)
@@ -22,39 +45,16 @@ class FinancialTransactionController extends Controller
             ->orderBy('transaction_date', 'asc')
             ->orderBy('id', 'asc');
 
-        // Filter by date range
-        if ($request->filled('start_date')) {
-            $query->whereDate('transaction_date', '>=', $request->start_date);
-        }
-        if ($request->filled('end_date')) {
-            $query->whereDate('transaction_date', '<=', $request->end_date);
-        }
-
-        // Filter by transaction type
-        if ($request->filled('type')) {
-            $query->where('transaction_type', $request->type);
-        }
-
-        // Filter by account
-        if ($request->filled('account_id')) {
-            $query->where('account_id', $request->account_id);
-        }
-
-        // Search by description
-        if ($request->filled('search')) {
-            $query->where('description', 'like', '%' . $request->search . '%');
-        }
+        $query = $this->applyTransactionFilters($request, $query);
 
         $transactions = $query->paginate(20)->withQueryString();
 
-        // Summary totals
-        $totalDebit  = FinancialTransaction::when($request->start_date, fn($q) => $q->whereDate('transaction_date', '>=', $request->start_date))
-            ->when($request->end_date, fn($q) => $q->whereDate('transaction_date', '<=', $request->end_date))
-            ->where('transaction_type', 'debit')->sum('amount');
+        // Summary totals: Clone query to perfectly match table filters
+        $summaryQuery = FinancialTransaction::query();
+        $summaryQuery = $this->applyTransactionFilters($request, $summaryQuery);
 
-        $totalKredit = FinancialTransaction::when($request->start_date, fn($q) => $q->whereDate('transaction_date', '>=', $request->start_date))
-            ->when($request->end_date, fn($q) => $q->whereDate('transaction_date', '<=', $request->end_date))
-            ->where('transaction_type', 'kredit')->sum('amount');
+        $totalDebit  = (clone $summaryQuery)->where('transaction_type', 'debit')->sum('amount');
+        $totalKredit = (clone $summaryQuery)->where('transaction_type', 'kredit')->sum('amount');
 
         $accounts  = FinancialAccount::orderBy('code')->get();
 
@@ -99,8 +99,11 @@ class FinancialTransactionController extends Controller
         $validated['created_by'] = Auth::id();
 
         DB::transaction(function () use ($validated) {
-            FinancialTransaction::create($validated);
-            $this->recalculateRunningBalance();
+            // Lock account to prevent concurrent modifications
+            FinancialAccount::where('id', $validated['account_id'])->lockForUpdate()->first();
+            
+            $transaction = FinancialTransaction::create($validated);
+            $this->recalculateRunningBalance($transaction->account_id, $transaction->transaction_date);
         });
 
         return redirect()->route('finance.transactions.index')
@@ -148,9 +151,29 @@ class FinancialTransactionController extends Controller
             $validated['document_path'] = null;
         }
 
-        DB::transaction(function () use ($validated, $transaction) {
+        $oldAccountId = $transaction->account_id;
+        $oldDate = $transaction->transaction_date;
+        $newAccountId = $validated['account_id'];
+        $newDate = $validated['transaction_date'];
+
+        DB::transaction(function () use ($validated, $transaction, $oldAccountId, $oldDate, $newAccountId, $newDate) {
+            // Mitigate Deadlock: Lock account(s) using a consistent ascending order
+            $accountsToLock = array_unique([$oldAccountId, $newAccountId]);
+            sort($accountsToLock);
+            FinancialAccount::whereIn('id', $accountsToLock)->orderBy('id', 'asc')->lockForUpdate()->get();
+
             $transaction->update($validated);
-            $this->recalculateRunningBalance();
+
+            // Proper cascade recalculation logic
+            if ($oldAccountId != $newAccountId) {
+                // If moved to new account, recalc BOTH old and new account histories safely
+                $this->recalculateRunningBalance($oldAccountId, $oldDate);
+                $this->recalculateRunningBalance($newAccountId, $newDate);
+            } else {
+                // Same account, calc from the earliest altered date
+                $earliestDate = strtotime($oldDate) <= strtotime($newDate) ? $oldDate : $newDate;
+                $this->recalculateRunningBalance($newAccountId, $earliestDate);
+            }
         });
 
         return redirect()->route('finance.transactions.index')
@@ -162,12 +185,18 @@ class FinancialTransactionController extends Controller
      */
     public function destroy(FinancialTransaction $transaction)
     {
-        DB::transaction(function () use ($transaction) {
+        $accountId = $transaction->account_id;
+        $trxDate = $transaction->transaction_date;
+
+        DB::transaction(function () use ($transaction, $accountId, $trxDate) {
+            // Lock account explicitly
+            FinancialAccount::where('id', $accountId)->lockForUpdate()->first();
+            
             if ($transaction->document_path) {
                 Storage::disk('local')->delete($transaction->document_path);
             }
             $transaction->delete();
-            $this->recalculateRunningBalance();
+            $this->recalculateRunningBalance($accountId, $trxDate);
         });
 
         return redirect()->route('finance.transactions.index')
@@ -191,40 +220,81 @@ class FinancialTransactionController extends Controller
     }
 
     /**
-     * Recalculate running_balance for all transactions in chronological order.
-     * Debit = cash in (+), Kredit = cash out (-).
+     * Recalculate running balance incrementally per account and safely handle concurrency.
      */
-    private function recalculateRunningBalance(): void
+    private function recalculateRunningBalance(int $accountId, $startDate = null): void
     {
-        $transactions = FinancialTransaction::orderBy('transaction_date', 'asc')
+        // Lock already handled upstream in store/update/destroy methods to prevent cross-account deadlocks.
+
+        // 1. Fetch the baseline balance strictly preceding the modification date
+        $initialBalance = '0.00';
+        
+        $query = FinancialTransaction::where('account_id', $accountId);
+        
+        if ($startDate) {
+            // Need to parse to standard format before passing logic
+            if (is_numeric($startDate)) {
+                $dateString = date('Y-m-d', $startDate);
+            } else {
+                $dateString = \Carbon\Carbon::parse($startDate)->toDateString();
+            }
+            
+            $lastBefore = FinancialTransaction::where('account_id', $accountId)
+                ->whereDate('transaction_date', '<', $dateString)
+                ->orderBy('transaction_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+                
+            if ($lastBefore) {
+                $initialBalance = (string) $lastBefore->running_balance;
+            }
+            
+            $query->whereDate('transaction_date', '>=', $dateString);
+        }
+
+        // 2. Process only the affected subset incrementally
+        $transactions = $query->orderBy('transaction_date', 'asc')
             ->orderBy('id', 'asc')
             ->get();
 
-        $balance = 0;
+        $balance = $initialBalance;
+        $dirtyMonths = [];
 
         foreach ($transactions as $trx) {
             if ($trx->transaction_type === 'debit') {
-                $balance += $trx->amount;
+                $balance = bcadd($balance, (string)$trx->amount, 2);
             } else {
-                $balance -= $trx->amount;
+                $balance = bcsub($balance, (string)$trx->amount, 2);
             }
 
-            // Update running balance and end-of-month/year flags
+            // Flag modified months
             $date = \Carbon\Carbon::parse($trx->transaction_date);
+            $monthKey = $date->format('Y-m');
+            $dirtyMonths[$monthKey] = true;
+            
             $trx->running_balance  = $balance;
-            $trx->is_end_of_month  = false;
+            $trx->is_end_of_month  = false; // Clear flag, we'll re-mark it cleanly below
             $trx->is_end_of_year   = false;
             $trx->saveQuietly();
         }
 
-        // Mark end-of-month and end-of-year on the last transaction of each period
-        $grouped = $transactions->groupBy(fn($t) => \Carbon\Carbon::parse($t->transaction_date)->format('Y-m'));
-        foreach ($grouped as $month => $group) {
-            $last = $group->last();
-            $carbonDate = \Carbon\Carbon::parse($last->transaction_date);
-            $last->is_end_of_month = true;
-            $last->is_end_of_year  = ($carbonDate->month === 12);
-            $last->saveQuietly();
+        // 4. Intelligently Repair EOM / EOY flags for affected months only
+        foreach (array_keys($dirtyMonths) as $monthKey) {
+            $year = substr($monthKey, 0, 4);
+            $month = substr($monthKey, 5, 2);
+            
+            $endOfMonthTrx = FinancialTransaction::where('account_id', $accountId)
+                ->whereYear('transaction_date', $year)
+                ->whereMonth('transaction_date', $month)
+                ->orderBy('transaction_date', 'desc')
+                ->orderBy('id', 'desc')
+                ->first();
+                
+            if ($endOfMonthTrx) {
+                $endOfMonthTrx->is_end_of_month = true;
+                $endOfMonthTrx->is_end_of_year = ($month == '12');
+                $endOfMonthTrx->saveQuietly();
+            }
         }
     }
 }

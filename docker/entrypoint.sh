@@ -32,9 +32,14 @@ fi
 # ─── Clear & cache config ─────────────────────────────────────────────────────
 echo "🧹 Clearing caches..."
 mkdir -p storage/framework/views storage/framework/cache/data storage/framework/sessions
-php artisan config:clear
-php artisan route:clear
-php artisan view:clear
+
+# Ensure correct ownership before generating any cache files
+chown -R www-data:www-data storage bootstrap/cache || true
+
+# Run commands as www-data so that generated cache files are not owned by root
+su -s /bin/sh www-data -c "php artisan config:clear"
+su -s /bin/sh www-data -c "php artisan route:clear"
+su -s /bin/sh www-data -c "php artisan view:clear"
 
 # ─── Run migrations ───────────────────────────────────────────────────────────
 echo "🗄️  Running migrations..."
