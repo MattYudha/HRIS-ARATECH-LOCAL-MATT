@@ -92,6 +92,7 @@
 }
 </style>
 @endpush
+@include('finance._finance_mobile')
 
 @section('content')
 
@@ -158,21 +159,19 @@
 {{-- ══ FILTER BAR ════════ --}}
 <form method="GET" action="{{ route('finance.transactions.index') }}">
 <div class="filter-bar">
-    <div>
+    <div class="filter-date-row">
         <input type="date" name="start_date" class="form-control form-control-sm"
-               value="{{ request('start_date') }}" style="width:140px" title="Dari tanggal">
-    </div>
-    <span class="text-muted text-xs fw-bold">—</span>
-    <div>
+               value="{{ request('start_date') }}" title="Dari tanggal">
+        <span class="text-muted text-xs fw-bold">&mdash;</span>
         <input type="date" name="end_date" class="form-control form-control-sm"
-               value="{{ request('end_date') }}" style="width:140px" title="Sampai tanggal">
+               value="{{ request('end_date') }}" title="Sampai tanggal">
     </div>
-    <select name="type" class="form-select form-select-sm" style="width:150px">
+    <select name="type" class="form-select form-select-sm">
         <option value="">🔄 Semua Tipe</option>
         <option value="debit"  {{ request('type')=='debit'  ?'selected':'' }}>💚 Debit (Masuk)</option>
         <option value="kredit" {{ request('type')=='kredit' ?'selected':'' }}>🔴 Kredit (Keluar)</option>
     </select>
-    <select name="account_id" class="form-select form-select-sm" style="width:200px">
+    <select name="account_id" class="form-select form-select-sm">
         <option value="">📊 Semua Akun</option>
         @foreach($accounts as $acc)
             <option value="{{ $acc->id }}" {{ request('account_id')==$acc->id?'selected':'' }}>
@@ -180,7 +179,7 @@
             </option>
         @endforeach
     </select>
-    <div class="input-group" style="width:200px">
+    <div class="input-group">
         <span class="input-group-text" style="background:#fff;border:1.5px solid #e4e8f0;border-radius:8px 0 0 8px;border-right:0;font-size:.8rem">
             <i class="bi bi-search" style="color:#8392ab"></i>
         </span>
@@ -188,10 +187,12 @@
                style="border-left:0;border-radius:0 8px 8px 0"
                placeholder="Keterangan..." value="{{ request('search') }}">
     </div>
-    <button type="submit" class="btn btn-dark btn-sm mb-0" style="border-radius:8px">Cari</button>
-    @if(request()->hasAny(['start_date','end_date','type','account_id','search']))
-        <a href="{{ route('finance.transactions.index') }}" class="btn btn-outline-secondary btn-sm mb-0" style="border-radius:8px">Reset</a>
-    @endif
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-dark btn-sm mb-0" style="border-radius:8px">Cari</button>
+        @if(request()->hasAny(['start_date','end_date','type','account_id','search']))
+            <a href="{{ route('finance.transactions.index') }}" class="btn btn-outline-secondary btn-sm mb-0" style="border-radius:8px">Reset</a>
+        @endif
+    </div>
     <span class="ms-auto text-xs text-muted">{{ $transactions->total() }} transaksi</span>
 </div>
 </form>
@@ -204,11 +205,11 @@
                 <tr>
                     <th style="width:110px">Tanggal</th>
                     <th>Keterangan</th>
-                    <th style="width:140px">Akun</th>
-                    <th>Entitas</th>
+                    <th class="d-none d-md-table-cell" style="width:140px">Akun</th>
+                    <th class="d-none d-lg-table-cell">Entitas</th>
                     <th class="text-end" style="width:130px">Debit</th>
                     <th class="text-end" style="width:130px">Kredit</th>
-                    <th class="text-end" style="width:135px">Saldo Running</th>
+                    <th class="d-none d-md-table-cell text-end" style="width:135px">Saldo Running</th>
                     <th style="width:75px"></th>
                 </tr>
             </thead>
@@ -239,11 +240,11 @@
                             <span class="tax-badge mt-1">{{ $taxLabels[$trx->tax_type] ?? $trx->tax_type }} Rp {{ number_format($trx->tax_amount,0,',','.') }}</span>
                         @endif
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                         <span class="coa-chip">{{ $trx->account->code ?? '—' }}</span>
                         <p class="text-xs text-muted mb-0 mt-1">{{ $trx->account->name ?? '—' }}</p>
                     </td>
-                    <td>
+                    <td class="d-none d-lg-table-cell">
                         <div style="font-size:.78rem;line-height:1.6;color:#344767">
                             @if($trx->senderEntity)
                                 <span class="text-muted">Dari:</span> <strong>{{ $trx->senderEntity->name }}</strong><br>
@@ -270,7 +271,7 @@
                             <span class="text-muted">—</span>
                         @endif
                     </td>
-                    <td class="text-end">
+                    <td class="d-none d-md-table-cell text-end">
                         <span class="amt-s {{ $trx->running_balance < 0 ? 'neg' : '' }}">
                             {{ $trx->running_balance < 0 ? '−' : '' }}{{ number_format(abs($trx->running_balance),0,',','.') }}
                         </span>

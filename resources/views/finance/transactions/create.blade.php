@@ -467,6 +467,259 @@
     font-weight: 600;
 }
 .ef-file-hidden { display: none; }
+
+/* ─── Mobile Responsive ────────────────────────────────── */
+
+/* Prevent iOS auto-zoom on inputs */
+@media (max-width: 767px) {
+    .ef-input,
+    .ef-select,
+    .ef-textarea { font-size: 16px !important; }
+
+    /* Page Header: stack vertically */
+    .ef-page-header {
+        flex-direction: column;
+        gap: .75rem;
+        padding-bottom: 1rem;
+        margin-bottom: 1.25rem;
+    }
+    .ef-btn-back {
+        align-self: flex-start;
+        font-size: .8rem;
+        padding: .45rem .9rem;
+    }
+    .ef-page-title { font-size: 1.1rem; }
+
+    /* Card: tighter padding on mobile */
+    .ef-card-body { padding: 1.1rem 1rem; }
+    .ef-card-header { padding: .75rem 1rem; }
+
+    /* Transaction type: make cards taller, more tappable */
+    .ef-type-grid { gap: .5rem; }
+    .ef-type-card {
+        padding: 1rem .85rem;
+        gap: .6rem;
+    }
+    .ef-type-indicator {
+        width: 40px;
+        height: 40px;
+        font-size: 1.1rem;
+        border-radius: 10px;
+    }
+    .ef-type-main { font-size: .9rem; }
+    .ef-type-sub  { font-size: .71rem; }
+
+    /* Amount display */
+    .ef-amount-display-value { font-size: 1.1rem; }
+
+    /* Action row: hide on mobile (use sticky bar instead) */
+    .ef-action-row { display: none !important; }
+
+    /* Sticky bottom submit bar */
+    .ef-mobile-bar {
+        display: flex !important;
+    }
+
+    /* Section heading: tighter */
+    .ef-section-heading { font-size: .66rem; margin-bottom: .8rem; }
+    .ef-divider { margin: 1.2rem 0; }
+
+    /* Sidebar: minimal on mobile */
+    .ef-sidebar-card { margin-bottom: .75rem; }
+    .ef-sidebar-body { padding: .85rem; }
+
+    /* SOP card: hidden on mobile to save space */
+    .ef-sidebar-sop { display: none; }
+
+    /* Sidebar balance: horizontal compact layout */
+    .ef-bal-row { padding: .45rem 0; font-size: .78rem; }
+
+    /* Upload zone: compact */
+    .ef-upload-zone { padding: 1.2rem .75rem; }
+    .ef-upload-icon { font-size: 1.3rem; }
+    .ef-upload-text { font-size: .8rem; }
+
+    /* Entitas label + quick add button: stack */
+    .ef-label.d-flex { flex-wrap: wrap; gap: .2rem; }
+    .btn-quick-add { font-size: .72rem; }
+
+    /* Toast: full width on mobile */
+    #ef-toast-container {
+        bottom: 5rem;
+        left: .75rem;
+        right: .75rem;
+    }
+    .ef-toast { min-width: unset; max-width: 100%; }
+}
+
+/* Sticky mobile bottom submit bar */
+.ef-mobile-bar {
+    display: none;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1040;
+    background: #fff;
+    border-top: 1px solid var(--ef-border);
+    padding: .65rem 1rem calc(.65rem + env(safe-area-inset-bottom));
+    gap: .5rem;
+    align-items: center;
+    box-shadow: 0 -2px 12px rgba(0,0,0,.08);
+}
+.ef-mobile-bar .ef-btn { flex: 1; justify-content: center; }
+.ef-mobile-bar .ef-btn-primary { flex: 2; }
+
+/* Add bottom padding to page on mobile so sticky bar doesn't overlap */
+@media (max-width: 767px) {
+    .row.g-4 { padding-bottom: 5rem; }
+}
+
+/* ─── Toast Notification ────────────────────────────────── */
+#ef-toast-container {
+    position: fixed;
+    bottom: 1.5rem;
+    right: 1.5rem;
+    z-index: 9999;
+    display: flex;
+    flex-direction: column;
+    gap: .6rem;
+    pointer-events: none;
+}
+.ef-toast {
+    display: flex;
+    align-items: flex-start;
+    gap: .7rem;
+    min-width: 280px;
+    max-width: 360px;
+    padding: .85rem 1rem;
+    background: #fff;
+    border: 1px solid var(--ef-border);
+    border-radius: 10px;
+    box-shadow: 0 4px 20px rgba(0,0,0,.12);
+    pointer-events: all;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity .25s ease, transform .25s ease;
+}
+.ef-toast.show {
+    opacity: 1;
+    transform: translateY(0);
+}
+.ef-toast.hide {
+    opacity: 0;
+    transform: translateY(12px);
+}
+.ef-toast-icon {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .8rem;
+    flex-shrink: 0;
+    margin-top: .05rem;
+}
+.ef-toast-icon.success { background: #dcfce7; color: #15803d; }
+.ef-toast-icon.error   { background: #fee2e2; color: #dc2626; }
+.ef-toast-icon.info    { background: #e0f2fe; color: #0369a1; }
+.ef-toast-body { flex: 1; min-width: 0; }
+.ef-toast-title {
+    font-size: .8rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    margin: 0 0 .1rem;
+    line-height: 1.3;
+}
+.ef-toast-msg {
+    font-size: .75rem;
+    color: var(--ef-muted);
+    margin: 0;
+    line-height: 1.4;
+}
+.ef-toast-close {
+    background: none;
+    border: none;
+    color: var(--ef-muted);
+    font-size: .8rem;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    flex-shrink: 0;
+    opacity: .6;
+    transition: opacity .15s;
+}
+.ef-toast-close:hover { opacity: 1; }
+
+/* ─── Modal Professional Overrides ─────────────────────── */
+.ef-modal .modal-content {
+    border: 1px solid var(--ef-border);
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(0,0,0,.12);
+    overflow: hidden;
+}
+.ef-modal .modal-header {
+    display: flex;
+    align-items: center;
+    gap: .6rem;
+    padding: 1rem 1.25rem;
+    border-bottom: 1px solid var(--ef-border-soft);
+    background: #fcfcfe;
+}
+.ef-modal .modal-header-icon {
+    width: 28px;
+    height: 28px;
+    background: var(--ef-bg);
+    border: 1px solid var(--ef-border);
+    border-radius: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: .78rem;
+    color: var(--ef-muted);
+    flex-shrink: 0;
+}
+.ef-modal .modal-title-text {
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    margin: 0;
+    letter-spacing: -.01em;
+}
+.ef-modal .modal-sub {
+    font-size: .7rem;
+    color: var(--ef-muted);
+    margin: 0;
+}
+.ef-modal .modal-close {
+    background: none;
+    border: none;
+    color: var(--ef-muted);
+    font-size: .9rem;
+    cursor: pointer;
+    padding: .2rem;
+    border-radius: 4px;
+    margin-left: auto;
+    transition: background .15s, color .15s;
+    line-height: 1;
+}
+.ef-modal .modal-close:hover {
+    background: var(--ef-bg);
+    color: var(--ef-navy);
+}
+.ef-modal .modal-body {
+    padding: 1.25rem;
+}
+.ef-modal .modal-footer {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: .5rem;
+    padding: .85rem 1.25rem;
+    border-top: 1px solid var(--ef-border-soft);
+    background: #fcfcfe;
+}
 </style>
 @endpush
 
@@ -715,7 +968,7 @@
                         </div>
                     </div>
 
-                    {{-- Actions --}}
+    {{-- Actions --}}
                     <div class="ef-action-row">
                         <a href="{{ route('finance.transactions.index') }}" class="ef-btn ef-btn-secondary">Batal</a>
                         <button type="submit" class="ef-btn ef-btn-primary">
@@ -761,7 +1014,7 @@
         </div>
 
         {{-- SOP --}}
-        <div class="ef-sidebar-card">
+        <div class="ef-sidebar-card ef-sidebar-sop">
             <div class="ef-sidebar-header">
                 <i class="bi bi-journal-text" style="font-size:.82rem;color:var(--ef-muted)"></i>
                 <p class="ef-sidebar-heading">SOP Formulir Transaksi</p>
@@ -788,26 +1041,41 @@
     </div>
 </div>
 
-{{-- ── MODAL QUICK ADD ENTITY ──────────────────── --}}
-<div class="modal fade" id="quickEntityModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered">
-        <div class="modal-content border-0 shadow-lg" style="border-radius:16px">
-            <div class="modal-header border-0 pb-0">
-                <h5 class="modal-title fw-bold" style="color:#1a1f3c">Tambah Entitas Cepat</h5>
-                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+{{-- ── MODAL QUICK ADD ENTITY ──────────────────────────── --}}
+<div class="modal fade ef-modal" id="quickEntityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="bi bi-person-plus"></i>
+                </div>
+                <div>
+                    <p class="modal-title-text">Tambah Entitas Cepat</p>
+                    <p class="modal-sub">Entitas tersimpan otomatis & siap dipilih di form</p>
+                </div>
+                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
             </div>
+
             <form id="quickEntityForm">
-                <div class="modal-body p-4">
+                <div class="modal-body">
                     <input type="hidden" id="target_dropdown" value="">
-                    
-                    <div class="mb-3">
-                        <label class="ef-label">Nama Entitas <span class="text-danger">*</span></label>
-                        <input type="text" name="name" id="entity_name" class="ef-input" placeholder="Contoh: PT Sumber Rejeki" required>
+
+                    <div class="ef-field">
+                        <label class="ef-label" for="entity_name">
+                            Nama Entitas <span class="req">*</span>
+                        </label>
+                        <input type="text" id="entity_name" name="name" class="ef-input"
+                               placeholder="Contoh: PT Sumber Rejeki" required autofocus>
                     </div>
 
-                    <div class="mb-3">
-                        <label class="ef-label">Tipe Entitas <span class="text-danger">*</span></label>
-                        <select name="type" id="entity_type" class="ef-select" required>
+                    <div class="ef-field">
+                        <label class="ef-label" for="entity_type">
+                            Tipe Entitas <span class="req">*</span>
+                        </label>
+                        <select id="entity_type" name="type" class="ef-select" required>
                             <option value="vendor">Vendor / Supplier</option>
                             <option value="bank">Bank</option>
                             <option value="client">Client / Pelanggan</option>
@@ -816,20 +1084,40 @@
                         </select>
                     </div>
 
-                    <div class="mb-0">
-                        <label class="ef-label">Info Kontak <span class="opt">(Opsional)</span></label>
-                        <input type="text" name="contact_info" id="entity_contact" class="ef-input" placeholder="Email / No HP">
+                    <div class="ef-field" style="margin-bottom: 0">
+                        <label class="ef-label" for="entity_contact">
+                            Info Kontak <span class="opt">(Opsional)</span>
+                        </label>
+                        <input type="text" id="entity_contact" name="contact_info" class="ef-input"
+                               placeholder="Email / No. HP">
                     </div>
                 </div>
-                <div class="modal-footer border-0 pt-0">
-                    <button type="button" class="btn text-xs fw-bold" data-bs-dismiss="modal">Batal</button>
-                    <button type="submit" class="btn px-4 text-white text-xs fw-bold" style="background:#5e72e4; border-radius:8px">
-                        <i class="bi bi-save me-1"></i> Simpan Entitas
+
+                <div class="modal-footer">
+                    <button type="button" class="ef-btn ef-btn-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="submit" id="entitySubmitBtn" class="ef-btn ef-btn-primary">
+                        <i class="bi bi-check2"></i> Simpan Entitas
                     </button>
                 </div>
             </form>
+
         </div>
     </div>
+</div>
+
+{{-- ── TOAST CONTAINER ──────────────────────────────────── --}}
+<div id="ef-toast-container"></div>
+
+{{-- ── MOBILE STICKY SUBMIT BAR ───────────────────── --}}
+<div class="ef-mobile-bar" id="mobileBar">
+    <a href="{{ route('finance.transactions.index') }}" class="ef-btn ef-btn-secondary">
+        <i class="bi bi-arrow-left"></i> Batal
+    </a>
+    <button type="submit" form="trxForm" class="ef-btn ef-btn-primary" id="mobileSubmitBtn">
+        <i class="bi bi-check2-circle"></i> Simpan Transaksi
+    </button>
 </div>
 
 @endsection
@@ -918,12 +1206,12 @@ function openEntityModal(target) {
 
 document.getElementById('quickEntityForm').addEventListener('submit', function(e) {
     e.preventDefault();
-    const btn = this.querySelector('button[type="submit"]');
+    const btn = document.getElementById('entitySubmitBtn');
     const target = document.getElementById('target_dropdown').value;
-    const originalText = btn.innerHTML;
+    const originalHTML = btn.innerHTML;
 
     btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1"></span> Menyimpan...';
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:.85rem;height:.85rem;border-width:2px"></span> Menyimpan...';
 
     const formData = {
         _token: '{{ csrf_token() }}',
@@ -934,37 +1222,66 @@ document.getElementById('quickEntityForm').addEventListener('submit', function(e
 
     fetch('{{ route("finance.entities.store") }}', {
         method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-            'X-Requested-With': 'XMLHttpRequest'
-        },
+        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
         body: JSON.stringify(formData)
     })
-    .then(response => response.json())
+    .then(r => r.json())
     .then(result => {
         if (result.success) {
-            // Append and select the new entity in both dropdowns
-            const newOption = new Option(`${result.data.name} (${result.data.type})`, result.data.id, true, true);
-            
-            document.getElementById('sender_entity_id').add(new Option(newOption.text, newOption.value));
-            document.getElementById('receiver_entity_id').add(new Option(newOption.text, newOption.value));
-
-            // Select the one that was clicked
+            const opt = new Option(`${result.data.name} (${result.data.type})`, result.data.id);
+            document.getElementById('sender_entity_id').add(opt.cloneNode(true));
+            document.getElementById('receiver_entity_id').add(opt.cloneNode(true));
             document.getElementById(`${target}_entity_id`).value = result.data.id;
-            
+
             quickModal.hide();
-            alert('Entitas baru berhasil ditambahkan!');
+            showToast('success', 'Entitas Ditambahkan', `"${result.data.name}" berhasil disimpan dan siap dipilih.`);
+        } else {
+            showToast('error', 'Gagal Menyimpan', result.message || 'Terjadi kesalahan, coba lagi.');
         }
     })
-    .catch(error => {
-        console.error('Error:', error);
-        alert('Terjadi kesalahan saat menyimpan entitas.');
+    .catch(() => {
+        showToast('error', 'Koneksi Gagal', 'Tidak dapat terhubung ke server.');
     })
     .finally(() => {
         btn.disabled = false;
-        btn.innerHTML = originalText;
+        btn.innerHTML = originalHTML;
     });
 });
+
+/* ── Toast Notification System ──────────────────── */
+function showToast(type, title, message, duration = 4000) {
+    const icons = {
+        success: '<i class="bi bi-check-lg"></i>',
+        error:   '<i class="bi bi-x-lg"></i>',
+        info:    '<i class="bi bi-info-lg"></i>'
+    };
+
+    const toast = document.createElement('div');
+    toast.className = 'ef-toast';
+    toast.innerHTML = `
+        <div class="ef-toast-icon ${type}">${icons[type] ?? icons.info}</div>
+        <div class="ef-toast-body">
+            <p class="ef-toast-title">${title}</p>
+            <p class="ef-toast-msg">${message}</p>
+        </div>
+        <button class="ef-toast-close" onclick="this.closest('.ef-toast').remove()">
+            <i class="bi bi-x"></i>
+        </button>
+    `;
+
+    document.getElementById('ef-toast-container').appendChild(toast);
+
+    // Trigger show animation
+    requestAnimationFrame(() => {
+        requestAnimationFrame(() => toast.classList.add('show'));
+    });
+
+    // Auto-dismiss
+    setTimeout(() => {
+        toast.classList.replace('show', 'hide');
+        setTimeout(() => toast.remove(), 300);
+    }, duration);
+}
 
 window.addEventListener('DOMContentLoaded', () => {
     const amt = document.getElementById('amount').value;

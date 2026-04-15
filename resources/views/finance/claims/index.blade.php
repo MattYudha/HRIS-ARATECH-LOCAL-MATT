@@ -39,6 +39,7 @@
 .fin-tbl tbody td { padding:.85rem 1rem; border-bottom:1px solid #f1f3f7; vertical-align:middle; }
 </style>
 @endpush
+@include('finance._finance_mobile')
 
 @section('content')
 
@@ -82,20 +83,20 @@
         <table class="fin-tbl">
             <thead>
                 <tr>
-                    <th style="width:110px">ID #</th>
+                    <th class="d-none d-md-table-cell" style="width:110px">ID #</th>
                     @if($isAdmin) <th>Karyawan</th> @endif
                     <th>Judul Klaim</th>
-                    <th>Kategori</th>
+                    <th class="d-none d-md-table-cell">Kategori</th>
                     <th class="text-end">Nominal</th>
                     <th class="text-center">Status</th>
-                    <th>Tanggal</th>
+                    <th class="d-none d-md-table-cell">Tanggal</th>
                     <th class="text-center">Aksi</th>
                 </tr>
             </thead>
             <tbody>
                 @forelse($query as $claim)
                 <tr>
-                    <td><span class="fw-bold text-xs" style="color:#8392ab">#{{ $claim->id }}</span></td>
+                    <td class="d-none d-md-table-cell"><span class="fw-bold text-xs" style="color:#8392ab">#{{ $claim->id }}</span></td>
                     @if($isAdmin)
                     <td>
                         <p class="fw-bold mb-0 text-sm" style="color:#344767">{{ $claim->employee->full_name }}</p>
@@ -106,12 +107,12 @@
                         <p class="fw-semibold mb-0 text-sm" style="color:#344767">{{ $claim->title }}</p>
                         <p class="text-xs text-muted mb-0">{{ Str::limit($claim->description, 40) }}</p>
                     </td>
-                    <td><span class="text-xs fw-bold" style="color:#5e72e4">{{ $claim->categoryLabel() }}</span></td>
+                    <td class="d-none d-md-table-cell"><span class="text-xs fw-bold" style="color:#5e72e4">{{ $claim->categoryLabel() }}</span></td>
                     <td class="text-end fw-bold text-sm" style="color:#344767">Rp {{ number_format($claim->amount,0,',','.') }}</td>
                     <td class="text-center">
                         <span class="claim-badge badge-{{ $claim->status }}">{{ $claim->statusLabel() }}</span>
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                         <p class="text-xs mb-0" style="color:#8392ab">{{ $claim->created_at->format('d/m/Y') }}</p>
                         <p class="text-xs text-muted mb-0">{{ $claim->created_at->diffForHumans() }}</p>
                     </td>

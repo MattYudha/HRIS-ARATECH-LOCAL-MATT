@@ -110,44 +110,76 @@
             #main { margin-left: 300px; transition: all 0.3s ease; }
         }
 
-    	.burger-btn {
-  		 cursor: pointer;
-    	 display: inline-flex;
-    	 background: transparent;
-    	 border: none;
-    	 font-size: 1.5rem;
-		}
+        /* Mobile sidebar overlap fix */
+        @media screen and (max-width: 1199px) {
+            #sidebar, .sidebar-wrapper {
+                z-index: 1050 !important;
+            }
+        }
 
         .mobile-nav-header {
-            padding: 1rem 1.5rem 0;
+            position: sticky;
+            top: 0;
+            z-index: 9;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            padding: 0.85rem 1.25rem;
+            margin-bottom: 1.25rem;
+            margin-left: -1rem; /* Negate the generic mobile padding of #main if any */
+            margin-right: -1rem;
+        }
+
+        .mobile-top-bar {
             display: flex;
             align-items: center;
+            justify-content: space-between;
+            width: 100%;
+            margin: 0 auto;
+        }
+
+        .app-brand {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
         }
 
         .mobile-burger-btn {
             display: inline-flex;
             align-items: center;
             justify-content: center;
-            color: #25396f;
+            width: 40px;
+            height: 40px;
+            color: #1a1f3c; /* Navy dark */
             text-decoration: none;
             cursor: pointer;
-            padding: 0;
             background: transparent;
             border: none;
+            border-radius: 8px;
+            transition: background 0.15s, transform 0.15s;
         }
 
         .mobile-burger-btn:hover,
-        .mobile-burger-btn:focus {
-            color: #0d6efd;
-            text-decoration: none;
+        .mobile-burger-btn:active {
+            background: rgba(0, 0, 0, 0.04);
+            transform: scale(0.95);
         }
 
         .mobile-burger-btn i {
-            font-size: 2rem;
+            font-size: 1.8rem;
+            line-height: 1;
         }
 
+        [data-bs-theme='dark'] .mobile-nav-header {
+            background: rgba(30, 30, 45, 0.85);
+            border-bottom-color: rgba(255, 255, 255, 0.05);
+        }
         [data-bs-theme='dark'] .mobile-burger-btn {
             color: #f8fafc;
+        }
+        [data-bs-theme='dark'] .app-brand span {
+            color: #f8fafc !important;
         }
       
     </style>
@@ -652,10 +684,16 @@
     <!-- ================= MAIN ================= -->
     <div id="main">
 
-        <header class="mobile-nav-header d-xl-none mb-3">
-            <a href="#" class="burger-btn mobile-burger-btn" aria-label="Buka menu navigasi">
-                <i class="bi bi-list"></i>
-            </a>
+        <header class="mobile-nav-header d-xl-none">
+            <div class="mobile-top-bar">
+                <div class="app-brand">
+                    <img src="{{ asset('img/HRIS ARATECH logo tr.png') }}" style="height: 28px;" alt="Logo" onerror="this.style.display='none'">
+                    <span class="fw-bolder" style="color: #1a1f3c; font-size: 1.05rem; letter-spacing: -0.02em;">Aratech </span>
+                </div>
+                <button class="burger-btn mobile-burger-btn" aria-label="Buka menu navigasi">
+                    <i class="bi bi-list"></i>
+                </button>
+            </div>
         </header>
 
         @yield('content')

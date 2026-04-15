@@ -78,6 +78,7 @@
 .act-delete:hover { background:#f5365c; color:#fff; }
 </style>
 @endpush
+@include('finance._finance_mobile')
 
 @section('content')
 
@@ -140,23 +141,25 @@
 {{-- ── Filter Bar ───────────────────────────────── --}}
 <form method="GET" action="{{ route('finance.entities.index') }}">
 <div class="filter-bar">
-    <div class="input-group" style="width:240px">
+    <div class="input-group">
         <span class="input-group-text" style="background:#fff;border:1.5px solid #e4e8f0;border-radius:8px 0 0 8px;border-right:0">
             <i class="bi bi-search" style="color:#8392ab;font-size:.8rem"></i>
         </span>
         <input type="text" name="search" class="form-control" style="border-left:0;border-radius:0 8px 8px 0"
                placeholder="Cari nama atau tipe..." value="{{ request('search') }}">
     </div>
-    <select name="type" class="form-select" style="width:160px" onchange="this.form.submit()">
+    <select name="type" class="form-select" onchange="this.form.submit()">
         <option value="">🏷 Semua Tipe</option>
         @foreach(['bank','vendor','internal','client','employee','tax_office','other'] as $t)
             <option value="{{ $t }}" {{ request('type') == $t ? 'selected':'' }}>{{ ucfirst(str_replace('_',' ',$t)) }}</option>
         @endforeach
     </select>
-    <button type="submit" class="btn btn-dark btn-sm mb-0" style="border-radius:8px">Cari</button>
-    @if(request('search') || request('type'))
-        <a href="{{ route('finance.entities.index') }}" class="btn btn-outline-secondary btn-sm mb-0" style="border-radius:8px">Reset</a>
-    @endif
+    <div class="filter-actions">
+        <button type="submit" class="btn btn-dark btn-sm mb-0" style="border-radius:8px">Cari</button>
+        @if(request('search') || request('type'))
+            <a href="{{ route('finance.entities.index') }}" class="btn btn-outline-secondary btn-sm mb-0" style="border-radius:8px">Reset</a>
+        @endif
+    </div>
     <span class="ms-auto text-xs text-muted">{{ $entities->total() }} entitas ditemukan</span>
 </div>
 </form>
@@ -169,7 +172,7 @@
                 <tr>
                     <th style="width:130px">Tipe</th>
                     <th>Nama Entitas</th>
-                    <th>Deskripsi</th>
+                    <th class="d-none d-md-table-cell">Deskripsi</th>
                     <th style="width:90px;text-align:center">Aksi</th>
                 </tr>
             </thead>
@@ -189,7 +192,7 @@
                         <p class="fw-bold mb-0 text-sm" style="color:#344767">{{ $entity->name }}</p>
                         <p class="text-xs text-muted mb-0">#{{ $entity->id }} · Dibuat {{ $entity->created_at->diffForHumans() }}</p>
                     </td>
-                    <td>
+                    <td class="d-none d-md-table-cell">
                         <p class="text-sm text-muted mb-0" style="line-height:1.5">
                             {{ $entity->description ? Str::limit($entity->description, 70) : '—' }}
                         </p>
