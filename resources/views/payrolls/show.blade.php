@@ -2,8 +2,6 @@
 
 @section('content')
 
-
-
 <div class="page-heading">
     <div class="page-title">
         <div class="row">
@@ -31,255 +29,287 @@
         <span class="ms-auto">{!! $payroll->status_badge !!}</span>
     </div>
 
-    <div class="card shadow-sm" id="print-area">
-        <div class="card-body p-4 payslip-container">
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    {{-- PAYSLIP DOCUMENT                                       --}}
+    {{-- ═══════════════════════════════════════════════════════ --}}
+    <div class="payslip-wrapper" id="print-area">
+        <div class="payslip-document">
 
-            {{-- Company Header --}}
-            <div class="text-center mb-2 payslip-header">
-                <h4 class="mb-0 fw-bold text-white" style="font-size: 1.15rem;">PT. Aratech Nusantara Indonesia</h4>
-                <p class="text-gray-300 mb-0" style="font-size: 0.78rem;">Jl. Jend. Sudirman No. 55, Jakarta Pusat</p>
-                <hr class="my-1 border-gray-600">
-                <h5 class="text-primary fw-bold mb-0" style="font-size: 1rem;">SLIP GAJI KARYAWAN</h5>
-                <p class="text-gray-300 mb-0" style="font-size: 0.82rem;">Periode: {{ $payroll->period_label }}</p>
-            </div>
-
-            {{-- Employee Info --}}
-            <div class="row mb-2" style="font-size: 0.82rem;">
-                <div class="col-6">
-                    <table class="table table-borderless table-sm mb-0 slip-info-table">
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="width:120px; padding: 2px 4px;">Nama</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ $payroll->employee?->fullname ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="padding: 2px 4px;">NIK</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ $payroll->employee?->emp_code ?? $payroll->employee?->nik ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="padding: 2px 4px;">Departemen</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ $payroll->employee?->department?->name ?? '-' }}</td>
-                        </tr>
-                    </table>
+            {{-- ── COMPANY HEADER ──────────────────────────────────── --}}
+            <div class="payslip-letterhead">
+                <div class="letterhead-brand">
+                    <div class="brand-logo-circle">
+                        <i class="bi bi-building"></i>
+                    </div>
+                    <div class="brand-text">
+                        <div class="brand-name">PT. Aratech Nusantara Indonesia</div>
+                        <div class="brand-address">Jl. Jend. Sudirman No. 55, Jakarta Pusat &nbsp;|&nbsp; (021) 5000-1234 &nbsp;|&nbsp; hrd@aratech.co.id</div>
+                    </div>
                 </div>
-                <div class="col-6">
-                    <table class="table table-borderless table-sm mb-0 slip-info-table">
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="width:120px; padding: 2px 4px;">Jabatan</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ $payroll->employee?->employeePositions?->where('is_active', true)->first()?->position?->position_name ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="padding: 2px 4px;">Tanggal Bayar</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ $payroll->pay_date?->format('d F Y') ?? '-' }}</td>
-                        </tr>
-                        <tr>
-                            <td class="fw-bold text-gray-300" style="padding: 2px 4px;">Status</td>
-                            <td class="text-white" style="padding: 2px 4px;">: {{ ucfirst($payroll->status ?? 'draft') }}</td>
-                        </tr>
-                    </table>
+                <div class="letterhead-divider"></div>
+                <div class="letterhead-title">
+                    <div class="slip-title">SLIP GAJI KARYAWAN</div>
+                    <div class="slip-period">Periode: {{ $payroll->period_label }}</div>
                 </div>
             </div>
 
-            <div class="row g-2">
-                {{-- Pendapatan --}}
-                <div class="col-6">
-                    <div class="border rounded p-2 h-100 payslip-dark-success">
-                        <h6 class="fw-bold text-green-400 border-bottom border-green-600 pb-1 mb-1" style="font-size: 0.85rem;"><i class="bi bi-wallet2 text-green-400"></i> PENDAPATAN</h6>
-                        <table class="table table-sm table-borderless mb-0 slip-table">
+            {{-- ── EMPLOYEE INFO ────────────────────────────────────── --}}
+            <div class="payslip-employee-info">
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Nama</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value fw-semibold">{{ $payroll->employee?->fullname ?? '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">NIK</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value">{{ $payroll->employee?->emp_code ?? $payroll->employee?->nik ?? '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Departemen</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value">{{ $payroll->employee?->department?->name ?? '-' }}</span>
+                    </div>
+                </div>
+                <div class="info-grid">
+                    <div class="info-row">
+                        <span class="info-label">Jabatan</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value">{{ $payroll->employee?->employeePositions?->where('is_active', true)->first()?->position?->position_name ?? '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Tanggal Bayar</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value">{{ $payroll->pay_date?->format('d F Y') ?? '-' }}</span>
+                    </div>
+                    <div class="info-row">
+                        <span class="info-label">Status</span>
+                        <span class="info-separator">:</span>
+                        <span class="info-value">
+                            <span class="status-badge status-{{ $payroll->status ?? 'draft' }}">{{ ucfirst($payroll->status ?? 'draft') }}</span>
+                        </span>
+                    </div>
+                </div>
+            </div>
+
+            {{-- ── EARNINGS & DEDUCTIONS ────────────────────────────── --}}
+            <div class="payslip-columns">
+
+                {{-- PENDAPATAN --}}
+                <div class="payslip-col">
+                    <div class="col-header col-header-earnings">
+                        <i class="bi bi-arrow-up-circle"></i>
+                        <span>PENDAPATAN</span>
+                    </div>
+                    <table class="payslip-table">
+                        <tbody>
                             <tr>
-                                <td class="text-gray-300">Gaji Pokok</td>
-                                <td class="text-end fw-bold text-white">Rp {{ number_format($payroll->salary, 0, ',', '.') }}</td>
+                                <td class="item-name">Gaji Pokok</td>
+                                <td class="item-amount fw-semibold">Rp {{ number_format($payroll->salary, 0, ',', '.') }}</td>
                             </tr>
                             @if($payroll->transport_allowance > 0)
                             <tr>
-                                <td class="text-gray-300">Tunjangan Transport</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->transport_allowance, 0, ',', '.') }}</td>
+                                <td class="item-name">Tunjangan Transport</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->transport_allowance, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->meal_allowance > 0)
                             <tr>
-                                <td class="text-gray-300">Tunjangan Makan</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->meal_allowance, 0, ',', '.') }}</td>
+                                <td class="item-name">Tunjangan Makan</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->meal_allowance, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->position_allowance > 0)
                             <tr>
-                                <td class="text-gray-300">Tunjangan Jabatan</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->position_allowance, 0, ',', '.') }}</td>
+                                <td class="item-name">Tunjangan Jabatan</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->position_allowance, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->overtime_amount > 0)
                             <tr>
-                                <td class="text-gray-300">Lembur ({{ $payroll->overtime_hours }} jam)</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->overtime_amount, 0, ',', '.') }}</td>
+                                <td class="item-name">Lembur ({{ $payroll->overtime_hours }} jam)</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->overtime_amount, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->performance_bonus > 0)
                             <tr>
-                                <td class="text-gray-300">Bonus Kinerja</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->performance_bonus, 0, ',', '.') }}</td>
+                                <td class="item-name">Bonus Kinerja</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->performance_bonus, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->attendance_bonus > 0)
                             <tr>
-                                <td class="text-gray-300">Bonus Kehadiran</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->attendance_bonus, 0, ',', '.') }}</td>
+                                <td class="item-name">Bonus Kehadiran</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->attendance_bonus, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->other_bonus > 0)
                             <tr>
-                                <td class="text-gray-300">Bonus Lainnya</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->other_bonus, 0, ',', '.') }}</td>
+                                <td class="item-name">Bonus Lainnya</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->other_bonus, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->bonus_notes)
                             <tr>
-                                <td colspan="2" class="text-gray-400" style="font-size: 0.72rem; padding-top:0;"><em>{{ $payroll->bonus_notes }}</em></td>
+                                <td colspan="2" class="item-note"><em>{{ $payroll->bonus_notes }}</em></td>
                             </tr>
                             @endif
-                            <tr class="border-top border-green-600">
-                                <td class="fw-bold text-green-400">Total Pendapatan</td>
-                                <td class="text-end fw-bold text-green-400">Rp {{ number_format($payroll->total_earnings, 0, ',', '.') }}</td>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td class="total-label">Total Pendapatan</td>
+                                <td class="total-amount">Rp {{ number_format($payroll->total_earnings, 0, ',', '.') }}</td>
                             </tr>
-                        </table>
-                    </div>
+                        </tfoot>
+                    </table>
                 </div>
 
-                {{-- Potongan --}}
-                <div class="col-6">
-                    <div class="border rounded p-2 h-100 payslip-dark-danger">
-                        <h6 class="fw-bold text-red-400 border-bottom border-red-600 pb-1 mb-1" style="font-size: 0.85rem;"><i class="bi bi-scissors text-red-400"></i> POTONGAN</h6>
-                        <table class="table table-sm table-borderless mb-0 slip-table">
+                {{-- POTONGAN --}}
+                <div class="payslip-col">
+                    <div class="col-header col-header-deductions">
+                        <i class="bi bi-arrow-down-circle"></i>
+                        <span>POTONGAN</span>
+                    </div>
+                    <table class="payslip-table">
+                        <tbody>
                             @if($payroll->late_deduction > 0)
                             <tr>
-                                <td class="text-gray-300">Pot. Telat ({{ $payroll->late_count }}×)</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->late_deduction, 0, ',', '.') }}</td>
+                                <td class="item-name">Pot. Keterlambatan ({{ $payroll->late_count }}×)</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->late_deduction, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->absent_deduction > 0)
                             <tr>
-                                <td class="text-gray-300">Pot. Absen ({{ $payroll->absent_count }} hari)</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->absent_deduction, 0, ',', '.') }}</td>
+                                <td class="item-name">Pot. Absen ({{ $payroll->absent_count }} hari)</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->absent_deduction, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->penalty_amount > 0)
                             <tr>
-                                <td class="text-gray-300">Denda/Penalti</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->penalty_amount, 0, ',', '.') }}</td>
+                                <td class="item-name">Denda / Penalti</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->penalty_amount, 0, ',', '.') }}</td>
                             </tr>
                             @if($payroll->penalty_notes)
                             <tr>
-                                <td colspan="2" class="text-gray-400" style="font-size: 0.72rem; padding-top:0;"><em>{{ $payroll->penalty_notes }}</em></td>
+                                <td colspan="2" class="item-note"><em>{{ $payroll->penalty_notes }}</em></td>
                             </tr>
                             @endif
                             @endif
                             @if($payroll->bpjs_kes > 0)
                             <tr>
-                                <td class="text-gray-300">BPJS Kesehatan</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->bpjs_kes, 0, ',', '.') }}</td>
+                                <td class="item-name">BPJS Kesehatan</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->bpjs_kes, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->bpjs_tk > 0)
                             <tr>
-                                <td class="text-gray-300">BPJS Ketenagakerjaan</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->bpjs_tk, 0, ',', '.') }}</td>
+                                <td class="item-name">BPJS Ketenagakerjaan</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->bpjs_tk, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->pph21 > 0)
                             <tr>
-                                <td class="text-gray-300">PPh 21</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->pph21, 0, ',', '.') }}</td>
+                                <td class="item-name">PPh 21</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->pph21, 0, ',', '.') }}</td>
                             </tr>
                             @endif
                             @if($payroll->other_deduction > 0)
                             <tr>
-                                <td class="text-gray-300">Potongan Lain</td>
-                                <td class="text-end text-white">Rp {{ number_format($payroll->other_deduction, 0, ',', '.') }}</td>
+                                <td class="item-name">Potongan Lainnya</td>
+                                <td class="item-amount">Rp {{ number_format($payroll->other_deduction, 0, ',', '.') }}</td>
                             </tr>
                             @if($payroll->deduction_notes)
                             <tr>
-                                <td colspan="2" class="text-gray-400" style="font-size: 0.72rem; padding-top:0;"><em>{{ $payroll->deduction_notes }}</em></td>
+                                <td colspan="2" class="item-note"><em>{{ $payroll->deduction_notes }}</em></td>
                             </tr>
                             @endif
                             @endif
                             @if($payroll->total_deductions == 0)
                             <tr>
-                                <td class="text-gray-400" colspan="2"><em>Tidak ada potongan</em></td>
+                                <td colspan="2" class="item-note text-center py-3">Tidak ada potongan</td>
                             </tr>
                             @endif
-                            <tr class="border-top border-red-600">
-                                <td class="fw-bold text-red-400">Total Potongan</td>
-                                <td class="text-end fw-bold text-red-400">Rp {{ number_format($payroll->total_deductions, 0, ',', '.') }}</td>
+                        </tbody>
+                        <tfoot>
+                            <tr class="total-row">
+                                <td class="total-label">Total Potongan</td>
+                                <td class="total-amount">Rp {{ number_format($payroll->total_deductions, 0, ',', '.') }}</td>
                             </tr>
-                        </table>
-                    </div>
+                        </tfoot>
+                    </table>
                 </div>
             </div>
 
-            {{-- Kehadiran Info --}}
+            {{-- ── KEHADIRAN ─────────────────────────────────────────── --}}
             @if($payroll->working_days > 0)
-            <div class="mt-2">
-                <div class="border rounded py-1 px-2 payslip-dark-info" style="font-size: 0.78rem;">
-                    <i class="bi bi-calendar-check text-blue-400"></i>
-                    <strong class="text-gray-300">Kehadiran:</strong>
-                    Hari Kerja: <strong class="text-white">{{ $payroll->working_days }}</strong> |
-                    Hadir: <strong class="text-white">{{ $payroll->days_present }}</strong> |
-                    Telat: <strong class="text-white">{{ $payroll->late_count }}</strong> |
-                    Absen: <strong class="text-white">{{ $payroll->absent_count }}</strong>
-                </div>
+            <div class="payslip-attendance">
+                <i class="bi bi-calendar3"></i>
+                <strong>Rekap Kehadiran:</strong>
+                <span>Hari Kerja: <strong>{{ $payroll->working_days }}</strong></span>
+                <span class="att-sep">|</span>
+                <span>Hadir: <strong>{{ $payroll->days_present }}</strong></span>
+                <span class="att-sep">|</span>
+                <span>Telat: <strong>{{ $payroll->late_count }}</strong></span>
+                <span class="att-sep">|</span>
+                <span>Absen: <strong>{{ $payroll->absent_count }}</strong></span>
             </div>
             @endif
 
-            {{-- Summary Box --}}
-            <div class="row mt-2">
-                <div class="col-6 offset-6">
-                    <div class="border rounded p-2 payslip-dark-primary">
-                        <table class="table table-sm table-borderless mb-0 slip-table">
-                            <tr>
-                                <td class="fw-bold text-gray-300">Total Pendapatan</td>
-                                <td class="text-end text-green-400 fw-bold">Rp {{ number_format($payroll->total_earnings, 0, ',', '.') }}</td>
-                            </tr>
-                            <tr>
-                                <td class="fw-bold text-gray-300">Total Potongan</td>
-                                <td class="text-end text-red-400 fw-bold">- Rp {{ number_format($payroll->total_deductions, 0, ',', '.') }}</td>
-                            </tr>
-                            <tr class="border-top border-2 border-blue-500">
-                                <td class="fw-bold text-white" style="font-size: 1.05rem;">GAJI BERSIH</td>
-                                <td class="text-end fw-bold text-cyan-400" style="font-size: 1.05rem;">Rp {{ number_format($payroll->net_salary, 0, ',', '.') }}</td>
-                            </tr>
-                        </table>
-                    </div>
-                </div>
+            {{-- ── NET SALARY SUMMARY ───────────────────────────────── --}}
+            <div class="payslip-summary">
+                <table class="summary-table">
+                    <tr>
+                        <td class="sum-label">Total Pendapatan</td>
+                        <td class="sum-amount">Rp {{ number_format($payroll->total_earnings, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr>
+                        <td class="sum-label">Total Potongan</td>
+                        <td class="sum-amount sum-deduction">- Rp {{ number_format($payroll->total_deductions, 0, ',', '.') }}</td>
+                    </tr>
+                    <tr class="sum-net-row">
+                        <td class="sum-net-label">GAJI BERSIH</td>
+                        <td class="sum-net-amount">Rp {{ number_format($payroll->net_salary, 0, ',', '.') }}</td>
+                    </tr>
+                </table>
             </div>
 
+            {{-- ── NOTES ────────────────────────────────────────────── --}}
             @if($payroll->notes)
-            <div class="mt-2">
-                <p class="text-gray-400 mb-0" style="font-size: 0.78rem;"><strong class="text-gray-300">Catatan:</strong> {{ $payroll->notes }}</p>
+            <div class="payslip-notes">
+                <strong>Catatan:</strong> {{ $payroll->notes }}
             </div>
             @endif
 
-            {{-- Signature Lines --}}
-            <div class="row text-center signature-area">
-                <div class="col-4">
-                    <p class="mb-0 text-gray-300">Diterima oleh,</p>
-                    <div class="signature-space"></div>
-                    <p class="border-top d-inline-block mb-0" style="min-width: 140px;">
-                        <strong class="text-white">{{ $payroll->employee?->fullname ?? '________________' }}</strong><br>
-                        <small class="text-gray-400">Karyawan</small>
-                    </p>
+            {{-- ── SIGNATURE ───────────────────────────────────────── --}}
+            <div class="payslip-signature">
+                <div class="sig-col">
+                    <p class="sig-title">Diterima oleh,</p>
+                    <div class="sig-space"></div>
+                    <div class="sig-line"></div>
+                    <p class="sig-name">{{ $payroll->employee?->fullname ?? '________________' }}</p>
+                    <p class="sig-role">Karyawan</p>
                 </div>
-                <div class="col-4"></div>
-                <div class="col-4">
-                    <p class="mb-0 text-gray-300">Disetujui oleh,</p>
-                    <div class="signature-space"></div>
-                    <p class="border-top d-inline-block mb-0" style="min-width: 140px;">
-                        <strong class="text-white">________________</strong><br>
+                <div class="sig-col-center"></div>
+                <div class="sig-col">
+                    <p class="sig-title">Disetujui oleh,</p>
+                    <div class="sig-space"></div>
+                    <div class="sig-line"></div>
+                    <p class="sig-name">________________</p>
+                    <p class="sig-role">
                         @if(\App\Constants\Roles::isAdmin(session('role')))
-                        <small class="text-gray-400">Master Admin</small>
+                            Master Admin
                         @else
-                        <small class="text-gray-400">HR Administrator Manager / Unit Head</small>
+                            HR Administrator / Manager
                         @endif
                     </p>
                 </div>
+            </div>
+
+            {{-- ── FOOTER ───────────────────────────────────────────── --}}
+            <div class="payslip-footer">
+                <p>Dokumen ini diterbitkan secara resmi oleh sistem HRIS PT. Aratech Nusantara Indonesia.</p>
+                <p>Dicetak pada: {{ now()->format('d F Y, H:i') }} WIB</p>
             </div>
 
         </div>
@@ -287,319 +317,419 @@
 </div>
 
 <style>
-  
-  /* Ubah semua text putih jadi hitam */
-.text-white {
-    color: #000 !important;
+/* ═══════════════════════════════════════════════════════════════
+   PAYSLIP — Professional Clean Design
+   ═══════════════════════════════════════════════════════════════ */
+
+.payslip-wrapper {
+    max-width: 860px;
+    margin: 0 auto 40px;
+    font-family: 'Segoe UI', 'Inter', sans-serif;
 }
 
-/* Untuk dark mode juga dipaksa hitam */
-[data-bs-theme="dark"] .text-white {
-    color: #000 !important;
-}
-  /* Ubah semua teks abu-abu jadi hitam */
-.text-gray-300,
-.text-gray-400,
-.text-muted {
-    color: #000 !important;
+.payslip-document {
+    background: #ffffff;
+    border: 1px solid #dde1e7;
+    border-radius: 8px;
+    overflow: hidden;
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
 }
 
-/* Untuk dark mode juga dipaksa hitam */
-[data-bs-theme="dark"] .text-gray-300,
-[data-bs-theme="dark"] .text-gray-400,
-[data-bs-theme="dark"] .text-muted {
-    color: #000 !important;
-}
-/* Screen styles */
-.slip-table td { font-size: 0.82rem; padding: 2px 4px !important; }
-.signature-area { margin-top: 30px; font-size: 0.82rem; }
-.signature-space { height: 60px; }
-
-/* Dark mode payslip styling */
-[data-bs-theme="dark"] .payslip-container {
-    background-color: var(--bs-gray-800) !important;
-    color: var(--bs-gray-100) !important;
+/* ── Letterhead ──────────────────────────────────────────────── */
+.payslip-letterhead {
+    background: #1e3a5f;
+    color: #fff;
+    padding: 24px 32px 20px;
 }
 
-[data-bs-theme="dark"] .payslip-container .card {
-    background-color: var(--bs-gray-800) !important;
-    border-color: var(--bs-gray-600) !important;
+.letterhead-brand {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    margin-bottom: 16px;
 }
 
-[data-bs-theme="dark"] .payslip-container .border.rounded {
-    background-color: var(--bs-gray-800) !important;
-    border-color: var(--bs-gray-600) !important;
+.brand-logo-circle {
+    width: 48px;
+    height: 48px;
+    background: rgba(255,255,255,0.15);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    flex-shrink: 0;
 }
 
-[data-bs-theme="dark"] .payslip-container .payslip-dark-success {
-    background-color: #1a2e1a !important;
-    border-color: #2d5a2d !important;
+.brand-name {
+    font-size: 1.1rem;
+    font-weight: 700;
+    letter-spacing: 0.3px;
 }
 
-[data-bs-theme="dark"] .payslip-container .payslip-dark-danger {
-    background-color: #2e1a1a !important;
-    border-color: #5a2d2d !important;
+.brand-address {
+    font-size: 0.73rem;
+    color: rgba(255,255,255,0.7);
+    margin-top: 2px;
 }
 
-[data-bs-theme="dark"] .payslip-container .payslip-dark-primary {
-    background-color: #1a2e4a !important;
-    border-color: #2d4a5a !important;
+.letterhead-divider {
+    border-top: 1px solid rgba(255,255,255,0.2);
+    margin-bottom: 14px;
 }
 
-[data-bs-theme="dark"] .payslip-container .payslip-dark-info {
-    background-color: #2d3748 !important;
-    border-color: #4a5568 !important;
+.letterhead-title {
+    text-align: center;
 }
 
-[data-bs-theme="dark"] .payslip-container .text-muted {
-    color: var(--bs-gray-400) !important;
+.slip-title {
+    font-size: 1rem;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
 }
 
-[data-bs-theme="dark"] .payslip-container h4,
-[data-bs-theme="dark"] .payslip-container h5,
-[data-bs-theme="dark"] .payslip-container h6 {
-    color: var(--bs-gray-100) !important;
+.slip-period {
+    font-size: 0.8rem;
+    color: rgba(255,255,255,0.75);
+    margin-top: 3px;
 }
 
-[data-bs-theme="dark"] .payslip-container .slip-info-table td {
-    color: var(--bs-gray-100) !important;
+/* ── Employee Info ───────────────────────────────────────────── */
+.payslip-employee-info {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    padding: 16px 32px;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dde1e7;
 }
 
-[data-bs-theme="dark"] .payslip-container .slip-table td {
-    color: var(--bs-gray-100) !important;
+.info-grid {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
 }
 
-[data-bs-theme="dark"] .payslip-container .badge {
-    color: var(--bs-gray-900) !important;
+.info-row {
+    display: flex;
+    align-items: baseline;
+    font-size: 0.82rem;
+    color: #374151;
 }
 
-[data-bs-theme="dark"] .payslip-container .badge.bg-primary {
-    background-color: var(--bs-primary) !important;
+.info-label {
+    width: 120px;
+    color: #6b7280;
+    flex-shrink: 0;
 }
 
-[data-bs-theme="dark"] .payslip-container .badge.bg-success {
-    background-color: var(--bs-success) !important;
+.info-separator {
+    margin: 0 8px;
+    color: #9ca3af;
 }
 
-[data-bs-theme="dark"] .payslip-container .badge.bg-warning {
-    background-color: var(--bs-warning) !important;
-    color: var(--bs-gray-900) !important;
+.info-value {
+    color: #111827;
 }
 
-/* Dark mode button styling */
-[data-bs-theme="dark"] .btn-secondary {
-    background-color: var(--bs-gray-600) !important;
-    border-color: var(--bs-gray-500) !important;
-    color: var(--bs-gray-100) !important;
+.status-badge {
+    display: inline-block;
+    padding: 2px 10px;
+    border-radius: 20px;
+    font-size: 0.72rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
 }
 
-[data-bs-theme="dark"] .btn-secondary:hover {
-    background-color: var(--bs-gray-500) !important;
-    border-color: var(--bs-gray-400) !important;
+.status-paid    { background: #dcfce7; color: #166534; }
+.status-approved{ background: #dbeafe; color: #1e40af; }
+.status-draft   { background: #fef9c3; color: #854d0e; }
+
+/* ── Two-column table area ───────────────────────────────────── */
+.payslip-columns {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 0;
+    border-bottom: 1px solid #dde1e7;
 }
 
-[data-bs-theme="dark"] .btn-success {
-    background-color: var(--bs-green-600) !important;
-    border-color: var(--bs-green-500) !important;
-    color: var(--bs-gray-100) !important;
+.payslip-col {
+    padding: 20px 24px;
 }
 
-[data-bs-theme="dark"] .btn-success:hover {
-    background-color: var(--bs-green-500) !important;
-    border-color: var(--bs-green-400) !important;
+.payslip-col:first-child {
+    border-right: 1px solid #dde1e7;
 }
 
-[data-bs-theme="dark"] .btn-warning {
-    background-color: var(--bs-yellow-600) !important;
-    border-color: var(--bs-yellow-500) !important;
-    color: var(--bs-gray-100) !important;
+.col-header {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    font-size: 0.78rem;
+    font-weight: 700;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    padding-bottom: 10px;
+    margin-bottom: 8px;
+    border-bottom: 2px solid;
 }
 
-[data-bs-theme="dark"] .btn-warning:hover {
-    background-color: var(--bs-yellow-500) !important;
-    border-color: var(--bs-yellow-400) !important;
+.col-header-earnings  { color: #155e30; border-color: #22c55e; }
+.col-header-deductions{ color: #991b1b; border-color: #ef4444; }
+
+.payslip-table {
+    width: 100%;
+    border-collapse: collapse;
 }
 
-/* Dark mode breadcrumb styling */
-[data-bs-theme="dark"] .breadcrumb {
-    background-color: var(--bs-gray-800) !important;
-    border-color: var(--bs-gray-600) !important;
+.payslip-table tbody tr:hover {
+    background: #f9fafb;
 }
 
-[data-bs-theme="dark"] .breadcrumb-item {
-    color: var(--bs-gray-300) !important;
+.item-name {
+    font-size: 0.8rem;
+    color: #374151;
+    padding: 4px 4px 4px 0;
+    width: 65%;
 }
 
-[data-bs-theme="dark"] .breadcrumb-item.active {
-    color: var(--bs-gray-100) !important;
+.item-amount {
+    font-size: 0.8rem;
+    color: #111827;
+    text-align: right;
+    padding: 4px 0;
+    white-space: nowrap;
 }
 
-[data-bs-theme="dark"] .breadcrumb-item a {
-    color: var(--bs-primary) !important;
+.item-note {
+    font-size: 0.72rem;
+    color: #9ca3af;
+    padding: 0 4px 4px 0;
 }
 
-[data-bs-theme="dark"] .breadcrumb-item a:hover {
-    color: var(--bs-primary-light) !important;
+.payslip-table tfoot .total-row {
+    border-top: 1.5px solid #e5e7eb;
 }
 
-/* Dark mode page heading styling */
-[data-bs-theme="dark"] .page-heading {
-    background-color: var(--bs-gray-800) !important;
+.total-label {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #111827;
+    padding: 8px 4px 4px 0;
 }
 
-[data-bs-theme="dark"] .page-title h3 {
-    color: var(--bs-gray-100) !important;
+.total-amount {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #111827;
+    text-align: right;
+    padding: 8px 0 4px;
+    white-space: nowrap;
 }
 
-[data-bs-theme="dark"] .page-title .text-subtitle {
-    color: var(--bs-gray-400) !important;
+/* ── Attendance Bar ──────────────────────────────────────────── */
+.payslip-attendance {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 32px;
+    font-size: 0.8rem;
+    color: #374151;
+    background: #f8f9fb;
+    border-bottom: 1px solid #dde1e7;
 }
 
-/* Custom color classes for dark mode */
-[data-bs-theme="dark"] .text-white {
-    color: #ffffff !important;
+.payslip-attendance i {
+    color: #1e3a5f;
 }
 
-[data-bs-theme="dark"] .text-gray-300 {
-    color: #d1d5db !important;
+.att-sep {
+    color: #d1d5db;
+    margin: 0 2px;
 }
 
-[data-bs-theme="dark"] .text-gray-400 {
-    color: #9ca3af !important;
+/* ── Summary Box ─────────────────────────────────────────────── */
+.payslip-summary {
+    display: flex;
+    justify-content: flex-end;
+    padding: 16px 32px;
+    border-bottom: 1px solid #dde1e7;
 }
 
-[data-bs-theme="dark"] .text-green-400 {
-    color: #4ade80 !important;
+.summary-table {
+    width: 340px;
+    border-collapse: collapse;
 }
 
-[data-bs-theme="dark"] .text-red-400 {
-    color: #f87171 !important;
+.sum-label {
+    font-size: 0.82rem;
+    color: #374151;
+    padding: 5px 16px 5px 0;
 }
 
-[data-bs-theme="dark"] .text-cyan-400 {
-    color: #22d3ee !important;
+.sum-amount {
+    font-size: 0.82rem;
+    color: #111827;
+    text-align: right;
+    padding: 5px 0;
+    white-space: nowrap;
 }
 
-[data-bs-theme="dark"] .text-blue-400 {
-    color: #60a5fa !important;
+.sum-deduction {
+    color: #dc2626;
 }
 
-[data-bs-theme="dark"] .border-green-600 {
-    border-color: #16a34a !important;
+.sum-net-row {
+    border-top: 2px solid #1e3a5f;
 }
 
-[data-bs-theme="dark"] .border-red-600 {
-    border-color: #dc2626 !important;
+.sum-net-label {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #1e3a5f;
+    padding: 10px 16px 10px 0;
+    letter-spacing: 0.5px;
 }
 
-[data-bs-theme="dark"] .border-blue-500 {
-    border-color: #3b82f6 !important;
+.sum-net-amount {
+    font-size: 0.95rem;
+    font-weight: 800;
+    color: #1e3a5f;
+    text-align: right;
+    padding: 10px 0;
+    white-space: nowrap;
 }
 
-[data-bs-theme="dark"] .border-gray-600 {
-    border-color: #4b5563 !important;
+/* ── Notes ───────────────────────────────────────────────────── */
+.payslip-notes {
+    padding: 12px 32px;
+    font-size: 0.78rem;
+    color: #6b7280;
+    border-bottom: 1px solid #dde1e7;
+    background: #fefce8;
 }
 
-/* Dark mode footer styling */
-[data-bs-theme="dark"] .footer {
-    background-color: var(--bs-gray-800) !important;
-    border-color: var(--bs-gray-600) !important;
+/* ── Signature Area ──────────────────────────────────────────── */
+.payslip-signature {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    padding: 24px 32px 28px;
+    border-bottom: 1px solid #dde1e7;
 }
 
-[data-bs-theme="dark"] .footer,
-[data-bs-theme="dark"] .footer p {
-    color: var(--bs-gray-400) !important;
+.sig-col {
+    text-align: center;
 }
 
-[data-bs-theme="dark"] .footer a {
-    color: var(--bs-primary) !important;
+.sig-col-center {
+    /* spacer */
 }
 
-/* Print styles - fit exactly 1 A4 page */
+.sig-title {
+    font-size: 0.79rem;
+    color: #374151;
+    margin-bottom: 0;
+}
+
+.sig-space {
+    height: 60px;
+}
+
+.sig-line {
+    border-top: 1px solid #374151;
+    width: 160px;
+    margin: 0 auto 6px;
+}
+
+.sig-name {
+    font-size: 0.82rem;
+    font-weight: 700;
+    color: #111827;
+    margin-bottom: 2px;
+}
+
+.sig-role {
+    font-size: 0.73rem;
+    color: #6b7280;
+    margin-bottom: 0;
+}
+
+/* ── Document Footer ─────────────────────────────────────────── */
+.payslip-footer {
+    text-align: center;
+    padding: 10px 32px;
+    background: #f8f9fb;
+    border-top: 1px solid #dde1e7;
+}
+
+.payslip-footer p {
+    font-size: 0.7rem;
+    color: #9ca3af;
+    margin: 1px 0;
+}
+
+/* ══════════════════════════════════════════════════════════════
+   PRINT STYLES
+   ══════════════════════════════════════════════════════════════ */
 @media print {
     @page {
         size: A4 portrait;
-        margin: 15mm 15mm 15mm 15mm;
+        margin: 12mm 14mm 12mm 14mm;
     }
 
-    /* Hide everything except print area */
     html, body {
         margin: 0 !important;
         padding: 0 !important;
-        width: 210mm;
-        height: 297mm;
-        overflow: hidden !important;
         -webkit-print-color-adjust: exact !important;
         print-color-adjust: exact !important;
     }
 
-    body * {
-        visibility: hidden;
-    }
-
-    #print-area, #print-area * {
-        visibility: visible;
-    }
+    body * { visibility: hidden; }
+    #print-area, #print-area * { visibility: visible; }
 
     #print-area {
         position: absolute;
         left: 0;
         top: 0;
         width: 100%;
-        height: auto;
-        max-height: 267mm; /* A4 height minus margins */
-        padding: 0 !important;
-        margin: 0 !important;
-        box-shadow: none !important;
-        border: none !important;
     }
 
-    #print-area .card-body {
-        padding: 0 !important;
-    }
-
-    .no-print, .page-heading > .page-title,
-    .no-print *, .d-flex.gap-2.mb-3 {
+    .no-print, .page-heading > .page-title, .d-flex.gap-2.mb-3 {
         display: none !important;
     }
 
-    /* Compact print typography */
-    .payslip-container h4 { font-size: 14pt !important; margin-bottom: 0 !important; }
-    .payslip-container h5 { font-size: 12pt !important; }
-    .payslip-container h6 { font-size: 9pt !important; }
-    .payslip-container p { font-size: 8.5pt !important; }
-    .payslip-container hr { margin: 3px 0 !important; }
+    .payslip-wrapper { max-width: 100%; margin: 0; }
+    .payslip-document { box-shadow: none !important; border-radius: 0; }
 
-    .slip-info-table td { font-size: 8.5pt !important; padding: 1px 3px !important; }
-    .slip-table td { font-size: 8.5pt !important; padding: 2px 3px !important; }
+    /* Force white backgrounds */
+    .payslip-letterhead { background: #1e3a5f !important; }
+    .payslip-employee-info { background: #f8f9fb !important; }
+    .payslip-attendance { background: #f8f9fb !important; }
+    .payslip-footer { background: #f8f9fb !important; }
+    .payslip-notes { background: #fefce8 !important; }
 
-    /* Colored backgrounds for print */
-    .border.rounded { border: 1px solid #ccc !important; }
-    .payslip-dark-success { background: #f0fff0 !important; }
-    .payslip-dark-danger { background: #fff0f0 !important; }
-    .payslip-dark-primary { background: #e3f2fd !important; }
-    .payslip-dark-info { background: #f5f5f5 !important; }
+    /* Typography scale-down for print */
+    .brand-name { font-size: 10.5pt !important; }
+    .brand-address { font-size: 7pt !important; }
+    .slip-title { font-size: 9.5pt !important; }
+    .slip-period { font-size: 8pt !important; }
+    .info-row { font-size: 8pt !important; }
+    .item-name, .item-amount { font-size: 7.5pt !important; }
+    .total-label, .total-amount { font-size: 8pt !important; }
+    .sum-label, .sum-amount { font-size: 8pt !important; }
+    .sum-net-label, .sum-net-amount { font-size: 9pt !important; }
+    .sig-title, .sig-name, .sig-role { font-size: 7.5pt !important; }
+    .payslip-footer p { font-size: 6.5pt !important; }
+    .payslip-attendance { font-size: 7.5pt !important; }
+    .payslip-notes { font-size: 7.5pt !important; }
 
-    .text-success { color: #198754 !important; }
-    .text-danger { color: #dc3545 !important; }
-    .text-primary { color: #0d6efd !important; }
-    .text-muted { color: #6c757d !important; }
-    .fw-bold { font-weight: 700 !important; }
-
-    /* Signature area - push to fill page */
-    .signature-area {
-        margin-top: 40px !important;
-        font-size: 8.5pt !important;
-    }
-    .signature-space {
-        height: 50px !important;
-    }
-
-    /* Remove card styling */
-    .card { box-shadow: none !important; border: none !important; background: white !important; }
-
-    /* Ensure no page break */
-    .payslip-container { page-break-inside: avoid; }
+    .sig-space { height: 40px !important; }
+    .payslip-col { padding: 12px 18px !important; }
+    .payslip-employee-info { padding: 12px 24px !important; }
+    .payslip-signature { padding: 16px 24px 20px !important; }
+    .payslip-summary { padding: 12px 24px !important; }
 }
 </style>
 

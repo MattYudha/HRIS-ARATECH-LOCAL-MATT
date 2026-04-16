@@ -3,1156 +3,831 @@
 @section('title', 'Catat Transaksi Baru')
 
 @push('styles')
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/css/tom-select.min.css">
 <style>
-/* ─── Enterprise Finance Form System ─────────────────────────────── */
+/* ════════════════════════════════════════════════════
+   FINANCE CREATE — Clean Professional
+   ════════════════════════════════════════════════════ */
 :root {
-    --ef-navy:        #1b2a4a;
-    --ef-slate:       #3d4e6c;
-    --ef-muted:       #6b7a99;
-    --ef-border:      #dce1ec;
-    --ef-border-soft: #eaecf3;
-    --ef-bg:          #f5f7fa;
-    --ef-white:       #ffffff;
-    --ef-debit-text:  #155c38;
-    --ef-debit-bg:    #eef7f2;
-    --ef-debit-ring:  #2d6a4f;
-    --ef-kredit-text: #7b1d22;
-    --ef-kredit-bg:   #fdf0f1;
-    --ef-kredit-ring: #9d2129;
+    --ef-navy:    #1b2a4a;
+    --ef-slate:   #3d4e6c;
+    --ef-muted:   #7486a4;
+    --ef-border:  #e2e7f0;
+    --ef-soft:    #f1f4f9;
+    --ef-bg:      #f7f9fc;
+    --ef-white:   #ffffff;
+    --ef-brand:   #1e3a5f;
+    --ef-focus:   rgba(30,58,95,0.10);
 }
 
-/* Page Header */
-.ef-page-header {
+/* ── Page wrapper ──────────────────────────────────── */
+.fc-wrap {
+    width: 100%;
+    padding-bottom: 2rem;
+}
+
+/* ── Page Header ───────────────────────────────────── */
+.fc-header {
     display: flex;
     justify-content: space-between;
-    align-items: flex-start;
-    padding-bottom: 1.2rem;
+    align-items: center;
+    padding-bottom: 1.4rem;
     border-bottom: 1px solid var(--ef-border);
     margin-bottom: 1.75rem;
+    gap: 1rem;
 }
-.ef-breadcrumb {
-    font-size: .73rem;
+.fc-header-left {}
+.fc-breadcrumb {
+    font-size: .75rem;
     color: var(--ef-muted);
-    margin-bottom: .3rem;
     display: flex;
     align-items: center;
-    gap: .35rem;
+    gap: .3rem;
+    margin-bottom: .25rem;
 }
-.ef-breadcrumb a {
-    color: var(--ef-muted);
-    text-decoration: none;
-}
-.ef-breadcrumb a:hover { color: var(--ef-navy); }
-.ef-breadcrumb .sep { opacity: .5; }
-.ef-page-title {
-    font-size: 1.2rem;
+.fc-breadcrumb a { color: var(--ef-muted); text-decoration: none; }
+.fc-breadcrumb a:hover { color: var(--ef-navy); }
+.fc-title {
+    font-size: 1.35rem;
     font-weight: 700;
     color: var(--ef-navy);
-    letter-spacing: -.02em;
+    letter-spacing: -.025em;
     margin: 0;
+    line-height: 1.2;
 }
-.ef-btn-back {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .42rem 1rem;
-    font-size: .77rem;
-    font-weight: 600;
-    border: 1px solid var(--ef-border);
-    border-radius: 6px;
-    background: var(--ef-white);
-    color: var(--ef-slate);
-    text-decoration: none;
-    transition: all .15s;
-    white-space: nowrap;
-}
-.ef-btn-back:hover {
-    background: var(--ef-bg);
-    color: var(--ef-navy);
+.fc-subtitle {
+    font-size: .78rem;
+    color: var(--ef-muted);
+    margin: .2rem 0 0;
 }
 
-/* Main Card */
-.ef-card {
+/* ── Header action buttons ─────────────────────────── */
+.fc-header-actions {
+    display: flex;
+    align-items: center;
+    gap: .75rem;
+    flex-shrink: 0;
+}
+.fc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: .38rem;
+    padding: .5rem 1.2rem;
+    font-size: .8rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: all .15s;
+    text-decoration: none;
+    font-family: inherit;
+    white-space: nowrap;
+    line-height: 1;
+}
+.fc-btn-ghost {
+    background: var(--ef-white);
+    border-color: var(--ef-border);
+    color: var(--ef-slate);
+}
+.fc-btn-ghost:hover { background: var(--ef-bg); color: var(--ef-navy); }
+.fc-btn-primary {
+    background: var(--ef-brand);
+    border-color: var(--ef-brand);
+    color: #fff;
+    box-shadow: 0 2px 8px rgba(30,58,95,.2);
+}
+.fc-btn-primary:hover { background: #142840; border-color: #142840; box-shadow: 0 4px 12px rgba(30,58,95,.3); }
+.fc-btn-primary:disabled { opacity: .6; cursor: not-allowed; box-shadow: none; }
+
+/* ── Error banner ──────────────────────────────────── */
+.fc-error-banner {
+    background: #fef2f2;
+    border: 1px solid #fecaca;
+    border-left: 3px solid #ef4444;
+    border-radius: 8px;
+    padding: .85rem 1rem;
+    margin-bottom: 1.5rem;
+    font-size: .8rem;
+    color: #991b1b;
+}
+
+/* ── Section card ──────────────────────────────────── */
+.fc-section {
     background: var(--ef-white);
     border: 1px solid var(--ef-border);
-    border-radius: 10px;
-    box-shadow: 0 1px 6px rgba(27,42,74,.06);
-    overflow: hidden;
+    border-radius: 12px;
+    box-shadow: 0 1px 6px rgba(0,0,0,.04);
+    overflow: visible;
+    margin-bottom: 1.25rem;
+    transition: box-shadow .2s;
+    position: relative;
 }
-.ef-card-header {
+.fc-section:focus-within {
+    box-shadow: 0 2px 14px rgba(30,58,95,.08);
+    border-color: #c8d5e8;
+}
+.fc-section-header {
     display: flex;
     align-items: center;
     gap: .55rem;
-    padding: .9rem 1.5rem;
-    border-bottom: 1px solid var(--ef-border-soft);
-    background: #fcfcfe;
+    padding: .75rem 1.5rem;
+    border-bottom: 1px solid var(--ef-border);
+    background: #fafbfd;
+    border-radius: 12px 12px 0 0;
 }
-.ef-card-icon {
-    font-size: .9rem;
-    color: var(--ef-muted);
-    line-height: 1;
+.fc-section-icon {
+    width: 26px; height: 26px;
+    border-radius: 6px;
+    background: #eef2f8;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .75rem; color: var(--ef-brand); flex-shrink: 0;
 }
-.ef-card-title-text {
-    font-size: .67rem;
+.fc-section-label {
+    font-size: .68rem;
     font-weight: 700;
     text-transform: uppercase;
-    letter-spacing: .1em;
+    letter-spacing: .12em;
     color: var(--ef-muted);
     margin: 0;
 }
-.ef-card-body { padding: 1.6rem; }
+.fc-section-body { padding: 1.5rem; }
 
-/* Form Fields */
-.ef-field { margin-bottom: 1.25rem; }
-.ef-label {
+/* ── Form fields ───────────────────────────────────── */
+.fc-field { margin-bottom: 1.25rem; }
+.fc-field:last-child { margin-bottom: 0; }
+.fc-label {
     display: block;
-    font-size: .77rem;
-    font-weight: 700;
-    color: var(--ef-navy);
+    font-size: .78rem;
+    font-weight: 600;
+    color: var(--ef-slate);
     margin-bottom: .45rem;
-    letter-spacing: -.01em;
 }
-.ef-label .req { color: #b91c1c; font-weight: 400; margin-left: .1rem; }
-.ef-label .opt {
-    font-size: .68rem;
-    font-weight: 400;
-    color: var(--ef-muted);
-    margin-left: .35rem;
-}
-
-.ef-input,
-.ef-select,
-.ef-textarea {
+.fc-label .req { color: #c0392b; font-weight: 400; margin-left: .1rem; }
+.fc-label .opt { font-size: .7rem; font-weight: 400; color: var(--ef-muted); margin-left: .3rem; }
+.fc-input, .fc-select, .fc-textarea {
     display: block;
     width: 100%;
-    padding: .52rem .9rem;
-    font-size: .83rem;
+    padding: .55rem .85rem;
+    font-size: .85rem;
     font-family: inherit;
     color: var(--ef-navy);
     background: var(--ef-white);
     border: 1px solid var(--ef-border);
-    border-radius: 6px;
+    border-radius: 8px;
     transition: border-color .15s, box-shadow .15s;
     appearance: none;
     -webkit-appearance: none;
+    line-height: 1.5;
 }
-.ef-input:focus,
-.ef-select:focus,
-.ef-textarea:focus {
+.fc-textarea {
+    resize: vertical;
+    min-height: 88px;
+    line-height: 1.6;
+}
+.fc-input:focus, .fc-select:focus, .fc-textarea:focus {
     outline: none;
-    border-color: #8baed6;
-    box-shadow: 0 0 0 3px rgba(75,131,200,.12);
+    border-color: var(--ef-brand);
+    box-shadow: 0 0 0 3px var(--ef-focus);
 }
-.ef-input.ef-error,
-.ef-select.ef-error,
-.ef-textarea.ef-error { border-color: #c0392b; }
-.ef-select {
-    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='11' height='11' fill='%236b7a99' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
+.fc-input.fc-error, .fc-select.fc-error, .fc-textarea.fc-error {
+    border-color: #e74c3c !important;
+    box-shadow: 0 0 0 3px rgba(231,76,60,.1) !important;
+}
+.fc-field-hint { font-size: .72rem; color: var(--ef-muted); margin-top: .3rem; }
+.fc-field-error { font-size: .72rem; color: #c0392b; margin-top: .3rem; display: flex; align-items: center; gap: .25rem; }
+.fc-select {
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='10' fill='%237486a4' viewBox='0 0 16 16'%3E%3Cpath d='M7.247 11.14L2.451 5.658C1.885 5.013 2.345 4 3.204 4h9.592a1 1 0 0 1 .753 1.659l-4.796 5.48a1 1 0 0 1-1.506 0z'/%3E%3C/svg%3E");
     background-repeat: no-repeat;
     background-position: right .8rem center;
     padding-right: 2.25rem;
     cursor: pointer;
 }
-.ef-textarea { resize: vertical; min-height: 88px; line-height: 1.55; }
-.ef-field-error { font-size: .7rem; color: #b91c1c; margin-top: .3rem; }
-.ef-field-hint { font-size: .7rem; color: var(--ef-muted); margin-top: .3rem; }
 
-/* Input with prefix */
-.ef-input-prefix-group { display: flex; }
-.ef-prefix-label {
-    display: flex;
-    align-items: center;
-    padding: .52rem .85rem;
-    font-size: .8rem;
-    font-weight: 700;
-    color: var(--ef-muted);
-    background: var(--ef-bg);
-    border: 1px solid var(--ef-border);
-    border-right: 0;
-    border-radius: 6px 0 0 6px;
-    white-space: nowrap;
-    letter-spacing: .02em;
-}
-.ef-input-prefix-group .ef-input {
-    border-radius: 0 6px 6px 0;
-    border-left-color: transparent;
-}
-.ef-input-prefix-group .ef-input:focus { border-left-color: #8baed6; }
-
-/* Amount Result Display */
-.ef-amount-display {
-    display: flex;
-    align-items: baseline;
-    gap: .65rem;
-    padding: .75rem 1rem;
-    margin-top: .6rem;
-    background: var(--ef-bg);
-    border: 1px solid var(--ef-border-soft);
-    border-radius: 6px;
-}
-.ef-amount-display-label {
-    font-size: .69rem;
-    font-weight: 600;
-    text-transform: uppercase;
-    letter-spacing: .06em;
-    color: var(--ef-muted);
-    white-space: nowrap;
-}
-.ef-amount-display-value {
-    font-size: 1.25rem;
-    font-weight: 800;
-    letter-spacing: -.03em;
-    color: var(--ef-navy);
-    transition: color .2s;
-}
-.ef-amount-display-value.debit  { color: var(--ef-debit-text); }
-.ef-amount-display-value.kredit { color: var(--ef-kredit-text); }
-
-/* Transaction Type Selector */
-.ef-type-grid {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: .6rem;
-}
-.ef-type-radio { position: absolute; opacity: 0; width: 0; height: 0; }
-.ef-type-card {
-    display: flex;
-    align-items: center;
-    gap: .75rem;
-    padding: .8rem 1.1rem;
-    border: 1.5px solid var(--ef-border);
-    border-radius: 8px;
-    cursor: pointer;
-    background: var(--ef-white);
-    transition: all .15s;
-    position: relative;
-}
-.ef-type-card:hover {
-    border-color: #b0bac9;
-    background: #fafbfc;
-}
-.ef-type-radio:checked + .ef-type-card {
-    box-shadow: 0 0 0 3px rgba(75,131,200,.1);
-}
-.ef-type-radio[value="debit"]:checked + .ef-type-card {
-    border-color: var(--ef-debit-ring);
-    background: var(--ef-debit-bg);
-}
-.ef-type-radio[value="kredit"]:checked + .ef-type-card {
-    border-color: var(--ef-kredit-ring);
-    background: var(--ef-kredit-bg);
-}
-.ef-type-indicator {
-    width: 34px;
-    height: 34px;
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .95rem;
-    flex-shrink: 0;
-    background: var(--ef-bg);
-    color: var(--ef-muted);
-    transition: all .15s;
-}
-.ef-type-radio[value="debit"]:checked  ~ * .ef-type-indicator,
-.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-indicator {
-    background: #d4eddf;
-    color: var(--ef-debit-text);
-}
-.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-indicator {
-    background: #f8d7da;
-    color: var(--ef-kredit-text);
-}
-.ef-type-text-wrap { line-height: 1.3; }
-.ef-type-main {
-    font-size: .84rem;
-    font-weight: 700;
-    color: var(--ef-navy);
-    display: block;
-}
-.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-main { color: var(--ef-debit-text); }
-.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-main { color: var(--ef-kredit-text); }
-.ef-type-sub {
-    font-size: .69rem;
-    color: var(--ef-muted);
-    display: block;
-    font-weight: 400;
-}
-.ef-type-check {
-    position: absolute;
-    top: .55rem;
-    right: .7rem;
-    font-size: .75rem;
-    color: var(--ef-muted);
-    opacity: 0;
-    transition: opacity .15s;
-}
-.ef-type-radio:checked + .ef-type-card .ef-type-check { opacity: 1; }
-.ef-type-radio[value="debit"]:checked + .ef-type-card .ef-type-check { color: var(--ef-debit-ring); }
-.ef-type-radio[value="kredit"]:checked + .ef-type-card .ef-type-check { color: var(--ef-kredit-ring); }
-
-/* Section Divider */
-.ef-divider {
-    border: none;
-    border-top: 1px solid var(--ef-border-soft);
-    margin: 1.5rem 0;
-}
-.ef-section-heading {
-    font-size: .67rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--ef-muted);
-    margin-bottom: 1rem;
-}
-
-/* Period Checkboxes */
-.ef-check-row { display: flex; flex-wrap: wrap; gap: 1.25rem; }
-.ef-check-wrap { display: flex; align-items: center; gap: .5rem; cursor: pointer; }
-.ef-check-wrap input[type="checkbox"] {
-    width: 15px;
-    height: 15px;
-    accent-color: var(--ef-navy);
-    cursor: pointer;
-    flex-shrink: 0;
-}
-.ef-check-wrap label {
-    font-size: .78rem;
-    color: var(--ef-slate);
-    cursor: pointer;
-}
-
-/* Action Buttons */
-.ef-action-row {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: .6rem;
-    padding-top: 1.4rem;
-    border-top: 1px solid var(--ef-border-soft);
-    margin-top: 1.5rem;
-}
-.ef-btn {
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    padding: .52rem 1.3rem;
-    font-size: .8rem;
-    font-weight: 700;
-    border-radius: 6px;
-    cursor: pointer;
-    border: 1px solid transparent;
-    transition: all .15s;
-    text-decoration: none;
-    letter-spacing: .01em;
-    font-family: inherit;
-}
-.ef-btn-secondary {
-    background: var(--ef-white);
-    border-color: var(--ef-border);
-    color: var(--ef-slate);
-}
-.ef-btn-secondary:hover {
-    background: var(--ef-bg);
-    color: var(--ef-navy);
-}
-.ef-btn-primary {
-    background: var(--ef-navy);
-    border-color: var(--ef-navy);
-    color: #fff;
-}
-.ef-btn-primary:hover {
-    background: #14203a;
-    border-color: #14203a;
-}
-
-/* ─── Sidebar ─────────────────────────────────────── */
-.ef-sidebar-card {
-    background: var(--ef-white);
-    border: 1px solid var(--ef-border);
-    border-radius: 10px;
-    box-shadow: 0 1px 5px rgba(27,42,74,.05);
-    overflow: hidden;
-    margin-bottom: 1rem;
-}
-.ef-sidebar-header {
-    display: flex;
-    align-items: center;
-    gap: .5rem;
-    padding: .8rem 1.1rem;
-    border-bottom: 1px solid var(--ef-border-soft);
-    background: #fcfcfe;
-}
-.ef-sidebar-heading {
-    font-size: .67rem;
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: .1em;
-    color: var(--ef-muted);
-    margin: 0;
-}
-.ef-sidebar-body { padding: 1.1rem; }
-
-/* Balance rows */
-.ef-bal-row {
+/* ── Label row with quick-add ──────────────────────── */
+.fc-label-row {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: .55rem 0;
-    border-bottom: 1px solid var(--ef-border-soft);
-    font-size: .8rem;
+    margin-bottom: .45rem;
 }
-.ef-bal-row:last-child { border-bottom: none; padding-bottom: 0; }
-.ef-bal-key { color: var(--ef-muted); }
-.ef-bal-val { font-weight: 700; color: var(--ef-navy); }
-.ef-bal-val.green { color: var(--ef-debit-text); }
-.ef-bal-val.red   { color: var(--ef-kredit-text); }
-.ef-bal-row-total { padding-top: .75rem; margin-top: .35rem; border-top: 1.5px solid var(--ef-border); }
-.ef-bal-val-total { font-size: 1.05rem; font-weight: 800; letter-spacing: -.02em; }
-
-/* SOP tip items */
-.ef-tip-item {
-    display: flex;
-    gap: .55rem;
-    padding: .55rem 0;
-    border-bottom: 1px solid var(--ef-border-soft);
-    font-size: .77rem;
-    color: var(--ef-slate);
-    line-height: 1.55;
-}
-.ef-tip-item:last-child { border-bottom: none; padding-bottom: 0; }
-.ef-tip-dot {
-    width: 5px;
-    height: 5px;
-    background: var(--ef-muted);
-    border-radius: 50%;
-    flex-shrink: 0;
-    margin-top: .52rem;
-}
-/* Quick Add Button */
+.fc-label-row .fc-label { margin-bottom: 0; }
 .btn-quick-add {
-    background: none; border: none; color: #5e72e4; font-size: .68rem;
-    font-weight: 700; padding: 0; transition: color .15s;
-    display: inline-flex; align-items: center; gap: .25rem;
+    background: none; border: none; color: var(--ef-brand);
+    font-size: .7rem; font-weight: 600; padding: 0; cursor: pointer;
+    display: inline-flex; align-items: center; gap: .2rem;
+    transition: color .15s;
 }
-.btn-quick-add:hover { color: #233dd2; text-decoration: underline; }
-/* Upload Zone */
-.ef-upload-zone {
-    border: 2px dashed var(--ef-border);
-    border-radius: 8px;
-    padding: 1.8rem 1rem;
-    text-align: center;
-    cursor: pointer;
-    background: var(--ef-bg);
-    transition: all .2s;
+.btn-quick-add:hover { color: #0d2a4a; text-decoration: underline; }
+
+/* ── Char counter ──────────────────────────────────── */
+.fc-input-meta { display: flex; justify-content: space-between; margin-top: .3rem; }
+.fc-char-counter { font-size: .7rem; color: var(--ef-muted); }
+
+/* ── Prefix input ──────────────────────────────────── */
+.fc-prefix-group { display: flex; }
+.fc-prefix {
+    display: flex; align-items: center;
+    padding: .55rem .8rem;
+    font-size: .82rem; font-weight: 600; color: var(--ef-muted);
+    background: var(--ef-soft); border: 1px solid var(--ef-border);
+    border-right: 0; border-radius: 8px 0 0 8px; white-space: nowrap;
 }
-.ef-upload-zone:hover, .ef-upload-zone.drag-over {
-    border-color: #8baed6;
-    background: #f0f5fb;
+.fc-prefix-group .fc-input { border-radius: 0 8px 8px 0; border-left-color: transparent; }
+.fc-prefix-group .fc-input:focus { border-left-color: var(--ef-brand); }
+
+/* ════════════════════════════════════════════════════
+   DEBIT / KREDIT — Clean Segmented
+   ════════════════════════════════════════════════════ */
+.seg-wrap {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: .75rem;
 }
-.ef-upload-icon { font-size: 1.6rem; color: var(--ef-muted); margin-bottom: .4rem; }
-.ef-upload-text { font-size: .83rem; font-weight: 600; color: var(--ef-slate); }
-.ef-upload-hint { font-size: .7rem; color: var(--ef-muted); margin-top: .2rem; }
-.ef-upload-name {
-    margin-top: .6rem;
-    display: inline-flex;
-    align-items: center;
-    gap: .4rem;
-    background: #e8f2fd;
-    color: #1a5fb4;
-    border-radius: 5px;
-    padding: .3rem .75rem;
-    font-size: .75rem;
-    font-weight: 600;
-}
-.ef-file-hidden { display: none; }
-
-/* ─── Mobile Responsive ────────────────────────────────── */
-
-/* Prevent iOS auto-zoom on inputs */
-@media (max-width: 767px) {
-    .ef-input,
-    .ef-select,
-    .ef-textarea { font-size: 16px !important; }
-
-    /* Page Header: stack vertically */
-    .ef-page-header {
-        flex-direction: column;
-        gap: .75rem;
-        padding-bottom: 1rem;
-        margin-bottom: 1.25rem;
-    }
-    .ef-btn-back {
-        align-self: flex-start;
-        font-size: .8rem;
-        padding: .45rem .9rem;
-    }
-    .ef-page-title { font-size: 1.1rem; }
-
-    /* Card: tighter padding on mobile */
-    .ef-card-body { padding: 1.1rem 1rem; }
-    .ef-card-header { padding: .75rem 1rem; }
-
-    /* Transaction type: make cards taller, more tappable */
-    .ef-type-grid { gap: .5rem; }
-    .ef-type-card {
-        padding: 1rem .85rem;
-        gap: .6rem;
-    }
-    .ef-type-indicator {
-        width: 40px;
-        height: 40px;
-        font-size: 1.1rem;
-        border-radius: 10px;
-    }
-    .ef-type-main { font-size: .9rem; }
-    .ef-type-sub  { font-size: .71rem; }
-
-    /* Amount display */
-    .ef-amount-display-value { font-size: 1.1rem; }
-
-    /* Action row: hide on mobile (use sticky bar instead) */
-    .ef-action-row { display: none !important; }
-
-    /* Sticky bottom submit bar */
-    .ef-mobile-bar {
-        display: flex !important;
-    }
-
-    /* Section heading: tighter */
-    .ef-section-heading { font-size: .66rem; margin-bottom: .8rem; }
-    .ef-divider { margin: 1.2rem 0; }
-
-    /* Sidebar: minimal on mobile */
-    .ef-sidebar-card { margin-bottom: .75rem; }
-    .ef-sidebar-body { padding: .85rem; }
-
-    /* SOP card: hidden on mobile to save space */
-    .ef-sidebar-sop { display: none; }
-
-    /* Sidebar balance: horizontal compact layout */
-    .ef-bal-row { padding: .45rem 0; font-size: .78rem; }
-
-    /* Upload zone: compact */
-    .ef-upload-zone { padding: 1.2rem .75rem; }
-    .ef-upload-icon { font-size: 1.3rem; }
-    .ef-upload-text { font-size: .8rem; }
-
-    /* Entitas label + quick add button: stack */
-    .ef-label.d-flex { flex-wrap: wrap; gap: .2rem; }
-    .btn-quick-add { font-size: .72rem; }
-
-    /* Toast: full width on mobile */
-    #ef-toast-container {
-        bottom: 5rem;
-        left: .75rem;
-        right: .75rem;
-    }
-    .ef-toast { min-width: unset; max-width: 100%; }
-}
-
-/* Sticky mobile bottom submit bar */
-.ef-mobile-bar {
-    display: none;
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    z-index: 1040;
-    background: #fff;
-    border-top: 1px solid var(--ef-border);
-    padding: .65rem 1rem calc(.65rem + env(safe-area-inset-bottom));
-    gap: .5rem;
-    align-items: center;
-    box-shadow: 0 -2px 12px rgba(0,0,0,.08);
-}
-.ef-mobile-bar .ef-btn { flex: 1; justify-content: center; }
-.ef-mobile-bar .ef-btn-primary { flex: 2; }
-
-/* Add bottom padding to page on mobile so sticky bar doesn't overlap */
-@media (max-width: 767px) {
-    .row.g-4 { padding-bottom: 5rem; }
-}
-
-/* ─── Toast Notification ────────────────────────────────── */
-#ef-toast-container {
-    position: fixed;
-    bottom: 1.5rem;
-    right: 1.5rem;
-    z-index: 9999;
+.seg-radio { position: absolute; opacity: 0; width: 0; height: 0; }
+.seg-card {
     display: flex;
-    flex-direction: column;
-    gap: .6rem;
-    pointer-events: none;
-}
-.ef-toast {
-    display: flex;
-    align-items: flex-start;
-    gap: .7rem;
-    min-width: 280px;
-    max-width: 360px;
-    padding: .85rem 1rem;
-    background: #fff;
-    border: 1px solid var(--ef-border);
+    align-items: center;
+    gap: .9rem;
+    padding: .9rem 1.1rem;
+    border: 1.5px solid var(--ef-border);
     border-radius: 10px;
-    box-shadow: 0 4px 20px rgba(0,0,0,.12);
-    pointer-events: all;
-    opacity: 0;
-    transform: translateY(12px);
-    transition: opacity .25s ease, transform .25s ease;
+    cursor: pointer;
+    background: var(--ef-white);
+    transition: all .18s ease;
+    user-select: none;
+    position: relative;
 }
-.ef-toast.show {
-    opacity: 1;
-    transform: translateY(0);
+.seg-card:hover { border-color: #b0bfcf; background: #f8fafc; }
+.seg-icon {
+    width: 36px; height: 36px;
+    border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: .95rem; flex-shrink: 0;
+    background: var(--ef-soft); color: var(--ef-muted);
+    transition: all .18s;
 }
-.ef-toast.hide {
-    opacity: 0;
-    transform: translateY(12px);
+.seg-texts {}
+.seg-main { font-size: .88rem; font-weight: 700; color: var(--ef-navy); display: block; transition: color .18s; }
+.seg-sub  { font-size: .72rem; color: var(--ef-muted); display: block; }
+.seg-check { position: absolute; top: .6rem; right: .75rem; font-size: .7rem; opacity: 0; transition: opacity .18s; }
+
+/* Debit active */
+.seg-card.seg-active-debit {
+    border-color: #2d6a4f;
+    background: #f0faf5;
+    box-shadow: 0 0 0 3px rgba(45,106,79,.08);
 }
-.ef-toast-icon {
-    width: 28px;
-    height: 28px;
-    border-radius: 50%;
+.seg-card.seg-active-debit .seg-icon { background: #d4eddf; color: #155c38; }
+.seg-card.seg-active-debit .seg-main { color: #155c38; }
+.seg-card.seg-active-debit .seg-check { opacity: 1; color: #2d6a4f; }
+
+/* Kredit active */
+.seg-card.seg-active-kredit {
+    border-color: #9d2129;
+    background: #fdf5f5;
+    box-shadow: 0 0 0 3px rgba(157,33,41,.08);
+}
+.seg-card.seg-active-kredit .seg-icon { background: #f8d7da; color: #7b1d22; }
+.seg-card.seg-active-kredit .seg-main { color: #7b1d22; }
+.seg-card.seg-active-kredit .seg-check { opacity: 1; color: #9d2129; }
+
+/* ════════════════════════════════════════════════════
+   NOMINAL — Compact Power Input
+   ════════════════════════════════════════════════════ */
+.nominal-wrap {
     display: flex;
     align-items: center;
-    justify-content: center;
-    font-size: .8rem;
-    flex-shrink: 0;
-    margin-top: .05rem;
+    gap: 0;
+    border: 1px solid var(--ef-border);
+    border-radius: 8px;
+    overflow: hidden;
+    transition: border-color .15s, box-shadow .15s;
+    background: var(--ef-white);
 }
+.nominal-wrap:focus-within {
+    border-color: var(--ef-brand);
+    box-shadow: 0 0 0 3px var(--ef-focus);
+}
+.nominal-prefix-box {
+    padding: 0 .9rem;
+    font-size: .82rem;
+    font-weight: 700;
+    color: var(--ef-muted);
+    background: var(--ef-soft);
+    border-right: 1px solid var(--ef-border);
+    height: 48px;
+    display: flex;
+    align-items: center;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.nominal-input {
+    flex: 1;
+    border: none;
+    outline: none;
+    background: transparent;
+    padding: 0 1rem;
+    font-size: 1.35rem;
+    font-weight: 700;
+    color: var(--ef-navy);
+    letter-spacing: -.02em;
+    font-family: inherit;
+    caret-color: var(--ef-brand);
+    height: 48px;
+    transition: color .18s;
+}
+.nominal-input::placeholder { color: #c8d0e0; font-weight: 600; font-size: 1.2rem; }
+.nominal-input.nominal-debit  { color: #155c38; }
+.nominal-input.nominal-kredit { color: #7b1d22; }
+.terbilang-helper {
+    font-size: .72rem;
+    color: var(--ef-muted);
+    font-style: italic;
+    margin-top: .35rem;
+    min-height: .9rem;
+}
+
+/* ── Section divider ───────────────────────────────── */
+.fc-divider { border: none; border-top: 1px solid var(--ef-border); margin: 1.25rem 0; }
+
+/* ── Tax collapsible ───────────────────────────────── */
+.tax-trigger {
+    display: flex; align-items: center; gap: .5rem;
+    width: 100%; background: #fafbfd; border: none;
+    font-family: inherit; font-size: .68rem; font-weight: 700;
+    text-transform: uppercase; letter-spacing: .12em; color: var(--ef-muted);
+    cursor: pointer; padding: .75rem 1.5rem;
+    border-bottom: 1px solid var(--ef-border);
+    transition: color .15s, background .15s; text-align: left;
+}
+.tax-trigger:hover { color: var(--ef-navy); background: #f5f7fa; }
+.tax-icon { font-size: .68rem; }
+.tax-badge {
+    display: none; background: #dbeafe; color: #1e40af;
+    font-size: .6rem; font-weight: 700; padding: .12rem .5rem;
+    border-radius: 20px; text-transform: none; letter-spacing: 0;
+}
+
+/* ── Upload zone ───────────────────────────────────── */
+.fc-upload {
+    border: 1.5px dashed var(--ef-border);
+    border-radius: 8px; padding: 1.5rem 1rem;
+    text-align: center; cursor: pointer;
+    background: var(--ef-bg); transition: all .18s;
+}
+.fc-upload:hover, .fc-upload.drag-over { border-color: #8baed6; background: #f0f5fb; }
+.fc-upload-icon { font-size: 1.35rem; color: var(--ef-muted); margin-bottom: .4rem; }
+.fc-upload-text { font-size: .82rem; font-weight: 600; color: var(--ef-slate); }
+.fc-upload-hint { font-size: .72rem; color: var(--ef-muted); margin-top: .2rem; }
+.fc-upload-name {
+    margin-top: .5rem; display: none;
+    align-items: center; justify-content: center; gap: .35rem;
+    background: #e8f2fd; color: #1a5fb4;
+    border-radius: 5px; padding: .3rem .75rem;
+    font-size: .73rem; font-weight: 600;
+}
+.fc-file-hidden { display: none; }
+
+/* ── Tom Select Override ───────────────────────────── */
+.ts-wrapper { width: 100%; }
+.ts-control {
+    border: 1px solid var(--ef-border) !important;
+    border-radius: 8px !important; box-shadow: none !important;
+    padding: .55rem .85rem !important; font-size: .85rem !important;
+    color: var(--ef-navy) !important; background: var(--ef-white) !important;
+    min-height: unset !important; cursor: pointer !important;
+    transition: border-color .15s, box-shadow .15s !important;
+}
+.ts-control:focus, .ts-wrapper.focus .ts-control {
+    border-color: var(--ef-brand) !important;
+    box-shadow: 0 0 0 3px var(--ef-focus) !important; outline: none !important;
+}
+.ts-dropdown {
+    border: 1px solid var(--ef-border) !important;
+    border-radius: 10px !important;
+    box-shadow: 0 8px 28px rgba(0,0,0,.13) !important;
+    font-size: .85rem !important; margin-top: 3px !important;
+    z-index: 9999 !important;
+    position: absolute !important;
+}
+.ts-dropdown .option { padding: .5rem .85rem !important; }
+.ts-dropdown .option:hover, .ts-dropdown .option.active { background: var(--ef-bg) !important; }
+.ts-dropdown .option.selected { background: #eef4ff !important; color: var(--ef-brand) !important; font-weight: 600 !important; }
+.ts-no-results { padding: .75rem .85rem; font-size: .8rem; color: var(--ef-muted); text-align: center; }
+.ts-add-btn {
+    display: block; margin: .4rem auto 0; background: none;
+    border: 1px dashed var(--ef-border); border-radius: 6px;
+    color: var(--ef-brand); font-size: .75rem; font-weight: 600;
+    padding: .28rem .8rem; cursor: pointer;
+}
+
+/* ── Modal ─────────────────────────────────────────── */
+.ef-modal .modal-content { border-radius: 12px; border: 1px solid var(--ef-border); overflow: hidden; }
+.ef-modal .modal-header { display: flex; align-items: center; gap: .55rem; padding: .95rem 1.25rem; border-bottom: 1px solid var(--ef-border); background: #fafbfd; }
+.ef-modal .modal-header-icon { width: 28px; height: 28px; background: var(--ef-soft); border: 1px solid var(--ef-border); border-radius: 6px; display: flex; align-items: center; justify-content: center; font-size: .75rem; color: var(--ef-muted); flex-shrink: 0; }
+.ef-modal .modal-title-text { font-size: .85rem; font-weight: 700; color: var(--ef-navy); margin: 0; }
+.ef-modal .modal-sub { font-size: .7rem; color: var(--ef-muted); margin: 0; }
+.ef-modal .modal-close { background: none; border: none; color: var(--ef-muted); font-size: .85rem; cursor: pointer; padding: .2rem; border-radius: 4px; margin-left: auto; transition: all .15s; }
+.ef-modal .modal-close:hover { background: var(--ef-soft); color: var(--ef-navy); }
+.ef-modal .modal-body { padding: 1.25rem; }
+.ef-modal .modal-footer { display: flex; justify-content: flex-end; gap: .5rem; padding: .85rem 1.25rem; border-top: 1px solid var(--ef-border); background: #fafbfd; }
+
+/* ── Toast ─────────────────────────────────────────── */
+#ef-toast-container { position: fixed; bottom: 1.5rem; right: 1.5rem; z-index: 9999; display: flex; flex-direction: column; gap: .55rem; pointer-events: none; }
+.ef-toast { display: flex; align-items: flex-start; gap: .65rem; min-width: 270px; max-width: 340px; padding: .8rem .9rem; background: #fff; border: 1px solid var(--ef-border); border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,.10); pointer-events: all; opacity: 0; transform: translateY(12px); transition: opacity .22s, transform .22s; }
+.ef-toast.show { opacity: 1; transform: translateY(0); }
+.ef-toast.hide { opacity: 0; transform: translateY(12px); }
+.ef-toast-icon { width: 28px; height: 28px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: .78rem; flex-shrink: 0; }
 .ef-toast-icon.success { background: #dcfce7; color: #15803d; }
 .ef-toast-icon.error   { background: #fee2e2; color: #dc2626; }
 .ef-toast-icon.info    { background: #e0f2fe; color: #0369a1; }
 .ef-toast-body { flex: 1; min-width: 0; }
-.ef-toast-title {
-    font-size: .8rem;
-    font-weight: 700;
-    color: var(--ef-navy);
-    margin: 0 0 .1rem;
-    line-height: 1.3;
-}
-.ef-toast-msg {
-    font-size: .75rem;
-    color: var(--ef-muted);
-    margin: 0;
-    line-height: 1.4;
-}
-.ef-toast-close {
-    background: none;
-    border: none;
-    color: var(--ef-muted);
-    font-size: .8rem;
-    cursor: pointer;
-    padding: 0;
-    line-height: 1;
-    flex-shrink: 0;
-    opacity: .6;
-    transition: opacity .15s;
-}
-.ef-toast-close:hover { opacity: 1; }
+.ef-toast-title { font-size: .78rem; font-weight: 700; color: var(--ef-navy); margin: 0 0 .1rem; }
+.ef-toast-msg   { font-size: .72rem; color: var(--ef-muted); margin: 0; }
+.ef-toast-close { background: none; border: none; color: var(--ef-muted); font-size: .78rem; cursor: pointer; padding: 0; opacity: .6; }
 
-/* ─── Modal Professional Overrides ─────────────────────── */
-.ef-modal .modal-content {
-    border: 1px solid var(--ef-border);
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(0,0,0,.12);
-    overflow: hidden;
+/* ── Mobile ─────────────────────────────────────────── */
+@media (max-width: 991px) {
+    .fc-header { flex-direction: column; align-items: flex-start; gap: 1.25rem; }
 }
-.ef-modal .modal-header {
-    display: flex;
-    align-items: center;
-    gap: .6rem;
-    padding: 1rem 1.25rem;
-    border-bottom: 1px solid var(--ef-border-soft);
-    background: #fcfcfe;
-}
-.ef-modal .modal-header-icon {
-    width: 28px;
-    height: 28px;
-    background: var(--ef-bg);
-    border: 1px solid var(--ef-border);
-    border-radius: 6px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: .78rem;
-    color: var(--ef-muted);
-    flex-shrink: 0;
-}
-.ef-modal .modal-title-text {
-    font-size: .82rem;
-    font-weight: 700;
-    color: var(--ef-navy);
-    margin: 0;
-    letter-spacing: -.01em;
-}
-.ef-modal .modal-sub {
-    font-size: .7rem;
-    color: var(--ef-muted);
-    margin: 0;
-}
-.ef-modal .modal-close {
-    background: none;
-    border: none;
-    color: var(--ef-muted);
-    font-size: .9rem;
-    cursor: pointer;
-    padding: .2rem;
-    border-radius: 4px;
-    margin-left: auto;
-    transition: background .15s, color .15s;
-    line-height: 1;
-}
-.ef-modal .modal-close:hover {
-    background: var(--ef-bg);
-    color: var(--ef-navy);
-}
-.ef-modal .modal-body {
-    padding: 1.25rem;
-}
-.ef-modal .modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    align-items: center;
-    gap: .5rem;
-    padding: .85rem 1.25rem;
-    border-top: 1px solid var(--ef-border-soft);
-    background: #fcfcfe;
+@media (max-width: 767px) {
+    .fc-wrap { padding-bottom: 3rem; }
+    .fc-header-actions { width: 100%; flex-direction: column-reverse; gap: .6rem; }
+    .fc-header-actions .fc-btn { width: 100%; justify-content: center; padding: .65rem 1rem; }
+    .fc-section-body { padding: 1.25rem; }
+    .fc-input, .fc-select, .fc-textarea { font-size: 1rem !important; }
+    .nominal-input { font-size: 1.25rem; height: 54px; }
+    .nominal-prefix-box { height: 54px; }
+    .seg-wrap { grid-template-columns: 1fr; }
+    .seg-card { padding: .75rem .9rem; }
 }
 </style>
 @endpush
 
 @section('content')
 
-{{-- Page Header --}}
-<div class="ef-page-header">
-    <div>
-        <div class="ef-breadcrumb">
-            <a href="{{ route('finance.transactions.index') }}">Buku Kas</a>
-            <span class="sep">/</span>
-            <span>Catat Transaksi Baru</span>
-        </div>
-        <h1 class="ef-page-title">Catat Transaksi Baru</h1>
-    </div>
-    <a href="{{ route('finance.transactions.index') }}" class="ef-btn-back">
-        <i class="bi bi-arrow-left"></i> Kembali
-    </a>
-</div>
+<script>
+window.FINANCE_TRX_CONFIG = {
+    csrf:            '{{ csrf_token() }}',
+    entityStoreUrl:  '{{ route("finance.entities.store") }}',
+    accountStoreUrl: '{{ route("finance.accounts.store") }}'
+};
+</script>
 
-@if($errors->any())
-<div style="background:#fff8f8;border:1px solid #f5c6cb;border-radius:8px;padding:.8rem 1.1rem;margin-bottom:1.25rem;font-size:.8rem;color:var(--ef-kredit-text)">
-    <i class="bi bi-exclamation-triangle-fill me-2"></i>
-    <strong>Terdapat kesalahan pada formulir:</strong>
-    <ul class="mb-0 mt-1 ps-4" style="line-height:1.8">
-        @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
-    </ul>
-</div>
-@endif
+<div class="fc-wrap">
 
-<div class="row g-4">
-
-    {{-- ── FORMULIR UTAMA ──────────────────────────────── --}}
-    <div class="col-lg-8">
-        <div class="ef-card">
-            <div class="ef-card-header">
-                <i class="bi bi-file-earmark-text ef-card-icon"></i>
-                <p class="ef-card-title-text">Formulir Pencatatan Transaksi</p>
+    {{-- ── Page Header ─────────────────────────────────── --}}
+    <div class="fc-header">
+        <div class="fc-header-left">
+            <div class="fc-breadcrumb">
+                <a href="{{ route('finance.transactions.index') }}">Buku Kas</a>
+                <span>/</span>
+                <span>Transaksi Baru</span>
             </div>
-            <div class="ef-card-body">
-                <form action="{{ route('finance.transactions.store') }}" method="POST" id="trxForm" enctype="multipart/form-data">
-                    @csrf
+            <h1 class="fc-title">Catat Transaksi Baru</h1>
+            <p class="fc-subtitle">Isi semua kolom wajib lalu simpan.</p>
+        </div>
+        <div class="fc-header-actions">
+            <a href="{{ route('finance.transactions.index') }}" class="fc-btn fc-btn-ghost" id="btnBatal">
+                <i class="bi bi-arrow-left"></i> Kembali
+            </a>
+            <button type="submit" form="trxForm" class="fc-btn fc-btn-primary" id="submitBtn">
+                <i class="bi bi-check2-circle"></i> Simpan Transaksi
+            </button>
+        </div>
+    </div>
 
-                    {{-- Tipe Transaksi --}}
-                    <div class="ef-field">
-                        <span class="ef-label">Tipe Transaksi <span class="req">*</span></span>
-                        <div class="ef-type-grid">
-                            <input type="radio" name="transaction_type" id="type_debit" value="debit"
-                                   class="ef-type-radio"
-                                   {{ old('transaction_type','debit') === 'debit' ? 'checked':'' }}>
-                            <label for="type_debit" class="ef-type-card">
-                                <div class="ef-type-indicator">
-                                    <i class="bi bi-arrow-down-left-circle"></i>
-                                </div>
-                                <div class="ef-type-text-wrap">
-                                    <span class="ef-type-main">Debit</span>
-                                    <span class="ef-type-sub">Uang Masuk / Penerimaan</span>
-                                </div>
-                                <i class="bi bi-check-circle-fill ef-type-check"></i>
-                            </label>
+    {{-- ── Error Banner ─────────────────────────────────── --}}
+    @if($errors->any())
+    <div class="fc-error-banner">
+        <i class="bi bi-exclamation-triangle-fill me-2"></i>
+        <strong>Terdapat kesalahan:</strong>
+        <ul class="mb-0 mt-1 ps-4" style="line-height:1.8">
+            @foreach($errors->all() as $e)<li>{{ $e }}</li>@endforeach
+        </ul>
+    </div>
+    @endif
 
-                            <input type="radio" name="transaction_type" id="type_kredit" value="kredit"
-                                   class="ef-type-radio"
-                                   {{ old('transaction_type') === 'kredit' ? 'checked':'' }}>
-                            <label for="type_kredit" class="ef-type-card">
-                                <div class="ef-type-indicator">
-                                    <i class="bi bi-arrow-up-right-circle"></i>
-                                </div>
-                                <div class="ef-type-text-wrap">
-                                    <span class="ef-type-main">Kredit</span>
-                                    <span class="ef-type-sub">Uang Keluar / Pembayaran</span>
-                                </div>
-                                <i class="bi bi-check-circle-fill ef-type-check"></i>
-                            </label>
-                        </div>
-                    </div>
+    <form action="{{ route('finance.transactions.store') }}" method="POST" id="trxForm" enctype="multipart/form-data">
+    @csrf
 
-                    {{-- Tanggal & Akun --}}
-                    <div class="row g-3 mb-0">
-                        <div class="col-md-5 ef-field">
-                            <label class="ef-label" for="transaction_date">Tanggal Transaksi <span class="req">*</span></label>
-                            <input type="date" name="transaction_date" id="transaction_date"
-                                   class="ef-input {{ $errors->has('transaction_date') ? 'ef-error' : '' }}"
-                                   value="{{ old('transaction_date', date('Y-m-d')) }}" required>
-                            @error('transaction_date')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="col-md-7 ef-field">
-                            <label class="ef-label d-flex justify-content-between align-items-center" for="account_id">
-                                <span>Akun / Kategori <span class="opt">(CoA)</span> <span class="req">*</span></span>
-                                <button type="button" class="btn-quick-add" onclick="openAccountModal()">
-                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
-                                </button>
-                            </label>
-                            <select name="account_id" id="account_id"
-                                    class="ef-select {{ $errors->has('account_id') ? 'ef-error' : '' }}" required>
-                                <option value="">— Pilih Kategori Akun —</option>
-                                @php $cats = ['asset'=>'Harta','liability'=>'Kewajiban','equity'=>'Modal','revenue'=>'Pendapatan','expense'=>'Biaya']; @endphp
-                                @foreach($cats as $cat => $label)
-                                    @if($accounts->where('category',$cat)->count())
-                                    <optgroup label="{{ $label }} ({{ ucfirst($cat) }})">
-                                        @foreach($accounts->where('category',$cat) as $acc)
-                                            <option value="{{ $acc->id }}" {{ old('account_id') == $acc->id ? 'selected':'' }}>
-                                                [{{ $acc->code }}] {{ $acc->name }}
-                                            </option>
-                                        @endforeach
-                                    </optgroup>
-                                    @endif
-                                @endforeach
-                            </select>
-                            @error('account_id')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
+    {{-- ══ SECTION 1 — Tipe & Nominal ══ --}}
+    <div class="fc-section">
+        <div class="fc-section-header">
+            <div class="fc-section-icon"><i class="bi bi-lightning-charge"></i></div>
+            <p class="fc-section-label">Tipe &amp; Nominal</p>
+        </div>
+        <div class="fc-section-body">
 
-                    {{-- Nominal --}}
-                    <div class="ef-field">
-                        <label class="ef-label" for="amount">Nominal <span class="req">*</span></label>
-                        <div class="ef-input-prefix-group">
-                            <span class="ef-prefix-label">Rp</span>
-                            <input type="number" name="amount" id="amount"
-                                   class="ef-input {{ $errors->has('amount') ? 'ef-error' : '' }}"
-                                   value="{{ old('amount') }}" placeholder="0"
-                                   min="0" step="any" required
-                                   oninput="updateAmountPreview(this.value)">
+            {{-- Tipe Transaksi --}}
+            <div class="fc-field">
+                <span class="fc-label">Tipe Transaksi <span class="req">*</span></span>
+                <div class="seg-wrap">
+                    <input type="radio" name="transaction_type" id="type_debit"
+                           value="debit" class="seg-radio"
+                           {{ old('transaction_type','debit') === 'debit' ? 'checked':'' }}>
+                    <label for="type_debit" class="seg-card">
+                        <div class="seg-icon"><i class="bi bi-arrow-down-left-circle-fill"></i></div>
+                        <div class="seg-texts">
+                            <span class="seg-main">Debit</span>
+                            <span class="seg-sub">Uang Masuk / Penerimaan</span>
                         </div>
-                        <div class="ef-amount-display">
-                            <span class="ef-amount-display-label">Terbilang</span>
-                            <span class="ef-amount-display-value" id="amountPreview">Rp 0</span>
-                        </div>
-                        @error('amount')<p class="ef-field-error">{{ $message }}</p>@enderror
-                    </div>
+                        <i class="bi bi-check-circle-fill seg-check"></i>
+                    </label>
 
-                    {{-- Deskripsi --}}
-                    <div class="ef-field">
-                        <label class="ef-label" for="description">Deskripsi / Keterangan <span class="req">*</span></label>
-                        <textarea name="description" id="description"
-                                  class="ef-textarea {{ $errors->has('description') ? 'ef-error' : '' }}"
-                                  placeholder="Contoh: Penerimaan pembayaran tagihan dari PT. XYZ untuk periode Maret 2026" required>{{ old('description') }}</textarea>
-                        <p class="ef-field-hint">Tulis deskripsi sejelas dan selengkap mungkin untuk kebutuhan audit trail.</p>
-                        @error('description')<p class="ef-field-error">{{ $message }}</p>@enderror
-                    </div>
+                    <input type="radio" name="transaction_type" id="type_kredit"
+                           value="kredit" class="seg-radio"
+                           {{ old('transaction_type') === 'kredit' ? 'checked':'' }}>
+                    <label for="type_kredit" class="seg-card">
+                        <div class="seg-icon"><i class="bi bi-arrow-up-right-circle-fill"></i></div>
+                        <div class="seg-texts">
+                            <span class="seg-main">Kredit</span>
+                            <span class="seg-sub">Uang Keluar / Pembayaran</span>
+                        </div>
+                        <i class="bi bi-check-circle-fill seg-check"></i>
+                    </label>
+                </div>
+            </div>
 
-                    {{-- Entitas --}}
-                    <hr class="ef-divider">
-                    <p class="ef-section-heading"><i class="bi bi-people me-1" style="font-size:.8rem"></i> Entitas Terkait <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
-                    <div class="row g-3">
-                        <div class="col-md-6 ef-field">
-                            <label class="ef-label d-flex justify-content-between align-items-center" for="sender_entity_id">
-                                <span>Entitas Pengirim <span class="opt">(Dari)</span></span>
-                                <button type="button" class="btn-quick-add" onclick="openEntityModal('sender')">
-                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
-                                </button>
-                            </label>
-                            <select name="sender_entity_id" id="sender_entity_id" class="ef-select {{ $errors->has('sender_entity_id') ? 'ef-error' : '' }}">
-                                <option value="">— Tidak Ada —</option>
-                                @foreach($entities as $ent)
-                                    <option value="{{ $ent->id }}" {{ old('sender_entity_id') == $ent->id ? 'selected':'' }}>
-                                        {{ $ent->name }} ({{ ucfirst($ent->type) }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('sender_entity_id')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="col-md-6 ef-field">
-                            <label class="ef-label d-flex justify-content-between align-items-center" for="receiver_entity_id">
-                                <span>Entitas Penerima <span class="opt">(Ke)</span></span>
-                                <button type="button" class="btn-quick-add" onclick="openEntityModal('receiver')">
-                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
-                                </button>
-                            </label>
-                            <select name="receiver_entity_id" id="receiver_entity_id" class="ef-select {{ $errors->has('receiver_entity_id') ? 'ef-error' : '' }}">
-                                <option value="">— Tidak Ada —</option>
-                                @foreach($entities as $ent)
-                                    <option value="{{ $ent->id }}" {{ old('receiver_entity_id') == $ent->id ? 'selected':'' }}>
-                                        {{ $ent->name }} ({{ ucfirst($ent->type) }})
-                                    </option>
-                                @endforeach
-                            </select>
-                            @error('receiver_entity_id')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
+            {{-- Nominal --}}
+            <div class="fc-field" style="margin-bottom:0">
+                <label class="fc-label" for="amount_display">Nominal <span class="req">*</span></label>
+                <div class="nominal-wrap">
+                    <div class="nominal-prefix-box">Rp</div>
+                    <input type="text" id="amount_display"
+                           inputmode="numeric" autocomplete="off"
+                           placeholder="0"
+                           class="{{ $errors->has('amount') ? 'fc-error' : '' }} nominal-input"
+                           value="{{ old('amount') ? number_format(old('amount'), 0, ',', '.') : '' }}">
+                </div>
+                <input type="hidden" name="amount" id="amount" value="{{ old('amount') }}">
+                <p class="terbilang-helper" id="terbilang_helper"></p>
+                @error('amount')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+            </div>
 
-                    {{-- ── BLOK PAJAK CORETAX ──────────────────────── --}}
-                    <hr class="ef-divider">
-                    <p class="ef-section-heading"><i class="bi bi-receipt-cutoff me-1" style="font-size:.8rem"></i> Informasi Pajak <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Coretax – Opsional)</span></p>
+        </div>
+    </div>
 
-                    <div class="row g-3 mb-0">
-                        <div class="col-md-4 ef-field">
-                            <label class="ef-label" for="dpp_amount">DPP <span class="opt">(Dasar Pengenaan Pajak)</span></label>
-                            <div class="ef-input-prefix-group">
-                                <span class="ef-prefix-label">Rp</span>
-                                <input type="number" name="dpp_amount" id="dpp_amount"
-                                       class="ef-input {{ $errors->has('dpp_amount') ? 'ef-error' : '' }}"
-                                       value="{{ old('dpp_amount') }}" placeholder="0" min="0" step="any"
-                                       oninput="recalcTax()">
-                            </div>
-                            <p class="ef-field-hint">Nominal sebelum pajak (Base Amount).</p>
-                            @error('dpp_amount')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="col-md-4 ef-field">
-                            <label class="ef-label" for="tax_type">Jenis Pajak</label>
-                            <select name="tax_type" id="tax_type" class="ef-select {{ $errors->has('tax_type') ? 'ef-error' : '' }}" onchange="recalcTax()">
-                                <option value="none" {{ old('tax_type','none') === 'none' ? 'selected':'' }}>— Tidak Ada Pajak —</option>
-                                <option value="ppn" {{ old('tax_type') === 'ppn' ? 'selected':'' }}>PPN (Saat ini 11%)</option>
-                                <option value="pph_21" {{ old('tax_type') === 'pph_21' ? 'selected':'' }}>PPh 21 (Penghasilan Karyawan)</option>
-                                <option value="pph_23" {{ old('tax_type') === 'pph_23' ? 'selected':'' }}>PPh 23 (Jasa / Royalti)</option>
-                                <option value="pph_4_ayat_2" {{ old('tax_type') === 'pph_4_ayat_2' ? 'selected':'' }}>PPh 4 Ayat 2 (Sewa Bangunan)</option>
-                            </select>
-                            @error('tax_type')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                        <div class="col-md-4 ef-field">
-                            <label class="ef-label" for="tax_amount">Nominal Pajak <span class="opt">(Auto / Manual)</span></label>
-                            <div class="ef-input-prefix-group">
-                                <span class="ef-prefix-label">Rp</span>
-                                <input type="number" name="tax_amount" id="tax_amount"
-                                       class="ef-input {{ $errors->has('tax_amount') ? 'ef-error' : '' }}"
-                                       value="{{ old('tax_amount') }}" placeholder="Dihitung otomatis" min="0" step="any">
-                            </div>
-                            <p class="ef-field-hint">Nilai otomatis dihitung, boleh diedit manual jika ada selisih pembulatan.</p>
-                            @error('tax_amount')<p class="ef-field-error">{{ $message }}</p>@enderror
-                        </div>
-                    </div>
-
-                    {{-- ── BLOK UPLOAD DOKUMEN ─────────────────────── --}}
-                    <hr class="ef-divider">
-                    <p class="ef-section-heading"><i class="bi bi-paperclip me-1" style="font-size:.8rem"></i> Lampiran Dokumen <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Bukti Transfer / Faktur – Opsional)</span></p>
-
-                    <div class="ef-field">
-                        <label class="ef-label" for="document">Upload Bukti / Faktur</label>
-                        <div class="ef-upload-zone" id="uploadZone" onclick="document.getElementById('document').click()">
-                            <div class="ef-upload-icon"><i class="bi bi-cloud-upload"></i></div>
-                            <div class="ef-upload-text">Klik untuk pilih file atau seret ke sini</div>
-                            <div class="ef-upload-hint">Format: PDF, JPG, PNG — Maks. 5 MB</div>
-                            <div class="ef-upload-name" id="uploadName" style="display:none"></div>
-                        </div>
-                        <input type="file" name="document" id="document" class="ef-file-hidden {{ $errors->has('document') ? 'ef-error' : '' }}"
-                               accept=".pdf,.jpg,.jpeg,.png" onchange="showFileName(this)">
-                        @error('document')<p class="ef-field-error">{{ $message }}</p>@enderror
-                    </div>
-
-                    {{-- Penanda Periode --}}
-                    <hr class="ef-divider">
-                    <p class="ef-section-heading"><i class="bi bi-calendar3 me-1" style="font-size:.8rem"></i> Penanda Periode Pembukuan <span style="text-transform:none;font-weight:400;letter-spacing:0;font-size:.68rem;color:var(--ef-muted)">(Opsional)</span></p>
-                    <div class="ef-check-row">
-                        <div class="ef-check-wrap">
-                            <input type="checkbox" id="is_end_of_month" name="is_end_of_month" value="1" {{ old('is_end_of_month') ? 'checked':'' }}>
-                            <label for="is_end_of_month">Tandai sebagai Akhir Bulan</label>
-                        </div>
-                        <div class="ef-check-wrap">
-                            <input type="checkbox" id="is_end_of_year" name="is_end_of_year" value="1" {{ old('is_end_of_year') ? 'checked':'' }}>
-                            <label for="is_end_of_year">Tandai sebagai Akhir Tahun</label>
-                        </div>
-                    </div>
-
-    {{-- Actions --}}
-                    <div class="ef-action-row">
-                        <a href="{{ route('finance.transactions.index') }}" class="ef-btn ef-btn-secondary">Batal</a>
-                        <button type="submit" class="ef-btn ef-btn-primary">
-                            <i class="bi bi-check2-circle"></i> Simpan Transaksi
+    {{-- ══ SECTION 2 — Tanggal & Akun ══ --}}
+    <div class="fc-section">
+        <div class="fc-section-header">
+            <div class="fc-section-icon"><i class="bi bi-calendar3"></i></div>
+            <p class="fc-section-label">Tanggal &amp; Kategori Akun</p>
+        </div>
+        <div class="fc-section-body">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-4 col-md-5 fc-field">
+                    <label class="fc-label" for="transaction_date">Tanggal Transaksi <span class="req">*</span></label>
+                    <input type="date" name="transaction_date" id="transaction_date"
+                           class="fc-input {{ $errors->has('transaction_date') ? 'fc-error' : '' }}"
+                           value="{{ old('transaction_date', date('Y-m-d')) }}" required>
+                    @error('transaction_date')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                </div>
+                <div class="col-lg-8 col-md-7 fc-field">
+                    <div class="fc-label-row">
+                        <label class="fc-label" for="account_id">Akun / Kategori <span class="opt">(CoA)</span> <span class="req">*</span></label>
+                        <button type="button" class="btn-quick-add" onclick="openAccountModal()">
+                            <i class="bi bi-plus-circle-fill"></i> Tambah Baru
                         </button>
                     </div>
-                </form>
-            </div>
-        </div>
-    </div>
-
-    {{-- ── SIDEBAR ──────────────────────────────────────── --}}
-    <div class="col-lg-4">
-
-        @php
-            $totalDebit  = \App\Models\FinancialTransaction::where('transaction_type','debit')->sum('amount');
-            $totalKredit = \App\Models\FinancialTransaction::where('transaction_type','kredit')->sum('amount');
-            $latestBal   = \App\Models\FinancialTransaction::orderByDesc('transaction_date')->orderByDesc('id')->value('running_balance') ?? 0;
-        @endphp
-
-        {{-- Ringkasan Saldo --}}
-        <div class="ef-sidebar-card">
-            <div class="ef-sidebar-header">
-                <i class="bi bi-bar-chart-line" style="font-size:.82rem;color:var(--ef-muted)"></i>
-                <p class="ef-sidebar-heading">Ringkasan Buku Kas</p>
-            </div>
-            <div class="ef-sidebar-body">
-                <div class="ef-bal-row">
-                    <span class="ef-bal-key">Total Debit</span>
-                    <span class="ef-bal-val green">Rp {{ number_format($totalDebit,0,',','.') }}</span>
-                </div>
-                <div class="ef-bal-row">
-                    <span class="ef-bal-key">Total Kredit</span>
-                    <span class="ef-bal-val red">Rp {{ number_format($totalKredit,0,',','.') }}</span>
-                </div>
-                <div class="ef-bal-row ef-bal-row-total">
-                    <span class="ef-bal-key" style="color:var(--ef-navy);font-weight:700">Saldo Berjalan</span>
-                    <span class="ef-bal-val ef-bal-val-total {{ $latestBal < 0 ? 'red' : '' }}">
-                        {{ $latestBal < 0 ? '−' : '' }}Rp {{ number_format(abs($latestBal),0,',','.') }}
-                    </span>
-                </div>
-            </div>
-        </div>
-
-        {{-- SOP --}}
-        <div class="ef-sidebar-card ef-sidebar-sop">
-            <div class="ef-sidebar-header">
-                <i class="bi bi-journal-text" style="font-size:.82rem;color:var(--ef-muted)"></i>
-                <p class="ef-sidebar-heading">SOP Formulir Transaksi</p>
-            </div>
-            <div class="ef-sidebar-body">
-                <div class="ef-tip-item">
-                    <div class="ef-tip-dot"></div>
-                    <span>Gunakan <strong>Debit</strong> untuk setiap kas yang masuk ke rekening perusahaan, seperti penerimaan pembayaran, pendapatan jasa, atau setoran modal.</span>
-                </div>
-                <div class="ef-tip-item">
-                    <div class="ef-tip-dot"></div>
-                    <span>Gunakan <strong>Kredit</strong> untuk setiap kas yang keluar, seperti pembayaran vendor, biaya operasional, atau pengeluaran rutin lainnya.</span>
-                </div>
-                <div class="ef-tip-item">
-                    <div class="ef-tip-dot"></div>
-                    <span>Pilih <strong>Akun CoA</strong> yang sesuai klasifikasinya agar laporan keuangan dan jurnal dapat digenerate secara otomatis dan akurat.</span>
-                </div>
-                <div class="ef-tip-item">
-                    <div class="ef-tip-dot"></div>
-                    <span>Isi kolom <strong>Deskripsi</strong> secara rinci dan spesifik. Informasi ini akan muncul pada laporan Buku Kas dan diperlukan dalam proses rekonsiliasi atau audit.</span>
+                    <select name="account_id" id="account_id"
+                            class="fc-select {{ $errors->has('account_id') ? 'fc-error' : '' }}" required>
+                        <option value="">— Pilih Kategori Akun —</option>
+                        @php $cats = ['asset'=>'Harta','liability'=>'Kewajiban','equity'=>'Modal','revenue'=>'Pendapatan','expense'=>'Biaya']; @endphp
+                        @foreach($cats as $cat => $catLabel)
+                            @if($accounts->where('category',$cat)->count())
+                            <optgroup label="{{ $catLabel }} ({{ ucfirst($cat) }})">
+                                @foreach($accounts->where('category',$cat) as $acc)
+                                    <option value="{{ $acc->id }}" {{ old('account_id') == $acc->id ? 'selected':'' }}>
+                                        [{{ $acc->code }}] {{ $acc->name }}
+                                    </option>
+                                @endforeach
+                            </optgroup>
+                            @endif
+                        @endforeach
+                    </select>
+                    @error('account_id')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
                 </div>
             </div>
         </div>
     </div>
+
+    {{-- ══ SECTION 3 — Keterangan, Entitas & Dokumen ══ --}}
+    <div class="fc-section">
+        <div class="fc-section-header">
+            <div class="fc-section-icon"><i class="bi bi-card-text"></i></div>
+            <p class="fc-section-label">Keterangan &amp; Entitas</p>
+        </div>
+        <div class="fc-section-body">
+
+            <div class="fc-field">
+                <label class="fc-label" for="description">Keterangan Transaksi <span class="req">*</span></label>
+                <textarea name="description" id="description"
+                          class="fc-textarea {{ $errors->has('description') ? 'fc-error' : '' }}"
+                          placeholder="Contoh: Bayar sewa kantor April 2026" required>{{ old('description') }}</textarea>
+                <div class="fc-input-meta">
+                    <p class="fc-field-hint">Deskripsi jelas membantu rekonsiliasi &amp; audit.</p>
+                    <span class="fc-char-counter" id="desc_counter">0 / 500</span>
+                </div>
+                @error('description')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+            </div>
+
+            <hr class="fc-divider">
+
+            <p class="fc-label" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ef-muted);margin-bottom:.9rem;">
+                <i class="bi bi-people me-1"></i>Entitas Terkait <span style="text-transform:none;letter-spacing:0;font-weight:400;">(Opsional)</span>
+            </p>
+            <div class="row g-3">
+                <div class="col-md-6 fc-field">
+                    <div class="fc-label-row">
+                        <label class="fc-label" for="sender_entity_id">Pengirim <span class="opt">(Dari)</span></label>
+                        <button type="button" class="btn-quick-add" onclick="openEntityModal('sender')">
+                            <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                        </button>
+                    </div>
+                    <select name="sender_entity_id" id="sender_entity_id"
+                            class="fc-select {{ $errors->has('sender_entity_id') ? 'fc-error' : '' }}">
+                        <option value="">Tidak ada — lewati</option>
+                        @foreach($entities as $ent)
+                            <option value="{{ $ent->id }}" {{ old('sender_entity_id') == $ent->id ? 'selected':'' }}>
+                                {{ $ent->name }} ({{ ucfirst($ent->type) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('sender_entity_id')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                </div>
+                <div class="col-md-6 fc-field">
+                    <div class="fc-label-row">
+                        <label class="fc-label" for="receiver_entity_id">Penerima <span class="opt">(Ke)</span></label>
+                        <button type="button" class="btn-quick-add" onclick="openEntityModal('receiver')">
+                            <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                        </button>
+                    </div>
+                    <select name="receiver_entity_id" id="receiver_entity_id"
+                            class="fc-select {{ $errors->has('receiver_entity_id') ? 'fc-error' : '' }}">
+                        <option value="">Tidak ada — lewati</option>
+                        @foreach($entities as $ent)
+                            <option value="{{ $ent->id }}" {{ old('receiver_entity_id') == $ent->id ? 'selected':'' }}>
+                                {{ $ent->name }} ({{ ucfirst($ent->type) }})
+                            </option>
+                        @endforeach
+                    </select>
+                    @error('receiver_entity_id')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                </div>
+            </div>
+
+            <hr class="fc-divider">
+
+            <p class="fc-label" style="font-size:.68rem;text-transform:uppercase;letter-spacing:.1em;color:var(--ef-muted);margin-bottom:.9rem;">
+                <i class="bi bi-paperclip me-1"></i>Lampiran <span style="text-transform:none;letter-spacing:0;font-weight:400;">(Opsional)</span>
+            </p>
+            <div class="fc-field" style="margin-bottom:0">
+                <div class="fc-upload" id="uploadZone" onclick="document.getElementById('document').click()">
+                    <div class="fc-upload-icon"><i class="bi bi-cloud-upload"></i></div>
+                    <div class="fc-upload-text">Klik atau seret file ke sini</div>
+                    <div class="fc-upload-hint">PDF, JPG, PNG — Maks. 5 MB</div>
+                    <div class="fc-upload-name" id="uploadName"></div>
+                </div>
+                <input type="file" name="document" id="document"
+                       class="fc-file-hidden {{ $errors->has('document') ? 'fc-error' : '' }}"
+                       accept=".pdf,.jpg,.jpeg,.png" onchange="showFileName(this)">
+                @error('document')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+            </div>
+
+        </div>
+    </div>
+
+    {{-- ══ SECTION 4 — Pajak (Collapsible) ══ --}}
+    <div class="fc-section">
+        <button type="button" class="tax-trigger" id="taxCollapseBtn" onclick="toggleTax()">
+            <div class="fc-section-icon" style="margin-right:.15rem"><i class="bi bi-receipt-cutoff"></i></div>
+            <span id="taxCollapseIcon" class="tax-icon">▸</span>
+            Informasi Pajak
+            <span style="text-transform:none;letter-spacing:0;font-weight:400;font-size:.68rem;">(Coretax – Opsional)</span>
+            <span class="tax-badge" id="taxBadge">● Diisi</span>
+        </button>
+        <div id="taxSection" style="display:none">
+            <div class="fc-section-body">
+                <div class="row g-3 mb-0">
+                    <div class="col-md-4 fc-field">
+                        <label class="fc-label" for="dpp_amount">DPP <span class="opt">(Dasar Pengenaan Pajak)</span></label>
+                        <div class="fc-prefix-group">
+                            <span class="fc-prefix">Rp</span>
+                            <input type="number" name="dpp_amount" id="dpp_amount"
+                                   class="fc-input {{ $errors->has('dpp_amount') ? 'fc-error' : '' }}"
+                                   value="{{ old('dpp_amount') }}" placeholder="0" min="0" step="any"
+                                   oninput="recalcTax()">
+                        </div>
+                        <p class="fc-field-hint">Nominal sebelum pajak.</p>
+                        @error('dpp_amount')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                    </div>
+                    <div class="col-md-4 fc-field">
+                        <label class="fc-label" for="tax_type">Jenis Pajak</label>
+                        <select name="tax_type" id="tax_type"
+                                class="fc-select {{ $errors->has('tax_type') ? 'fc-error' : '' }}"
+                                onchange="recalcTax()">
+                            <option value="none" {{ old('tax_type','none') === 'none' ? 'selected':'' }}>— Tidak Ada Pajak —</option>
+                            <option value="ppn"          {{ old('tax_type') === 'ppn'          ? 'selected':'' }}>PPN (11%)</option>
+                            <option value="pph_21"       {{ old('tax_type') === 'pph_21'       ? 'selected':'' }}>PPh 21 — Karyawan</option>
+                            <option value="pph_23"       {{ old('tax_type') === 'pph_23'       ? 'selected':'' }}>PPh 23 — Jasa</option>
+                            <option value="pph_4_ayat_2" {{ old('tax_type') === 'pph_4_ayat_2' ? 'selected':'' }}>PPh 4(2) — Sewa</option>
+                        </select>
+                        @error('tax_type')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                    </div>
+                    <div class="col-md-4 fc-field">
+                        <label class="fc-label" for="tax_amount">Nominal Pajak <span class="opt">(Auto)</span></label>
+                        <div class="fc-prefix-group">
+                            <span class="fc-prefix">Rp</span>
+                            <input type="number" name="tax_amount" id="tax_amount"
+                                   class="fc-input {{ $errors->has('tax_amount') ? 'fc-error' : '' }}"
+                                   value="{{ old('tax_amount') }}" placeholder="Otomatis" min="0" step="any">
+                        </div>
+                        <p class="fc-field-hint">Otomatis dihitung, bisa diedit.</p>
+                        @error('tax_amount')<p class="fc-field-error"><i class="bi bi-exclamation-circle"></i> {{ $message }}</p>@enderror
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    </form>
+
 </div>
 
-{{-- ── MODAL QUICK ADD ENTITY ──────────────────────────── --}}
-<div class="modal fade ef-modal" id="quickEntityModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px">
-        <div class="modal-content">
+<div id="ef-toast-container"></div>
 
+{{-- ── MODAL: Quick Add Entity ──────────────────────────── --}}
+<div class="modal fade ef-modal" id="quickEntityModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
+        <div class="modal-content">
             <div class="modal-header">
-                <div class="modal-header-icon">
-                    <i class="bi bi-person-plus"></i>
-                </div>
+                <div class="modal-header-icon"><i class="bi bi-person-plus"></i></div>
                 <div>
                     <p class="modal-title-text">Tambah Entitas Cepat</p>
-                    <p class="modal-sub">Entitas tersimpan otomatis & siap dipilih di form</p>
+                    <p class="modal-sub">Entitas tersimpan &amp; siap dipilih</p>
                 </div>
-                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="bi bi-x-lg"></i>
-                </button>
+                <button type="button" class="modal-close" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
             </div>
-
             <form id="quickEntityForm">
                 <div class="modal-body">
                     <input type="hidden" id="target_dropdown" value="">
-
-                    <div class="ef-field">
-                        <label class="ef-label" for="entity_name">
-                            Nama Entitas <span class="req">*</span>
-                        </label>
-                        <input type="text" id="entity_name" name="name" class="ef-input"
-                               placeholder="Contoh: PT Sumber Rejeki" required autofocus>
+                    <div class="fc-field">
+                        <label class="fc-label" for="entity_name">Nama Entitas <span class="req">*</span></label>
+                        <input type="text" id="entity_name" name="name" class="fc-input" placeholder="Contoh: PT Sumber Rejeki" required autofocus>
                     </div>
-
-                    <div class="ef-field">
-                        <label class="ef-label" for="entity_type">
-                            Tipe Entitas <span class="req">*</span>
-                        </label>
-                        <select id="entity_type" name="type" class="ef-select" required>
+                    <div class="fc-field">
+                        <label class="fc-label" for="entity_type">Tipe <span class="req">*</span></label>
+                        <select id="entity_type" name="type" class="fc-select" required>
                             <option value="vendor">Vendor / Supplier</option>
                             <option value="bank">Bank</option>
                             <option value="client">Client / Pelanggan</option>
-                            <option value="internal">Internal Perusahaan</option>
+                            <option value="internal">Internal</option>
                             <option value="other">Lainnya</option>
                         </select>
                     </div>
-
-                    <div class="ef-field" style="margin-bottom: 0">
-                        <label class="ef-label" for="entity_contact">
-                            Info Kontak <span class="opt">(Opsional)</span>
-                        </label>
-                        <input type="text" id="entity_contact" name="contact_info" class="ef-input"
-                               placeholder="Email / No. HP">
+                    <div class="fc-field" style="margin-bottom:0">
+                        <label class="fc-label" for="entity_contact">Kontak <span class="opt">(Opsional)</span></label>
+                        <input type="text" id="entity_contact" name="contact_info" class="fc-input" placeholder="Email / No. HP">
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="ef-btn ef-btn-secondary" data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <button type="submit" id="entitySubmitBtn" class="ef-btn ef-btn-primary">
-                        <i class="bi bi-check2"></i> Simpan Entitas
+                    <button type="button" class="fc-btn fc-btn-ghost" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="fc-btn fc-btn-primary" id="entitySubmitBtn">
+                        <i class="bi bi-check2"></i> Simpan
                     </button>
                 </div>
             </form>
-
         </div>
     </div>
 </div>
 
-{{-- ── MODAL QUICK ADD ACCOUNT ─────────────────────────── --}}
+{{-- ── MODAL: Quick Add Account ─────────────────────────── --}}
 <div class="modal fade ef-modal" id="quickAccountModal" tabindex="-1" aria-hidden="true">
-    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px">
+    <div class="modal-dialog modal-dialog-centered" style="max-width:440px">
         <div class="modal-content">
-
             <div class="modal-header">
-                <div class="modal-header-icon">
-                    <i class="bi bi-wallet2"></i>
-                </div>
+                <div class="modal-header-icon"><i class="bi bi-folder-plus"></i></div>
                 <div>
-                    <p class="modal-title-text">Tambah Akun/CoA Cepat</p>
-                    <p class="modal-sub">Akun tersimpan otomatis & siap dipilih di form</p>
+                    <p class="modal-title-text">Tambah Akun CoA</p>
+                    <p class="modal-sub">Akun langsung bisa dipilih setelah disimpan</p>
                 </div>
-                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
-                    <i class="bi bi-x-lg"></i>
-                </button>
+                <button type="button" class="modal-close" data-bs-dismiss="modal"><i class="bi bi-x-lg"></i></button>
             </div>
-
             <form id="quickAccountForm">
                 <div class="modal-body">
-                    <div class="ef-field">
-                        <label class="ef-label" for="account_code">
-                            Kode Akun <span class="req">*</span>
-                        </label>
-                        <input type="text" id="account_code" name="code" class="ef-input"
-                               placeholder="Contoh: 110, 201" required>
+                    <div class="row g-3">
+                        <div class="col-4 fc-field">
+                            <label class="fc-label" for="account_code">Kode <span class="req">*</span></label>
+                            <input type="text" id="account_code" class="fc-input" placeholder="1001" required>
+                        </div>
+                        <div class="col-8 fc-field">
+                            <label class="fc-label" for="account_name">Nama Akun <span class="req">*</span></label>
+                            <input type="text" id="account_name" class="fc-input" placeholder="Kas Operasional" required>
+                        </div>
                     </div>
-
-                    <div class="ef-field">
-                        <label class="ef-label" for="account_name">
-                            Nama Akun <span class="req">*</span>
-                        </label>
-                        <input type="text" id="account_name" name="name" class="ef-input"
-                               placeholder="Contoh: Kas Kecil, Pendapatan Proyek" required>
-                    </div>
-
-                    <div class="ef-field" style="margin-bottom: 0">
-                        <label class="ef-label" for="account_category">
-                            Kategori <span class="req">*</span>
-                        </label>
-                        <select id="account_category" name="category" class="ef-select" required>
+                    <div class="fc-field" style="margin-bottom:0">
+                        <label class="fc-label" for="account_category">Kategori <span class="req">*</span></label>
+                        <select id="account_category" class="fc-select" required>
                             <option value="asset">Harta (Asset)</option>
                             <option value="liability">Kewajiban (Liability)</option>
                             <option value="equity">Modal (Equity)</option>
@@ -1161,264 +836,20 @@
                         </select>
                     </div>
                 </div>
-
                 <div class="modal-footer">
-                    <button type="button" class="ef-btn ef-btn-secondary" data-bs-dismiss="modal">
-                        Batal
-                    </button>
-                    <button type="submit" id="accountSubmitBtn" class="ef-btn ef-btn-primary">
+                    <button type="button" class="fc-btn fc-btn-ghost" data-bs-dismiss="modal">Batal</button>
+                    <button type="submit" class="fc-btn fc-btn-primary" id="accountSubmitBtn">
                         <i class="bi bi-check2"></i> Simpan Akun
                     </button>
                 </div>
             </form>
-
         </div>
     </div>
-</div>
-
-{{-- ── TOAST CONTAINER ──────────────────────────────────── --}}
-<div id="ef-toast-container"></div>
-
-{{-- ── MOBILE STICKY SUBMIT BAR ───────────────────── --}}
-<div class="ef-mobile-bar" id="mobileBar">
-    <a href="{{ route('finance.transactions.index') }}" class="ef-btn ef-btn-secondary">
-        <i class="bi bi-arrow-left"></i> Batal
-    </a>
-    <button type="submit" form="trxForm" class="ef-btn ef-btn-primary" id="mobileSubmitBtn">
-        <i class="bi bi-check2-circle"></i> Simpan Transaksi
-    </button>
 </div>
 
 @endsection
 
 @push('scripts')
-<script>
-function updateAmountPreview(val) {
-    const preview = document.getElementById('amountPreview');
-    const num = parseFloat(val) || 0;
-    preview.textContent = 'Rp ' + num.toLocaleString('id-ID', { minimumFractionDigits: 0 });
-
-    const checked = document.querySelector('input[name="transaction_type"]:checked');
-    preview.className = 'ef-amount-display-value ' + (checked ? checked.value : '');
-}
-
-document.querySelectorAll('input[name="transaction_type"]').forEach(r => {
-    r.addEventListener('change', () => updateAmountPreview(document.getElementById('amount').value));
-});
-
-/* ── Tax Auto Calculator ─────────────────────── */
-const TAX_RATES = { ppn: 0.11, pph_21: 0.05, pph_23: 0.02, pph_4_ayat_2: 0.1 };
-// PPh types are withholding (deducted from total)
-const DEDUCTION_TYPES = ['pph_21', 'pph_23', 'pph_4_ayat_2'];
-
-function recalcTax() {
-    const dpp   = parseFloat(document.getElementById('dpp_amount').value) || 0;
-    const type  = document.getElementById('tax_type').value;
-    const taxEl = document.getElementById('tax_amount');
-    const amtEl = document.getElementById('amount');
-
-    if (type === 'none' || dpp === 0) {
-        taxEl.placeholder = 'Tidak ada pajak';
-        // Sync amount with whatever is in amount field if no tax
-        return;
-    }
-
-    const rate = TAX_RATES[type] || 0;
-    const tax  = Math.round(dpp * rate);
-
-    // Auto-fill tax amount (keep editable)
-    taxEl.value = tax;
-
-    // Auto-fill total amount field
-    const totalAmt = DEDUCTION_TYPES.includes(type)
-        ? dpp - tax   // Withholding: total = DPP - pajak
-        : dpp + tax;  // PPN: total = DPP + pajak
-
-    amtEl.value = totalAmt;
-    updateAmountPreview(totalAmt);
-}
-
-/* ── File Upload Display ─────────────────────── */
-function showFileName(input) {
-    const nameEl = document.getElementById('uploadName');
-    const zone   = document.getElementById('uploadZone');
-    if (input.files && input.files[0]) {
-        nameEl.innerHTML = '<i class="bi bi-file-earmark-check"></i> ' + input.files[0].name;
-        nameEl.style.display = 'inline-flex';
-        zone.style.borderColor = '#2d6a4f';
-        zone.style.background  = '#eef7f2';
-    }
-}
-
-// Drag-and-drop support
-const zone = document.getElementById('uploadZone');
-if (zone) {
-    zone.addEventListener('dragover', e => { e.preventDefault(); zone.classList.add('drag-over'); });
-    zone.addEventListener('dragleave', () => zone.classList.remove('drag-over'));
-    zone.addEventListener('drop', e => {
-        e.preventDefault();
-        zone.classList.remove('drag-over');
-        const fileInput = document.getElementById('document');
-        fileInput.files = e.dataTransfer.files;
-        showFileName(fileInput);
-    });
-}
-
-/* ── Quick Add Entity Logic ─────────────────── */
-const quickModal = new bootstrap.Modal(document.getElementById('quickEntityModal'));
-
-function openEntityModal(target) {
-    document.getElementById('target_dropdown').value = target;
-    document.getElementById('quickEntityForm').reset();
-    quickModal.show();
-}
-
-document.getElementById('quickEntityForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('entitySubmitBtn');
-    const target = document.getElementById('target_dropdown').value;
-    const originalHTML = btn.innerHTML;
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:.85rem;height:.85rem;border-width:2px"></span> Menyimpan...';
-
-    const formData = {
-        _token: '{{ csrf_token() }}',
-        name: document.getElementById('entity_name').value,
-        type: document.getElementById('entity_type').value,
-        contact_info: document.getElementById('entity_contact').value
-    };
-
-    fetch('{{ route("finance.entities.store") }}', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' },
-        body: JSON.stringify(formData)
-    })
-    .then(r => r.json())
-    .then(result => {
-        if (result.success) {
-            const opt = new Option(`${result.data.name} (${result.data.type})`, result.data.id);
-            document.getElementById('sender_entity_id').add(opt.cloneNode(true));
-            document.getElementById('receiver_entity_id').add(opt.cloneNode(true));
-            document.getElementById(`${target}_entity_id`).value = result.data.id;
-
-            quickModal.hide();
-            showToast('success', 'Entitas Ditambahkan', `"${result.data.name}" berhasil disimpan dan siap dipilih.`);
-        } else {
-            showToast('error', 'Gagal Menyimpan', result.message || 'Terjadi kesalahan, coba lagi.');
-        }
-    })
-    .catch(() => {
-        showToast('error', 'Koneksi Gagal', 'Tidak dapat terhubung ke server.');
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
-    });
-});
-
-/* ── Quick Add Account Logic ─────────────────── */
-const quickAccModal = new bootstrap.Modal(document.getElementById('quickAccountModal'));
-
-function openAccountModal() {
-    document.getElementById('quickAccountForm').reset();
-    quickAccModal.show();
-}
-
-document.getElementById('quickAccountForm').addEventListener('submit', function(e) {
-    e.preventDefault();
-    const btn = document.getElementById('accountSubmitBtn');
-    const originalHTML = btn.innerHTML;
-
-    btn.disabled = true;
-    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:.85rem;height:.85rem;border-width:2px"></span> Menyimpan...';
-
-    const formData = {
-        _token: '{{ csrf_token() }}',
-        code: document.getElementById('account_code').value,
-        name: document.getElementById('account_name').value,
-        category: document.getElementById('account_category').value
-    };
-
-    fetch('{{ route("finance.accounts.store") }}', {
-        method: 'POST',
-        headers: { 
-            'Content-Type': 'application/json', 
-            'X-Requested-With': 'XMLHttpRequest',
-            'Accept': 'application/json'
-        },
-        body: JSON.stringify(formData)
-    })
-    .then(async r => {
-        const json = await r.json();
-        if (!r.ok) { throw json; }
-        return json;
-    })
-    .then(result => {
-        if (result.success) {
-            const optValue = result.data.id;
-            const optLabel = `[${result.data.code}] ${result.data.name}`;
-            const opt = new Option(optLabel, optValue);
-            document.getElementById('account_id').appendChild(opt);
-            document.getElementById('account_id').value = optValue;
-
-            quickAccModal.hide();
-            showToast('success', 'Akun Ditambahkan', `"${result.data.name}" berhasil disimpan.`);
-        }
-    })
-    .catch((err) => {
-        let msg = 'Tidak dapat terhubung ke server.';
-        if (err.errors) {
-            msg = Object.values(err.errors)[0][0];
-        } else if (err.message) {
-            msg = err.message;
-        }
-        showToast('error', 'Gagal Menyimpan', msg);
-    })
-    .finally(() => {
-        btn.disabled = false;
-        btn.innerHTML = originalHTML;
-    });
-});
-
-/* ── Toast Notification System ──────────────────── */
-function showToast(type, title, message, duration = 4000) {
-    const icons = {
-        success: '<i class="bi bi-check-lg"></i>',
-        error:   '<i class="bi bi-x-lg"></i>',
-        info:    '<i class="bi bi-info-lg"></i>'
-    };
-
-    const toast = document.createElement('div');
-    toast.className = 'ef-toast';
-    toast.innerHTML = `
-        <div class="ef-toast-icon ${type}">${icons[type] ?? icons.info}</div>
-        <div class="ef-toast-body">
-            <p class="ef-toast-title">${title}</p>
-            <p class="ef-toast-msg">${message}</p>
-        </div>
-        <button class="ef-toast-close" onclick="this.closest('.ef-toast').remove()">
-            <i class="bi bi-x"></i>
-        </button>
-    `;
-
-    document.getElementById('ef-toast-container').appendChild(toast);
-
-    // Trigger show animation
-    requestAnimationFrame(() => {
-        requestAnimationFrame(() => toast.classList.add('show'));
-    });
-
-    // Auto-dismiss
-    setTimeout(() => {
-        toast.classList.replace('show', 'hide');
-        setTimeout(() => toast.remove(), 300);
-    }, duration);
-}
-
-window.addEventListener('DOMContentLoaded', () => {
-    const amt = document.getElementById('amount').value;
-    updateAmountPreview(amt || '0');
-});
-</script>
+<script src="https://cdn.jsdelivr.net/npm/tom-select@2.3.1/dist/js/tom-select.complete.min.js"></script>
+<script src="{{ asset('js/finance-transaction-create.js') }}"></script>
 @endpush

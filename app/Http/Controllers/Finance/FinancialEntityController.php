@@ -13,14 +13,29 @@ class FinancialEntityController extends Controller
      */
     public function index(Request $request)
     {
-        $entities = FinancialEntity::when($request->search, function($query, $search) {
-            $query->where('name', 'like', "%{$search}%")
-                  ->orWhere('type', 'like', "%{$search}%")
-                  ->orWhere('contact_info', 'like', "%{$search}%");
-        })->latest()->paginate(10);
+        $query = FinancialEntity::query();
+
+        // Filter by search keyword
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $query->where(function ($q) use ($search) {
+                $q->where('name', 'like', "%{$search}%")
+                  ->orWhere('contact_info', 'like', "%{$search}%")
+                  ->orWhere('description', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter by type (ignore unknown types like 'employee')
+        $validTypes = ['internal', 'bank', 'vendor', 'client', 'other'];
+        if ($request->filled('type') && in_array($request->type, $validTypes)) {
+            $query->where('type', $request->type);
+        }
+
+        $entities = $query->latest()->paginate(15)->withQueryString();
 
         return view('finance.entities.index', compact('entities'));
     }
+
 
     /**
      * Show the form for creating a new resource.

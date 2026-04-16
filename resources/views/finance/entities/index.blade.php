@@ -85,7 +85,8 @@
 {{-- ── Hero ─────────────────────────────────────── --}}
 @php
     use App\Models\FinancialEntity;
-    $countByType = FinancialEntity::groupBy('type')->selectRaw('type, count(*) as cnt')->pluck('cnt','type');
+    use Illuminate\Support\Str;
+    $countByType   = FinancialEntity::groupBy('type')->selectRaw('type, count(*) as cnt')->pluck('cnt','type');
     $totalEntities = FinancialEntity::count();
 @endphp
 
@@ -150,7 +151,7 @@
     </div>
     <select name="type" class="form-select" onchange="this.form.submit()">
         <option value="">🏷 Semua Tipe</option>
-        @foreach(['bank','vendor','internal','client','employee','tax_office','other'] as $t)
+        @foreach(['bank','vendor','internal','client','other'] as $t)
             <option value="{{ $t }}" {{ request('type') == $t ? 'selected':'' }}>{{ ucfirst(str_replace('_',' ',$t)) }}</option>
         @endforeach
     </select>
@@ -194,7 +195,7 @@
                     </td>
                     <td class="d-none d-md-table-cell">
                         <p class="text-sm text-muted mb-0" style="line-height:1.5">
-                            {{ $entity->description ? Str::limit($entity->description, 70) : '—' }}
+                            {{ $entity->description ? \Illuminate\Support\Str::limit($entity->description, 70) : '—' }}
                         </p>
                     </td>
                     <td>

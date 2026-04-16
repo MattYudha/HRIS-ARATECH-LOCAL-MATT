@@ -39,24 +39,30 @@
 }
 .fin-hero .hero-title { font-size: 1.2rem; font-weight: 800; color: #fff; margin-bottom: .2rem; }
 .fin-hero .hero-sub   { font-size: .78rem; color: rgba(255,255,255,.5); margin: 0; }
+.fin-hero .hero-stats-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: .75rem;
+    margin-top: 1.25rem;
+}
 .fin-hero .hero-kpi {
     background: rgba(255,255,255,.07);
     border: 1px solid rgba(255,255,255,.12);
     border-radius: var(--radius-md);
-    padding: .75rem 1.25rem;
-    min-width: 120px;
+    padding: .75rem;
     text-align: center;
 }
 .fin-hero .hero-kpi .kpi-val {
-    font-size: 1.05rem; font-weight: 800;
+    font-size: 1rem; font-weight: 800;
     color: #fff; line-height: 1.1;
     font-variant-numeric: tabular-nums;
 }
-.fin-hero .hero-kpi .kpi-val.positive { color: rgba(160,239,204,.9); }
-.fin-hero .hero-kpi .kpi-val.negative { color: rgba(255,180,180,.9); }
+.fin-hero .hero-kpi .kpi-val.positive { color: #10b981; }
+.fin-hero .hero-kpi .kpi-val.negative { color: #f87171; }
 .fin-hero .hero-kpi .kpi-lbl {
-    font-size: .6rem; color: rgba(255,255,255,.4);
-    text-transform: uppercase; letter-spacing: .07em; margin-top: .25rem;
+    font-size: .55rem; color: rgba(255,255,255,.5);
+    text-transform: uppercase; letter-spacing: .08em; margin-top: .3rem;
+    white-space: nowrap;
 }
 
 /* ══ Year Pills ═══════════════════════════════════════════ */
@@ -118,22 +124,27 @@
 .c-sub   { font-size: .72rem; color: var(--muted); margin-bottom: .9rem; }
 
 /* ══ KPI Mini ═════════════════════════════════════════════ */
-.c-kpi-row { display: flex; gap: .65rem; margin-bottom: .9rem; flex-wrap: wrap; }
+.c-kpi-row { 
+    display: grid; 
+    grid-template-columns: repeat(3, 1fr); 
+    gap: .65rem; 
+    margin-bottom: 1.25rem; 
+}
 .c-kpi {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius-md);
-    padding: .4rem .8rem;
-    flex: 1; min-width: 80px;
+    padding: .6rem .8rem;
+    text-align: center;
 }
 .c-kpi .ck-v {
     font-size: .85rem; font-weight: 800;
     color: var(--body); line-height: 1.1;
     font-variant-numeric: tabular-nums;
 }
-.c-kpi .ck-v.positive { color: #15803d; }
-.c-kpi .ck-v.negative { color: #dc2626; }
-.c-kpi .ck-l { font-size: .6rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; }
+.c-kpi .ck-v.positive { color: #166534; }
+.c-kpi .ck-v.negative { color: #991b1b; }
+.c-kpi .ck-l { font-size: .55rem; color: var(--muted); text-transform: uppercase; letter-spacing: .05em; margin-top: .15rem; }
 
 /* ══ Top Lists ════════════════════════════════════════════ */
 .top-list-item {
@@ -183,21 +194,21 @@
     margin-bottom: 1.25rem;
     align-items: center;
 }
+@media (max-width: 991px) {
+    .fin-hero .hero-stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .c-kpi-row { grid-template-columns: repeat(2, 1fr); }
+}
 @media (max-width: 767px) {
+    .fin-hero { padding: 1.25rem; }
+    .hero-title { font-size: 1.1rem; }
     .quicklinks { flex-wrap: nowrap; overflow-x: auto; white-space: nowrap; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
     .quicklinks::-webkit-scrollbar { display: none; }
+    .chart-card .card-body { padding: 1.1rem; }
 }
-.quicklinks a, .quicklinks span {
-    font-size: .75rem; font-weight: 600;
-    color: var(--muted);
-    text-decoration: none; padding: .22rem .55rem;
-    border-radius: var(--radius-sm); transition: background .12s, color .12s;
+@media (max-width: 480px) {
+    .c-kpi-row { grid-template-columns: 1fr; }
+    .sec-badge { display: none; }
 }
-.quicklinks a:hover { background: var(--border); color: var(--body); }
-.quicklinks .sep { color: var(--border); font-size: .9rem; }
-.quicklinks .ql-label { font-size: .72rem; color: var(--muted); font-weight: 500; }
-.quicklinks .ql-cta { color: var(--accent) !important; font-weight: 700; }
-.quicklinks .ql-cta:hover { background: rgba(26,31,60,.06) !important; }
 </style>
 @endpush
 @include('finance._finance_mobile')
@@ -215,10 +226,10 @@
 @endphp
 
 <div class="fin-hero shadow">
-    <div class="d-flex flex-wrap align-items-start justify-content-between gap-3">
-        <div>
+    <div class="row w-100 g-0">
+        <div class="col-12 col-xl-5 mb-3 mb-xl-0">
             <p class="hero-title">📈 Grafik Analitik Keuangan</p>
-            <p class="hero-sub">Dashboard finansial lengkap organisasi — Tahun Fiskal {{ $year }}</p>
+            <p class="hero-sub">Dashboard finansial lengkap organisasi — Tahun {{ $year }}</p>
             <div class="d-flex flex-wrap gap-2 mt-3">
                 @foreach($availableYears as $y)
                 <a href="{{ route('finance.charts.index', ['year' => $y]) }}"
@@ -226,24 +237,26 @@
                 @endforeach
             </div>
         </div>
-        <div class="d-flex flex-wrap gap-2">
-            <div class="hero-kpi">
-                <div class="kpi-val positive">Rp {{ number_format($totalIn/1e6,1) }}jt</div>
-                <div class="kpi-lbl">Total Masuk</div>
-            </div>
-            <div class="hero-kpi">
-                <div class="kpi-val negative">Rp {{ number_format($totalOut/1e6,1) }}jt</div>
-                <div class="kpi-lbl">Total Keluar</div>
-            </div>
-            <div class="hero-kpi">
-                <div class="kpi-val {{ $netSaldo < 0 ? 'negative' : '' }}">
-                    {{ $netSaldo < 0 ? '−' : '' }}Rp {{ number_format(abs($netSaldo)/1e6,1) }}jt
+        <div class="col-12 col-xl-7">
+            <div class="hero-stats-grid">
+                <div class="hero-kpi">
+                    <div class="kpi-val positive">Rp {{ number_format($totalIn/1e6,1) }}jt</div>
+                    <div class="kpi-lbl">Total Masuk</div>
                 </div>
-                <div class="kpi-lbl">Saldo Bersih</div>
-            </div>
-            <div class="hero-kpi">
-                <div class="kpi-val">{{ $top10Expenses->count() }} Transaksi</div>
-                <div class="kpi-lbl">Top Pengeluaran</div>
+                <div class="hero-kpi">
+                    <div class="kpi-val negative">Rp {{ number_format($totalOut/1e6,1) }}jt</div>
+                    <div class="kpi-lbl">Total Keluar</div>
+                </div>
+                <div class="hero-kpi">
+                    <div class="kpi-val {{ $netSaldo < 0 ? 'negative' : '' }}">
+                        {{ $netSaldo < 0 ? '−' : '' }}Rp {{ number_format(abs($netSaldo)/1e6,1) }}jt
+                    </div>
+                    <div class="kpi-lbl">Saldo Bersih</div>
+                </div>
+                <div class="hero-kpi">
+                    <div class="kpi-val">{{ $top10Expenses->count() }} Trx</div>
+                    <div class="kpi-lbl">Top Pengeluaran</div>
+                </div>
             </div>
         </div>
     </div>
@@ -565,13 +578,16 @@ const months  = @json($months);
 const gridColor = '#f0f2f5';
 const tickStyle = { font: { size: 10 }, color: '#9da7b6' };
 
+const isMobile = window.innerWidth < 768;
+
 const defOpts = {
     responsive: true,
-    maintainAspectRatio: true,
+    maintainAspectRatio: false,
+    aspectRatio: isMobile ? 1 : 2,
     plugins: {
         legend: {
             position: 'top',
-            labels: { font: { size: 11 }, boxWidth: 10, padding: 14, usePointStyle: true, color: '#6c757d' }
+            labels: { font: { size: 10 }, boxWidth: 8, padding: 10, usePointStyle: true, color: '#6c757d' }
         },
         tooltip: { callbacks: { label: c => fmt(c.parsed.y ?? c.parsed) } }
     },

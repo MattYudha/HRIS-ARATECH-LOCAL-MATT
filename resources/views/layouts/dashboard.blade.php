@@ -105,13 +105,15 @@
         }
 
         /* Desktop sidebar layout */
-        @media screen and (min-width: 1200px) {
+        @media screen and (min-width: 992px) {
             #sidebar { width: 300px; transition: all 0.3s ease; overflow-x: hidden; }
             #main { margin-left: 300px; transition: all 0.3s ease; }
+            body.sidebar-collapsed #sidebar { width: 0; transform: translateX(-300px); }
+            body.sidebar-collapsed #main { margin-left: 0; }
         }
 
         /* Mobile sidebar overlap fix */
-        @media screen and (max-width: 1199px) {
+        @media screen and (max-width: 991px) {
             #sidebar, .sidebar-wrapper {
                 z-index: 1050 !important;
             }
@@ -193,7 +195,7 @@
 
     <!-- ================= SIDEBAR ================= -->
     <div id="sidebar">
-        <div class="sidebar-wrapper">
+        <div class="sidebar-wrapper active">
 
             <div class="sidebar-header text-center d-flex flex-column align-items-center gap-2 pb-2">
                 <div class="d-flex justify-content-center align-items-center w-100 px-3">
@@ -293,7 +295,7 @@
 
                     <!-- SYSTEM SETTINGS (Master Admin Only) -->
                     @if($isMasterAdmin)
-                    <li class="menu-group {{ $systemMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-gear-fill group-icon"></i>
                             <span>System Settings</span>
@@ -323,7 +325,7 @@
                     @endif
 
                     <!-- HR Administrator MANAGEMENT -->
-                    <li class="menu-group {{ $hrMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-people-fill group-icon"></i>
                             <span>HR Administrator Management</span>
@@ -381,7 +383,7 @@
 
                     <!-- KEY PERFORMANCE (KPI) -->
                     @if($showPayrollGroup)
-                    <li class="menu-group {{ $kpiMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-speedometer group-icon"></i>
                             <span>Key Performance (KPI)</span>
@@ -422,7 +424,7 @@
 
                     <!-- BUKU KAS & KEUANGAN MODULE (RBAC) -->
                     @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isSupervisor)
-                    <li class="menu-group {{ $financeMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-wallet2 group-icon"></i>
                             <span>Buku Kas & Keuangan</span>
@@ -483,7 +485,7 @@
                     @endif
 
                     <!-- INVENTORY -->
-                    <li class="menu-group {{ $inventoryMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-boxes group-icon"></i>
                             <span>Inventory</span>
@@ -551,7 +553,7 @@
                     </li>
 
                     <!-- LETTERS -->
-                    <li class="menu-group {{ $lettersMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-envelope-fill group-icon"></i>
                             <span>Letters</span>
@@ -597,7 +599,7 @@
 
                     <!-- REPORTS -->
                     @if($isManagerOrAdmin)
-                    <li class="menu-group {{ $reportsMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-file-earmark-text group-icon"></i>
                             <span>Reports</span>
@@ -623,7 +625,7 @@
                     @endif
 
                     <!-- PERSONAL -->
-                    <li class="menu-group {{ $personalMenuActive ? 'expanded' : '' }}">
+                    <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-person-fill group-icon"></i>
                             <span>Personal</span>
@@ -723,17 +725,18 @@
 <script>
     const bodyEl = document.body;
     const sidebarWrapper = $('#sidebar .sidebar-wrapper');
-    const DESKTOP_BREAKPOINT = 1200;
+    const DESKTOP_BREAKPOINT = 992;
 
     function isDesktopViewport() {
         return window.innerWidth >= DESKTOP_BREAKPOINT;
     }
 
     function syncSidebarLayout() {
-        bodyEl.classList.remove('sidebar-collapsed');
-
+        // Only force open if not explicitly collapsed by user (optional, but keep it simple for now as requested)
         if (isDesktopViewport()) {
-            sidebarWrapper.addClass('active');
+            if (!bodyEl.classList.contains('sidebar-collapsed')) {
+                sidebarWrapper.addClass('active');
+            }
             return;
         }
 
@@ -746,7 +749,10 @@
     $(document).on('click', '.burger-btn', function(e) {
         e.preventDefault();
 
-        if (!isDesktopViewport()) {
+        if (isDesktopViewport()) {
+            bodyEl.classList.toggle('sidebar-collapsed');
+            // If toggling on desktop, the CSS handles #main margin
+        } else {
             sidebarWrapper.toggleClass('active');
         }
     });

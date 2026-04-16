@@ -21,8 +21,8 @@
 /* ══ Hero ════════════════════════════════════════════════════════════════ */
 .coa-hero {
     background: var(--accent);
-    border-radius: var(--radius-lg);
-    padding: 1.5rem 1.75rem;
+    border-radius: 20px;
+    padding: 1.75rem 2rem;
     margin-bottom: 1.5rem;
     position: relative;
     overflow: hidden;
@@ -81,10 +81,10 @@
 
 /* ══ Stat Pills ══════════════════════════════════════════════════════════ */
 .stat-strip {
-    display: flex;
-    gap: .5rem;
-    align-items: stretch;
-    flex-wrap: wrap;
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: .75rem;
+    width: 100%;
 }
 .stat-pill {
     background: rgba(255,255,255,.07);
@@ -166,9 +166,9 @@
 .filter-bar {
     display: flex;
     flex-wrap: wrap;
-    gap: .6rem;
+    gap: .75rem;
     align-items: center;
-    margin-bottom: 1rem;
+    margin-bottom: 1.25rem;
 }
 .filter-bar .form-control {
     border-radius: var(--radius-md);
@@ -350,14 +350,19 @@
     margin-right: auto;
 }
 
-/* ══ Pagination ══════════════════════════════════════════════════════════ */
-.pagination-footer {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: .85rem 1.25rem;
-    border-top: 1px solid var(--border);
-    background: var(--surface);
+@media (max-width: 1199px) {
+    .stat-strip { grid-template-columns: repeat(3, 1fr); }
+}
+@media (max-width: 767px) {
+    .coa-hero { padding: 1.5rem; }
+    .hero-title { font-size: 1.15rem; }
+    .filter-bar .input-group { width: 100% !important; }
+    .filter-bar .btn { flex: 1; justify-content: center; }
+}
+@media (max-width: 575px) {
+    .stat-strip { grid-template-columns: repeat(2, 1fr); }
+    .coa-hero .d-flex { flex-direction: column; align-items: stretch !important; }
+    .hero-action { justify-content: center; width: 100%; }
 }
 </style>
 @endpush
@@ -383,43 +388,45 @@
 
 {{-- ══ Hero ══════════════════════════════════════════════════════════════ --}}
 <div class="coa-hero">
-    <div class="d-flex flex-wrap justify-content-between align-items-center gap-3">
-        <div>
-            <p class="hero-title">Chart of Accounts</p>
+    <div class="row align-items-center g-4">
+        <div class="col-12 col-xxl-5">
+            <h1 class="hero-title">Chart of Accounts (CoA)</h1>
             <p class="hero-sub">Klasifikasi akun keuangan untuk pencatatan transaksi buku kas organisasi</p>
-            <div class="d-flex flex-wrap gap-2 mt-3">
+            <div class="d-flex flex-wrap gap-2 mt-4">
                 <a href="{{ route('finance.accounts.create') }}" class="hero-action hero-action-primary">
-                    <i class="bi bi-plus-lg" style="font-size:.75rem"></i> Tambah Akun
+                    <i class="bi bi-plus-lg"></i> Tambah Akun
                 </a>
                 <a href="{{ route('finance.transactions.index') }}" class="hero-action hero-action-ghost">
-                    <i class="bi bi-arrow-up-right" style="font-size:.75rem"></i> Input Transaksi
+                    <i class="bi bi-arrow-up-right"></i> Input Transaksi
                 </a>
             </div>
         </div>
-        <div class="stat-strip">
-            <div class="stat-pill">
-                <div class="sp-val">{{ $totalAccounts }}</div>
-                <div class="sp-lbl">Total</div>
-            </div>
-            <div class="stat-pill">
-                <div class="sp-val">{{ $counts['asset'] ?? 0 }}</div>
-                <div class="sp-lbl">Asset</div>
-            </div>
-            <div class="stat-pill">
-                <div class="sp-val">{{ $counts['liability'] ?? 0 }}</div>
-                <div class="sp-lbl">Liability</div>
-            </div>
-            <div class="stat-pill">
-                <div class="sp-val">{{ $counts['equity'] ?? 0 }}</div>
-                <div class="sp-lbl">Equity</div>
-            </div>
-            <div class="stat-pill">
-                <div class="sp-val">{{ $counts['revenue'] ?? 0 }}</div>
-                <div class="sp-lbl">Revenue</div>
-            </div>
-            <div class="stat-pill">
-                <div class="sp-val">{{ $counts['expense'] ?? 0 }}</div>
-                <div class="sp-lbl">Expense</div>
+        <div class="col-12 col-xxl-7">
+            <div class="stat-strip">
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $totalAccounts }}</div>
+                    <div class="sp-lbl">Total</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $counts['asset'] ?? 0 }}</div>
+                    <div class="sp-lbl">Asset</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $counts['liability'] ?? 0 }}</div>
+                    <div class="sp-lbl">Liability</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $counts['equity'] ?? 0 }}</div>
+                    <div class="sp-lbl">Equity</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $counts['revenue'] ?? 0 }}</div>
+                    <div class="sp-lbl">Revenue</div>
+                </div>
+                <div class="stat-pill">
+                    <div class="sp-val">{{ $counts['expense'] ?? 0 }}</div>
+                    <div class="sp-lbl">Expense</div>
+                </div>
             </div>
         </div>
     </div>
@@ -461,7 +468,7 @@
         <input type="hidden" name="category" value="{{ request('category') }}">
     @endif
     <div class="filter-bar">
-        <div class="input-group" style="width: 280px">
+        <div class="input-group" style="width: 320px">
             <span class="input-group-text">
                 <i class="bi bi-search"></i>
             </span>
@@ -470,24 +477,24 @@
                    value="{{ request('search') }}">
         </div>
         <button type="submit" class="btn btn-sm mb-0 fw-semibold"
-                style="background: var(--accent); color: #fff; border-radius: var(--radius-md); padding: .38rem 1rem; font-size: .8rem">
+                style="background: var(--accent); color: #fff; border-radius: var(--radius-md); padding: .45rem 1.25rem; font-size: .8rem">
             Cari
         </button>
         @if(request('search') || request('category'))
             <a href="{{ route('finance.accounts.index') }}"
                class="btn btn-sm mb-0"
-               style="border: 1.5px solid var(--border); border-radius: var(--radius-md); color: var(--muted); font-size: .8rem; padding: .38rem .85rem;">
-                Reset
+               style="border: 1.5px solid var(--border); border-radius: var(--radius-md); color: var(--muted); font-size: .8rem; padding: .45rem 1.1rem;">
+                <i class="bi bi-x-lg"></i>
             </a>
         @endif
-        <span class="ms-auto" style="font-size: .75rem; color: var(--muted)">
-            {{ $accounts->total() }} akun ditemukan
+        <span class="ms-md-auto text-end" style="font-size: .75rem; color: var(--muted); min-width: 140px;">
+            <strong>{{ $accounts->total() }}</strong> akun ditemukan
         </span>
     </div>
 </form>
 
 {{-- ══ Table ════════════════════════════════════════════════════════════════ --}}
-<div class="card border-0" style="border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow);">
+<div class="card border-0" style="border-radius: 20px; overflow: hidden; box-shadow: var(--shadow);">
     <div class="table-responsive">
         <table class="coa-table">
             <thead>

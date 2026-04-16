@@ -9,8 +9,8 @@
     border-radius: 18px; padding: 1.8rem 2rem; margin-bottom: 1.5rem; color:#fff;
 }
 .my-fin-hero .total-label { font-size:.75rem; font-weight:800; color:rgba(255,255,255,.6); text-transform:uppercase; letter-spacing:.08em; }
-.my-fin-hero .total-val   { font-size:2.4rem; font-weight:900; line-height:1; margin:.5rem 0; }
-.my-fin-hero .sub-val     { font-size:.85rem; color:rgba(255,255,255,.7); }
+.my-fin-hero .total-val   { font-size:2.4rem; font-weight:900; line-height:1; margin:.5rem 0; color:#4ade80 !important; text-shadow: 0 0 20px rgba(74,222,128,0.3); }
+.my-fin-hero .sub-val     { font-size:.85rem; color:rgba(255,255,255,.75); }
 
 .quick-card { border-radius:15px; border:none; transition:transform .2s; }
 .quick-card:hover { transform:translateY(-5px); }
@@ -36,10 +36,10 @@
             <h1 class="total-val">Rp {{ number_format($totalEarningsYtd, 0, ',', '.') }}</h1>
             <p class="sub-val">Total akumulasi gaji bersih yang diterima selama tahun ini.</p>
             <div class="d-flex gap-2 mt-4">
-                <a href="{{ route('finance.claims.create') }}" class="btn btn-sm btn-white text-dark fw-bold px-4" style="border-radius:10px">
+                <a href="{{ route('finance.claims.create') }}" class="btn btn-sm fw-bold px-4" style="border-radius:10px; background:#ffffff; color:#172b4d; border:none; box-shadow:0 2px 8px rgba(0,0,0,0.2);">
                     <i class="bi bi-receipt me-1"></i>Ajukan Klaim
                 </a>
-                <a href="{{ route('finance.claims.index') }}" class="btn btn-sm" style="background:rgba(255,255,255,.15);color:#fff;border-radius:10px;border:1.5px solid rgba(255,255,255,.2)">
+                <a href="{{ route('finance.claims.index') }}" class="btn btn-sm fw-semibold" style="background:rgba(255,255,255,.18); color:#ffffff; border-radius:10px; border:1.5px solid rgba(255,255,255,.35);">
                     Riwayat Klaim
                 </a>
             </div>
