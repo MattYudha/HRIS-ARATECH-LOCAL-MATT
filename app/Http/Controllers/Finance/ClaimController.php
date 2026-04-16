@@ -70,12 +70,13 @@ class ClaimController extends Controller
             ->with('success', 'Klaim biaya berhasil diajukan dan sedang menunggu persetujuan.');
     }
 
-    // ── Show (detail satu klaim) ─────────────────────────────────
     public function show(FinancialClaim $claim)
     {
         $this->authorizeClaimAccess($claim);
         $claim->load(['employee', 'reviewer', 'account', 'transaction']);
-        return view('finance.claims.show', compact('claim'));
+        
+        $isAdmin = auth()->user()->isAdmin();
+        return view('finance.claims.show', compact('claim', 'isAdmin'));
     }
 
     // ── Admin: Approve ────────────────────────────────────────────

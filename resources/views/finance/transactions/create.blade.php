@@ -807,7 +807,12 @@
                             @error('transaction_date')<p class="ef-field-error">{{ $message }}</p>@enderror
                         </div>
                         <div class="col-md-7 ef-field">
-                            <label class="ef-label" for="account_id">Akun / Kategori <span style="font-size:.68rem;font-weight:400;color:var(--ef-muted)">(CoA)</span> <span class="req">*</span></label>
+                            <label class="ef-label d-flex justify-content-between align-items-center" for="account_id">
+                                <span>Akun / Kategori <span class="opt">(CoA)</span> <span class="req">*</span></span>
+                                <button type="button" class="btn-quick-add" onclick="openAccountModal()">
+                                    <i class="bi bi-plus-circle-fill"></i> Tambah Baru
+                                </button>
+                            </label>
                             <select name="account_id" id="account_id"
                                     class="ef-select {{ $errors->has('account_id') ? 'ef-error' : '' }}" required>
                                 <option value="">— Pilih Kategori Akun —</option>
@@ -1107,6 +1112,70 @@
     </div>
 </div>
 
+{{-- ── MODAL QUICK ADD ACCOUNT ─────────────────────────── --}}
+<div class="modal fade ef-modal" id="quickAccountModal" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered" style="max-width: 440px">
+        <div class="modal-content">
+
+            <div class="modal-header">
+                <div class="modal-header-icon">
+                    <i class="bi bi-wallet2"></i>
+                </div>
+                <div>
+                    <p class="modal-title-text">Tambah Akun/CoA Cepat</p>
+                    <p class="modal-sub">Akun tersimpan otomatis & siap dipilih di form</p>
+                </div>
+                <button type="button" class="modal-close" data-bs-dismiss="modal" aria-label="Close">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+
+            <form id="quickAccountForm">
+                <div class="modal-body">
+                    <div class="ef-field">
+                        <label class="ef-label" for="account_code">
+                            Kode Akun <span class="req">*</span>
+                        </label>
+                        <input type="text" id="account_code" name="code" class="ef-input"
+                               placeholder="Contoh: 110, 201" required>
+                    </div>
+
+                    <div class="ef-field">
+                        <label class="ef-label" for="account_name">
+                            Nama Akun <span class="req">*</span>
+                        </label>
+                        <input type="text" id="account_name" name="name" class="ef-input"
+                               placeholder="Contoh: Kas Kecil, Pendapatan Proyek" required>
+                    </div>
+
+                    <div class="ef-field" style="margin-bottom: 0">
+                        <label class="ef-label" for="account_category">
+                            Kategori <span class="req">*</span>
+                        </label>
+                        <select id="account_category" name="category" class="ef-select" required>
+                            <option value="asset">Harta (Asset)</option>
+                            <option value="liability">Kewajiban (Liability)</option>
+                            <option value="equity">Modal (Equity)</option>
+                            <option value="revenue">Pendapatan (Revenue)</option>
+                            <option value="expense">Biaya (Expense)</option>
+                        </select>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button type="button" class="ef-btn ef-btn-secondary" data-bs-dismiss="modal">
+                        Batal
+                    </button>
+                    <button type="submit" id="accountSubmitBtn" class="ef-btn ef-btn-primary">
+                        <i class="bi bi-check2"></i> Simpan Akun
+                    </button>
+                </div>
+            </form>
+
+        </div>
+    </div>
+</div>
+
 {{-- ── TOAST CONTAINER ──────────────────────────────────── --}}
 <div id="ef-toast-container"></div>
 
@@ -1241,6 +1310,70 @@ document.getElementById('quickEntityForm').addEventListener('submit', function(e
     })
     .catch(() => {
         showToast('error', 'Koneksi Gagal', 'Tidak dapat terhubung ke server.');
+    })
+    .finally(() => {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    });
+});
+
+/* ── Quick Add Account Logic ─────────────────── */
+const quickAccModal = new bootstrap.Modal(document.getElementById('quickAccountModal'));
+
+function openAccountModal() {
+    document.getElementById('quickAccountForm').reset();
+    quickAccModal.show();
+}
+
+document.getElementById('quickAccountForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    const btn = document.getElementById('accountSubmitBtn');
+    const originalHTML = btn.innerHTML;
+
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-1" style="width:.85rem;height:.85rem;border-width:2px"></span> Menyimpan...';
+
+    const formData = {
+        _token: '{{ csrf_token() }}',
+        code: document.getElementById('account_code').value,
+        name: document.getElementById('account_name').value,
+        category: document.getElementById('account_category').value
+    };
+
+    fetch('{{ route("finance.accounts.store") }}', {
+        method: 'POST',
+        headers: { 
+            'Content-Type': 'application/json', 
+            'X-Requested-With': 'XMLHttpRequest',
+            'Accept': 'application/json'
+        },
+        body: JSON.stringify(formData)
+    })
+    .then(async r => {
+        const json = await r.json();
+        if (!r.ok) { throw json; }
+        return json;
+    })
+    .then(result => {
+        if (result.success) {
+            const optValue = result.data.id;
+            const optLabel = `[${result.data.code}] ${result.data.name}`;
+            const opt = new Option(optLabel, optValue);
+            document.getElementById('account_id').appendChild(opt);
+            document.getElementById('account_id').value = optValue;
+
+            quickAccModal.hide();
+            showToast('success', 'Akun Ditambahkan', `"${result.data.name}" berhasil disimpan.`);
+        }
+    })
+    .catch((err) => {
+        let msg = 'Tidak dapat terhubung ke server.';
+        if (err.errors) {
+            msg = Object.values(err.errors)[0][0];
+        } else if (err.message) {
+            msg = err.message;
+        }
+        showToast('error', 'Gagal Menyimpan', msg);
     })
     .finally(() => {
         btn.disabled = false;
