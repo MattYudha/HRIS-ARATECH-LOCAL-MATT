@@ -45,6 +45,24 @@ su -s /bin/sh www-data -c "php artisan view:clear"
 echo "🗄️  Running migrations..."
 php artisan migrate --force --no-interaction
 
+# ─── PHP Upload Config ──────────────────────────────────────────────────────────
+echo "⚙️  Setting PHP upload limits..."
+cat > /usr/local/etc/php/conf.d/uploads.ini <<'EOF'
+upload_max_filesize = 10M
+post_max_size = 15M
+max_execution_time = 60
+max_input_time = 60
+memory_limit = 256M
+EOF
+
+# ─── Create storage symlink ───────────────────────────────────────────────────
+echo "🔗 Creating storage symlink..."
+mkdir -p storage/app/public/claims/attachments
+chown -R www-data:www-data storage/app/public || true
+# Remove broken symlink if exists, then recreate
+rm -f public/storage
+php artisan storage:link --force
+
 echo "✅ Setup complete! Starting PHP-FPM..."
 
 # ─── Start PHP-FPM ────────────────────────────────────────────────────────────

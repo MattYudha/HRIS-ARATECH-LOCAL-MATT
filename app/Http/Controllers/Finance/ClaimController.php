@@ -55,10 +55,50 @@ class ClaimController extends Controller
             'attachment'  => 'nullable|file|mimes:jpg,jpeg,png,pdf|max:5120', // 5MB max
         ]);
 
-        // Handle file upload
+        // Handle file upload — bypass move_uploaded_file() issue on Docker WSL2/Windows volumes
+        unset($validated['attachment']); // jangan mass-assign UploadedFile object
+
         if ($request->hasFile('attachment')) {
-            $validated['attachment_path'] = $request->file('attachment')
-                ->store('claims/attachments', 'public');
+            $file     = $request->file('attachment');
+            
+            if (!$file->isValid()) {
+                return back()->withErrors(['attachment' => 'File tidak valid. Error code PHP: ' . $file->getError()])->withInput();
+            }
+
+            $filename = $file->hashName();
+            $subPath  = 'claims/attachments/' . $filename;
+
+            try {
+                $content = file_get_contents($file->getRealPath());
+                if ($content === false) {
+                    return back()->withErrors(['attachment' => 'Gagal membaca isi file dari directory temp.'])->withInput();
+                }
+
+                // Path penuh tempat file akan disimpan
+                $fullPath = storage_path("app/public/" . $subPath);
+
+                // Pastikan direktori ada (bikin murni pakai PHP jika belum ada)
+                $dir = dirname($fullPath);
+                if (!is_dir($dir)) {
+                    mkdir($dir, 0777, true);
+                }
+
+                // Tulis langsung pakai fungsi native (bypass Flysystem Laravel)
+                $stored = file_put_contents($fullPath, $content);
+
+                if ($stored === false) {
+                    $error = error_get_last();
+                    return back()
+                        ->withErrors(['attachment' => "Gagal write file: " . ($error['message'] ?? 'Unknown error')])
+                        ->withInput();
+                }
+
+                $validated['attachment_path'] = $subPath;
+            } catch (\Exception $e) {
+                return back()
+                    ->withErrors(['attachment' => 'Exception: ' . $e->getMessage()])
+                    ->withInput();
+            }
         }
 
         $validated['employee_id'] = auth()->user()->employee?->id;

@@ -57,7 +57,12 @@
 @if($errors->any())
     <div class="alert mb-3 text-white py-2" style="background:#f5365c;border-radius:10px;font-size:.84rem">
         <i class="bi bi-exclamation-circle-fill me-1"></i>
-        <span>Mohon periksa kembali inputan Anda.</span>
+        <strong>Mohon periksa kembali inputan Anda:</strong>
+        <ul class="mb-0 mt-1" style="font-size:.80rem">
+            @foreach($errors->all() as $error)
+                <li>{{ $error }}</li>
+            @endforeach
+        </ul>
     </div>
 @endif
 

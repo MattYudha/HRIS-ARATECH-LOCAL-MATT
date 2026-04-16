@@ -31,7 +31,7 @@ services:
       SESSION_HTTP_ONLY: "true"
       SESSION_SAME_SITE: lax
       QUEUE_CONNECTION: sync
-      FILESYSTEM_DISK: local
+      FILESYSTEM_DISK: public
     volumes:
       - ./storage/app:/var/www/html/storage/app
       - ./storage/logs:/var/www/html/storage/logs
@@ -39,6 +39,7 @@ services:
       - ./routes:/var/www/html/routes
       - ./app:/var/www/html/app
       - ./database:/var/www/html/database
+      - ./docker/php/uploads.ini:/usr/local/etc/php/conf.d/uploads.ini:ro
     depends_on:
       db:
         condition: service_healthy
