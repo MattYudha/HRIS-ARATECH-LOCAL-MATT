@@ -54,17 +54,7 @@ class CheckRole
         $request->session()->put('role', $employee->role->title);
         $request->session()->put('employee_id', $employee->id);
         
-        // Compatibility check: Bidirectional alias between Master Admin and Super Admin
         $checkRoles = $roles;
-        $masterAdmin = \App\Constants\Roles::MASTER_ADMIN;
-        $superAdmin = 'Super Admin';
-        
-        if (in_array($masterAdmin, $roles) && !in_array($superAdmin, $roles)) {
-            $checkRoles[] = $superAdmin;
-        }
-        if (in_array($superAdmin, $roles) && !in_array($masterAdmin, $roles)) {
-            $checkRoles[] = $masterAdmin;
-        }
 
         // Use trimmed and case-insensitive check if possible, but at least trim
         $checkUserRole = trim($employee->role->title);

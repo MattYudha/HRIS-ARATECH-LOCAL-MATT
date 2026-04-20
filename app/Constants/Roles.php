@@ -13,16 +13,15 @@ class Roles
     const MARKETING          = 'Marketing';
 
     // Role Groups
-    const ADMIN_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR, 'Super Admin'];
+    const ADMIN_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR];
 
-    const FINANCE_FULL_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR, 'Super Admin'];
+    const FINANCE_FULL_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR];
 
     const FINANCE_OPERATOR_ROLES = [
         self::MASTER_ADMIN,
         self::HR_ADMINISTRATOR,
         self::MANAGER_UNIT_HEAD,
         self::MARKETING,
-        'Super Admin',
     ];
 
     const FINANCE_VIEW_ROLES = [
@@ -31,7 +30,6 @@ class Roles
         self::MANAGER_UNIT_HEAD,
         self::MARKETING,
         self::SUPERVISOR,
-        'Super Admin',
     ];
 
     const SUPERVISOR_ROLES = [
@@ -39,7 +37,6 @@ class Roles
         self::HR_ADMINISTRATOR,
         self::MANAGER_UNIT_HEAD,
         self::SUPERVISOR,
-        'Super Admin',
     ];
 
     const ALL_ROLES = [
@@ -49,7 +46,6 @@ class Roles
         self::SUPERVISOR,
         self::EMPLOYEE,
         self::MARKETING,
-        'Super Admin',
     ];
 
     /**

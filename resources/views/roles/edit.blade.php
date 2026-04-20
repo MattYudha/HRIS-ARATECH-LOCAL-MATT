@@ -89,7 +89,7 @@
 
                             <div class="mb-3" id="akses">
                                 <label class="form-label fw-semibold">Akses Modul</label>
-                                <p class="text-muted small mb-2">Hanya Master Admin yang dapat mengubah akses. Centang modul yang diizinkan untuk role ini.</p>
+                                <p class="text-muted small mb-2">Hanya {{ \App\Constants\Roles::MASTER_ADMIN }} yang dapat mengubah akses. Centang modul yang diizinkan untuk role ini.</p>
                                 <div class="row g-2">
                                     @foreach($modules as $module)
                                         <div class="col-md-6">

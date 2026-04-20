@@ -44,7 +44,7 @@
                         <div class="d-flex justify-content-between align-items-center mb-3">
                             <div>
                                 @unless($isPowerUser)
-                                    <span class="badge bg-secondary">View only - Master Admin required to edit</span>
+                                    <span class="badge bg-secondary">View only - {{ \App\Constants\Roles::MASTER_ADMIN }} required to edit</span>
                                 @endunless
                             </div>
                             @if($isPowerUser)
@@ -123,7 +123,7 @@
                                                         </form>
                                                     </div>
                                                 @else
-                                                    <span class="badge bg-secondary">Hanya Master Admin yang bisa edit</span>
+                                                    <span class="badge bg-secondary">Hanya {{ \App\Constants\Roles::MASTER_ADMIN }} yang bisa edit</span>
                                                 @endif
                                             </td>
                                         </tr>

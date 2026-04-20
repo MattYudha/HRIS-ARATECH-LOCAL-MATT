@@ -79,8 +79,7 @@ class User extends Authenticatable
      */
     public function isMasterAdmin(): bool
     {
-        $roleTitle = $this->employee?->role?->title;
-        return in_array($roleTitle, [\App\Constants\Roles::MASTER_ADMIN, 'Super Admin']);
+        return $this->employee?->role?->title === \App\Constants\Roles::MASTER_ADMIN;
     }
     
     /**
@@ -178,9 +177,7 @@ class User extends Authenticatable
     public function hasAccess(string $module): bool
     {
         // Only Master Admins have full access by default
-        // Compatibility: Handle both Master Admin and legacy Super Admin
-        $roleTitle = $this->employee?->role?->title;
-        if (in_array($roleTitle, [\App\Constants\Roles::MASTER_ADMIN, 'Super Admin'])) {
+        if ($this->employee?->role?->title === \App\Constants\Roles::MASTER_ADMIN) {
             return true;
         }
 

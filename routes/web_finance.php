@@ -12,7 +12,7 @@ use App\Constants\Roles;
 Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->group(function () {
 
     // ── 1. Full Admin / HR Access (CRUD Master Data & Full Transaksi) ────────────────
-    Route::middleware(['role:Master Admin,HR Administrator'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR])->group(function() {
         Route::resource('entities', FinancialEntityController::class);
         Route::resource('accounts', FinancialAccountController::class);
         
@@ -23,7 +23,7 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
 
     // ── 2. Finance Operator Access (Create Transaksi, View Master) ──────────────────
     // Grouping for Manager & Marketing
-    Route::middleware(['role:Master Admin,HR Administrator,Manager / Unit Head,Marketing'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing'])->group(function() {
         // Can view master but not CRUD
         Route::get('entities', [FinancialEntityController::class, 'index'])->name('entities.index');
         Route::get('accounts', [FinancialAccountController::class, 'index'])->name('accounts.index');
@@ -35,14 +35,14 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
 
     // ── 3. Finance View Access (Ledger, Reports, Charts) ──────────────────────────
     // For Admin, HR, Manager, Marketing, and Supervisor
-    Route::middleware(['role:Master Admin,HR Administrator,Manager / Unit Head,Marketing,Supervisor'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor'])->group(function() {
         Route::get('transactions', [FinancialTransactionController::class, 'index'])->name('transactions.index');
         Route::get('reports', [FinancialReportController::class, 'index'])->name('reports.index');
         Route::get('charts', [FinancialReportController::class, 'charts'])->name('charts.index');
     });
 
     // ── 4. Transaction Edit/Delete (Admin Only) ───────────────────────────────────
-    Route::middleware(['role:Master Admin,HR Administrator'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR])->group(function() {
         Route::get('transactions/{transaction}/edit', [FinancialTransactionController::class, 'edit'])->name('transactions.edit');
         Route::put('transactions/{transaction}', [FinancialTransactionController::class, 'update'])->name('transactions.update');
         Route::delete('transactions/{transaction}', [FinancialTransactionController::class, 'destroy'])->name('transactions.destroy');
@@ -55,5 +55,5 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
     // ── 6. Secure Document Download (all roles that can view transactions) ─────────
     Route::get('transactions/{transaction}/document', [FinancialTransactionController::class, 'downloadDocument'])
         ->name('transactions.document')
-        ->middleware(['role:Master Admin,HR Administrator,Manager / Unit Head,Marketing,Supervisor']);
+        ->middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor']);
 });
