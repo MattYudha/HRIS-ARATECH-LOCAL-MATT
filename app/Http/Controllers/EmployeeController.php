@@ -56,8 +56,20 @@ class EmployeeController extends Controller
                             <form action="'.$deleteUrl.'" method="POST" class="d-inline delete-form" data-id="'.$row->id.'">
                                 <input type="hidden" name="_token" value="'.$csrf.'">
                                 <input type="hidden" name="_method" value="DELETE">
-                                <button type="submit" class="btn btn-outline-danger btn-delete">
+                                <button type="submit" class="btn btn-outline-danger btn-delete" title="Delete Employee">
                                     <i class="bi bi-trash"></i>
+                                </button>
+                            </form>
+                        ';
+                    }
+
+                    if ($user->isAdmin()) {
+                        $resetDeviceUrl = route('employees.reset-device', $row->id);
+                        $btns .= '
+                            <form action="'.$resetDeviceUrl.'" method="POST" class="d-inline" data-id="'.$row->id.'">
+                                <input type="hidden" name="_token" value="'.$csrf.'">
+                                <button type="submit" class="btn btn-outline-secondary" title="Reset Device Fingerprint" onclick="return confirm(\'Reset device fingerprint for '.$row->fullname.'?\')">
+                                    <i class="bi bi-phone-vibrate"></i>
                                 </button>
                             </form>
                         ';
@@ -522,5 +534,29 @@ class EmployeeController extends Controller
             return 'mutation';
         }
         return 'adjustment';
+    }
+
+    /**
+     * Reset the user's browser device fingerprints.
+     */
+    public function resetDevice(Request $request, Employee $employee)
+    {
+        // Must be an admin to perform this action
+        if (!auth()->user()->isAdmin()) {
+            abort(403, 'Unauthorized action.');
+        }
+
+        $user = $employee->user;
+
+        if (!$user) {
+            return redirect()->back()->with('error', 'Karyawan ini belum memiliki akun login.');
+        }
+
+        $user->update([
+            'browser_fingerprint_desktop' => null,
+            'browser_fingerprint_mobile' => null
+        ]);
+
+        return redirect()->back()->with('success', 'Perangkat berhasil di-reset. Karyawan dapat meregistrasikan ulang browser mereka saat absen berikutnya.');
     }
 }

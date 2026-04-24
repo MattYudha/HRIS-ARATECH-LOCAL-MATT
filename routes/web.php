@@ -75,6 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
     // Resource routes for employees
+    Route::post('employees/{employee}/reset-device', [EmployeeController::class, 'resetDevice'])->name('employees.reset-device')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::resource('employees', EmployeeController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::post('employees/{employee}/documents', [DocumentController::class, 'store'])->name('employees.documents.store')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('employees.documents.destroy')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);

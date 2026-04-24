@@ -257,11 +257,22 @@
                                 $currentEmployeeId = session('employee_id');
                             @endphp
 
-                            @if($isAdmin || $employee->id == $currentEmployeeId)
-                            <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-primary">
-                                <i class="bi bi-pencil"></i> Edit Employee
-                            </a>
-                            @endif
+                            <div class="d-flex gap-2">
+                                @if($isAdmin)
+                                <form action="{{ route('employees.reset-device', $employee->id) }}" method="POST" class="d-inline">
+                                    @csrf
+                                    <button type="submit" class="btn btn-outline-danger" onclick="return confirm('Apakah Anda yakin ingin mereset pengunci perangkat (Browser Fingerprint) untuk karyawan ini? Karyawan harus mendaftarkan ulang perangkat mereka saat absen berikutnya.')">
+                                        <i class="bi bi-phone-vibrate"></i> Reset Device
+                                    </button>
+                                </form>
+                                @endif
+
+                                @if($isAdmin || $employee->id == $currentEmployeeId)
+                                <a href="{{ route('employees.edit', $employee->id) }}" class="btn btn-primary">
+                                    <i class="bi bi-pencil"></i> Edit Employee
+                                </a>
+                                @endif
+                            </div>
                         </div>
 
                     </div>
