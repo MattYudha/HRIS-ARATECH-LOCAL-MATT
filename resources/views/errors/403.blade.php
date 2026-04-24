@@ -65,12 +65,21 @@
         <div class="logo-box">
             <img src="{{ asset('img/HRIS ARATECH logo tr.png') }}" alt="Logo">
         </div>
-        <div class="error-code">403</div>
-        <h2 class="error-title">Akses Ditolak / Unauthorized</h2>
-        <p class="error-desc">
-            Maaf, akun Anda tidak memiliki izin yang cukup untuk mengakses halaman ini. 
-            Mohon hubungi Master Admin jika Anda merasa ini adalah kesalahan.
-        </p>
+        
+        <div class="mb-3">
+            <i class="bi bi-shield-lock-fill" style="font-size: 5.5rem; filter: drop-shadow(0 10px 15px rgba(245, 54, 92, 0.3)); background: linear-gradient(135deg, #ff7eb3 0%, #ff758c 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent;"></i>
+        </div>
+        
+        <h2 class="error-title">Akses Dibatasi</h2>
+        
+        <div class="error-desc">
+            <p class="mb-2">
+                Halaman ini memuat fitur dan informasi sensitif yang <strong>hanya diperuntukkan bagi pengguna dengan role Administrator</strong>.
+            </p>
+            <p class="mb-0" style="font-size: 0.85rem; opacity: 0.8;">
+                <i class="bi bi-info-circle me-1"></i> Jika Anda merasa seharusnya memiliki akses, silakan hubungi Master Admin.
+            </p>
+        </div>
         <a href="{{ url('/dashboard') }}" class="btn btn-premium">
             <i class="bi bi-house-door me-2"></i> Kembali ke Dashboard
         </a>

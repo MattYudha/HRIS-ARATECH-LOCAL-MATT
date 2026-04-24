@@ -23,7 +23,7 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
 
     // ── 2. Finance Operator Access (Create Transaksi, View Master) ──────────────────
     // Grouping for Manager & Marketing
-    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,' . Roles::FINANCE])->group(function() {
         // Can view master but not CRUD
         Route::get('entities', [FinancialEntityController::class, 'index'])->name('entities.index');
         Route::get('accounts', [FinancialAccountController::class, 'index'])->name('accounts.index');
@@ -35,7 +35,7 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
 
     // ── 3. Finance View Access (Ledger, Reports, Charts) ──────────────────────────
     // For Admin, HR, Manager, Marketing, and Supervisor
-    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor'])->group(function() {
+    Route::middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor,' . Roles::FINANCE])->group(function() {
         Route::get('transactions', [FinancialTransactionController::class, 'index'])->name('transactions.index');
         Route::get('reports', [FinancialReportController::class, 'index'])->name('reports.index');
         Route::get('charts', [FinancialReportController::class, 'charts'])->name('charts.index');
@@ -55,5 +55,5 @@ Route::middleware(['auth', 'verified'])->prefix('finance')->name('finance.')->gr
     // ── 6. Secure Document Download (all roles that can view transactions) ─────────
     Route::get('transactions/{transaction}/document', [FinancialTransactionController::class, 'downloadDocument'])
         ->name('transactions.document')
-        ->middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor']);
+        ->middleware(['role:' . Roles::MASTER_ADMIN . ',' . Roles::HR_ADMINISTRATOR . ',Manager / Unit Head,Marketing,Supervisor,' . Roles::FINANCE]);
 });

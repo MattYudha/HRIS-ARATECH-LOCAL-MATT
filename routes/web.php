@@ -65,7 +65,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('/dashboard/presence', [DashboardController::class, 'presence']);
 
     // Resource routes for departments
-    Route::get('departments/org-chart', [DepartmentController::class, 'orgChart'])->name('departments.org-chart')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::get('departments/org-chart', [DepartmentController::class, 'orgChart'])->name('departments.org-chart');
     Route::resource('departments', DepartmentController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
     // Resource routes for office locations
@@ -75,7 +75,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('roles', RoleController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
     // Resource routes for employees
-    Route::resource('employees', EmployeeController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('employees', EmployeeController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::post('employees/{employee}/documents', [DocumentController::class, 'store'])->name('employees.documents.store')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::delete('documents/{document}', [DocumentController::class, 'destroy'])->name('employees.documents.destroy')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
@@ -86,39 +86,34 @@ Route::middleware(['auth'])->group(function () {
     Route::post('employee-approvals/{id}/reject', [App\Http\Controllers\EmployeeUpdateApprovalController::class, 'reject'])->name('employee-approvals.reject')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
     // Resource routes for tasks
-    Route::resource('tasks', TaskController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::get('tasks/done/{id}', [TaskController::class, 'done'])->name('tasks.done')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::get('tasks/pending/{id}', [TaskController::class, 'pending'])->name('tasks.pending')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('tasks', TaskController::class);
+    Route::get('tasks/done/{id}', [TaskController::class, 'done'])->name('tasks.done');
+    Route::get('tasks/pending/{id}', [TaskController::class, 'pending'])->name('tasks.pending');
     // Routes for task comments
-    Route::post('tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::get('tasks/comments/{comment}/evidence', [TaskCommentController::class, 'evidence'])->name('tasks.comments.evidence')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::delete('tasks/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::post('tasks/{task}/comments', [TaskCommentController::class, 'store'])->name('tasks.comments.store');
+    Route::get('tasks/comments/{comment}/evidence', [TaskCommentController::class, 'evidence'])->name('tasks.comments.evidence');
+    Route::delete('tasks/comments/{comment}', [TaskCommentController::class, 'destroy'])->name('tasks.comments.destroy');
 
     // Resource routes for payroll
     Route::get("payrolls/attendance-data", [PayrollsController::class, "getAttendanceData"])->name("payrolls.attendance-data")->middleware(["role:" . Roles::HR_ADMINISTRATOR . "," . Roles::MASTER_ADMIN]);
     Route::get("payrolls/employee-data", [PayrollsController::class, "getEmployeeData"])->name("payrolls.employee-data")->middleware(["role:" . Roles::HR_ADMINISTRATOR . "," . Roles::MASTER_ADMIN]);
-    Route::resource('payrolls', PayrollsController::class)->only(['index', 'show'])->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('payrolls', PayrollsController::class)->only(['index', 'show']);
     Route::resource('payrolls', PayrollsController::class)->only(['create', 'store', 'edit', 'update', 'destroy'])->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 
     // Additional presence routes (must be defined before resource route to avoid conflicts)
-    Route::get('presences/checkout', [PresencesController::class, 'checkout'])->name('presences.checkout')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::get('presences/checkout', [PresencesController::class, 'checkout'])->name('presences.checkout');
     Route::post('presences/checkout', [PresencesController::class, 'processCheckout'])->name('presences.checkout.process')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee', 'throttle:10,1']);
-    Route::get('presences/calendar', [PresencesController::class, 'calendar'])->name('presences.calendar')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::get('presences/statistics', [PresencesController::class, 'statistics'])->name('presences.statistics')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+        ->middleware(['throttle:10,1']);
+    Route::get('presences/calendar', [PresencesController::class, 'calendar'])->name('presences.calendar');
+    Route::get('presences/statistics', [PresencesController::class, 'statistics'])->name('presences.statistics');
     Route::get('presences/export', [PresencesController::class, 'export'])->name('presences.export')
         ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     
     // Presence routes (accessible to all)
-    Route::get('presences', [PresencesController::class, 'index'])->name('presences.index')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
-    Route::get('presences/create', [PresencesController::class, 'create'])->name('presences.create')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::get('presences', [PresencesController::class, 'index'])->name('presences.index');
+    Route::get('presences/create', [PresencesController::class, 'create'])->name('presences.create');
     Route::post('presences', [PresencesController::class, 'store'])->name('presences.store')
-        ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee', 'throttle:10,1']);
+        ->middleware(['throttle:10,1']);
 
     // Resource routes for presences management (restricted)
     Route::resource('presences', PresencesController::class)
@@ -126,7 +121,7 @@ Route::middleware(['auth'])->group(function () {
         ->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN, 'throttle:10,1']);
     
     // Resource routes for leave requests
-    Route::resource('leave-requests', LeaveRequestController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('leave-requests', LeaveRequestController::class);
     
     Route::get('leave-requests/confirm/{id}', [LeaveRequestController::class, 'confirm'])->name('leave-requests.confirm')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head']);
     Route::get('leave-requests/reject/{id}', [LeaveRequestController::class, 'reject'])->name('leave-requests.reject')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head']);
@@ -141,7 +136,7 @@ Route::middleware(['auth'])->group(function () {
     Route::resource('inventory-usage-logs', InventoryUsageLogController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,inventory_logs']);
 
     // Resource routes for inventory requests
-    Route::resource('inventory-requests', InventoryRequestController::class)->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('inventory-requests', InventoryRequestController::class);
     Route::get('inventory-requests/approve/{id}', [InventoryRequestController::class, 'approve'])->name('inventory-requests.approve')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',inventory']);
     Route::get('inventory-requests/reject/{id}', [InventoryRequestController::class, 'reject'])->name('inventory-requests.reject')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',inventory']);
 
@@ -185,7 +180,7 @@ Route::middleware(['auth'])->group(function () {
     Route::get('signatures/{signable}/{id}/list', [SignatureController::class, 'list'])->name('signatures.list');
     Route::get('signature-logs', [SignatureController::class, 'logs'])->name('signatures.logs');
     Route::post('signatures/{signature}/verify', [SignatureController::class, 'verify'])->name('signatures.verify')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
-    Route::get('signatures/{signature}/download', [SignatureController::class, 'download'])->name('signatures.download')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::get('signatures/{signature}/download', [SignatureController::class, 'download'])->name('signatures.download');
     Route::get('signatures/{signature}/validate', [SignatureController::class, 'validate'])->name('signatures.validate');
 
     // KPI and Reporting routes
@@ -207,7 +202,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('kpi/approve/{id}', [KPIController::class, 'approve'])->name('kpi.approve')->middleware(['role:Manager / Unit Head,' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::post('kpi/reject/{id}', [KPIController::class, 'reject'])->name('kpi.reject')->middleware(['role:Manager / Unit Head,' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     
-    Route::get('reports/monthly-recap', [ReportingController::class, 'monthlyRecap'])->name('reports.monthly-recap')->middleware(['role:Manager / Unit Head,' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Employee']);
+    Route::get('reports/monthly-recap', [ReportingController::class, 'monthlyRecap'])->name('reports.monthly-recap');
     Route::get('reports/executive', [ReportingController::class, 'executiveDashboard'])->name('reports.executive')->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
     Route::get('reports/{id}/export-pdf', [ReportingController::class, 'exportPDF'])->name('reports.export-pdf');
     Route::get('reports/export-csv', [ReportingController::class, 'exportCSV'])->name('reports.export-csv')->middleware(['role:Manager / Unit Head,' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
@@ -220,7 +215,7 @@ Route::middleware(['auth'])->group(function () {
     Route::post('system/backup', [SystemController::class, 'backup'])->name('system.backup')->middleware(['role:' . Roles::MASTER_ADMIN]);
 
     // Resource routes for incidents
-    Route::resource('incidents', IncidentController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update'])->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN . ',Manager / Unit Head,Employee']);
+    Route::resource('incidents', IncidentController::class)->only(['index', 'show', 'create', 'store', 'edit', 'update']);
     Route::resource('incidents', IncidentController::class)->only(['destroy'])->middleware(['role:' . Roles::HR_ADMINISTRATOR . ',' . Roles::MASTER_ADMIN]);
 });
 

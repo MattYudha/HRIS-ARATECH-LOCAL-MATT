@@ -11,17 +11,19 @@ class Roles
     const SUPERVISOR         = 'Supervisor';
     const EMPLOYEE           = 'Employee';
     const MARKETING          = 'Marketing';
+    const FINANCE            = 'Finance';
 
     // Role Groups
     const ADMIN_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR];
 
-    const FINANCE_FULL_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR];
+    const FINANCE_FULL_ROLES = [self::MASTER_ADMIN, self::HR_ADMINISTRATOR, self::FINANCE];
 
     const FINANCE_OPERATOR_ROLES = [
         self::MASTER_ADMIN,
         self::HR_ADMINISTRATOR,
         self::MANAGER_UNIT_HEAD,
         self::MARKETING,
+        self::FINANCE,
     ];
 
     const FINANCE_VIEW_ROLES = [
@@ -30,6 +32,7 @@ class Roles
         self::MANAGER_UNIT_HEAD,
         self::MARKETING,
         self::SUPERVISOR,
+        self::FINANCE,
     ];
 
     const SUPERVISOR_ROLES = [
@@ -46,6 +49,7 @@ class Roles
         self::SUPERVISOR,
         self::EMPLOYEE,
         self::MARKETING,
+        self::FINANCE,
     ];
 
     /**

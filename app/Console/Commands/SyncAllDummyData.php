@@ -51,6 +51,10 @@ class SyncAllDummyData extends Command
                 ['title' => 'Employee'],
                 ['description' => 'Standard Employee with Self Service (ESS) access']
             );
+            $financeRole = Role::firstOrCreate(
+                ['title' => 'Finance'],
+                ['description' => 'Finance Operator and Viewer']
+            );
             $this->info('✓ Professional roles synced');
 
             // 2. Create Departments

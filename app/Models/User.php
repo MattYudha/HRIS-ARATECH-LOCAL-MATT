@@ -90,6 +90,14 @@ class User extends Authenticatable
         return $this->employee?->role?->title === \App\Constants\Roles::MANAGER_UNIT_HEAD;
     }
     
+    /**
+     * Check if user is Finance
+     */
+    public function isFinance(): bool
+    {
+        return $this->employee?->role?->title === \App\Constants\Roles::FINANCE;
+    }
+    
     
     /**
      * Check if user is an admin (HR Administrator or Master Admin)

@@ -217,6 +217,7 @@
                         $isSupervisor = $role === \App\Constants\Roles::SUPERVISOR;
                         $isEmployee = $role === \App\Constants\Roles::EMPLOYEE;
                         $isMarketing = $role === \App\Constants\Roles::MARKETING;
+                        $isFinanceRole = $role === \App\Constants\Roles::FINANCE;
 
                         $isDevOrAdmin = $isAdmin || $isMasterAdmin;
                         $isManagerOrAdmin = $isAdmin || $isMasterAdmin || $isManager;
@@ -423,7 +424,7 @@
                     @endif
 
                     <!-- BUKU KAS & KEUANGAN MODULE (RBAC) -->
-                    @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isSupervisor)
+                    @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isSupervisor || $isFinanceRole)
                     <li class="menu-group expanded">
                         <div class="menu-group-header">
                             <i class="bi bi-wallet2 group-icon"></i>
@@ -431,7 +432,7 @@
                             <i class="bi bi-chevron-right chevron"></i>
                         </div>
                         <ul class="menu-group-items">
-                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isFinanceRole)
                             <li class="sidebar-item {{ $activeFinanceTransactions ? 'active' : '' }}">
                                 <a href="{{ url('/finance/transactions') }}" class="sidebar-link">
                                     <i class="bi bi-pencil-square"></i>
@@ -440,7 +441,7 @@
                             </li>
                             @endif
                             
-                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isFinanceRole)
                             <li class="sidebar-item {{ $activeFinanceEntities ? 'active' : '' }}">
                                 <a href="{{ url('/finance/entities') }}" class="sidebar-link">
                                     <i class="bi bi-building"></i>
@@ -462,7 +463,7 @@
                                 </a>
                             </li>
 
-                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing)
+                            @if($isAdmin || $isMasterAdmin || $isManager || $isMarketing || $isFinanceRole)
                             <li class="sidebar-item {{ $activeFinanceCharts ? 'active' : '' }}">
                                 <a href="{{ url('/finance/charts') }}" class="sidebar-link">
                                     <i class="bi bi-graph-up-arrow"></i>
@@ -514,14 +515,12 @@
                                 </a>
                             </li>
                             @endif
-                            @if($user->hasAccess('inventory_requests') || $isStaff)
                             <li class="sidebar-item {{ $activeInventoryRequests ? 'active' : '' }}">
                                 <a href="{{ url('/inventory-requests') }}" class="sidebar-link">
                                     <i class="bi bi-cart-plus"></i>
                                     <span>Requests</span>
                                 </a>
                             </li>
-                            @endif
                             @if($isMasterAdmin || false || $user->hasAccess('inventory'))
                             <hr class="mx-3 my-1 border-light opacity-25">
                             <li class="sidebar-item {{ $activeVendors ? 'active' : '' }}">
