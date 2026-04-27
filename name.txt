@@ -1,0 +1,25 @@
+fix corevo
+
+jam --- perbaiki absen 
+
+kpi admin input kpi log 
+
+lembur - tidak hadir 
+
+sesi nya masih nyangkut 
+
+middle ware kalau kebanyakan input
+
+log audit trail nya di enable / disable 
+
+buku kas keuangan payroll
+
+payroll di side bar admin 
+
+task , activity log
+
+bersihin data
+
+buuton side bar
+
+late hapus -- presences
